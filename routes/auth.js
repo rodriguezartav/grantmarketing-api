@@ -3,6 +3,7 @@ var router = express.Router();
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
+  return res.send(401);
   return res.json({
     "X-Hasura-User-Id": "25",
     "X-Hasura-Role": "user",
@@ -12,6 +13,8 @@ router.get("/", function (req, res, next) {
 });
 
 router.post("/", function (req, res, next) {
+  return res.send(401);
+
   return res.json({
     "X-Hasura-User-Id": "25",
     "X-Hasura-Role": "user",
