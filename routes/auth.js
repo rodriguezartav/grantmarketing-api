@@ -3,21 +3,18 @@ var router = express.Router();
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
-  return res.send(401);
   return res.json({
     "X-Hasura-User-Id": "25",
-    "X-Hasura-Role": "user",
+    "X-Hasura-Role": "admin",
     "X-Hasura-Is-Owner": "true",
     "X-Hasura-Custom": "custom value",
   });
 });
 
 router.post("/", function (req, res, next) {
-  return res.send(401);
-
   return res.json({
     "X-Hasura-User-Id": "25",
-    "X-Hasura-Role": "user",
+    "X-Hasura-Role": "admin",
     "X-Hasura-Is-Owner": "true",
     "X-Hasura-Custom": "custom value",
   });
