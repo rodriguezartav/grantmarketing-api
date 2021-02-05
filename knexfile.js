@@ -30,8 +30,6 @@ pg.types.setTypeParser(pg.types.builtins.NUMERIC, (value) => {
 
 const parsePgConnStr = require("pg-connection-string").parse;
 
-console.log(process.env.DATABASE_URL);
-
 module.exports = {
   development: {
     client: "pg",
