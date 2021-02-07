@@ -1,0 +1,49 @@
+{
+  "$id": "http://rodcocr.coom/schema/users.json",
+  "title": "Users",
+  "description": "Generated: Mon Apr 27 2020 11:57:21 GMT-0600 (Central Standard Time)",
+  "properties": {
+    "id": {
+      "type": "number",
+      "description": ""
+    },
+    "provider_name": {
+      "type": "string",
+      "description": ""
+    },
+    "customer_id": {
+      "type": "number",
+      "ui_type": "reference",
+      "description": "",
+      "reference": "customers"
+    },
+
+    "auth_token": {
+      "type": "string",
+      "description": ""
+    },
+    "refresh_token": {
+      "type": "string",
+      "description": ""
+    },
+    "external_user_id": {
+      "type": "string",
+      "description": ""
+    },
+    "expiry_date": {
+      "type": "string",
+      "description": ""
+    },
+    "client_id": {
+      "type": "string",
+      "description": ""
+    },
+    "client_secret ": {
+      "type": "string",
+      "description": ""
+    }
+  },
+  "required": ["provider_name"],
+  "type": "object",
+  "additionalProperties": true
+}

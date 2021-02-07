@@ -5,35 +5,47 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-var indexRouter = require("./routes/index");
-var customersRouter = require("./routes/customers");
-var authRouter = require("./routes/auth");
+
 const knex = require("./helpers/knex");
 const cors = require("cors");
+const { makeRouter } = require("./routes/standard");
+const XeroIntegration = require("./routes/integrations/xero");
+const SalesforceIntegration = require("./routes/integrations/salesforce");
+
+const Login = require("./routes/login");
+const Jwt = require("./middleware/jwt");
 
 var app = express();
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "jade");
+app.set("view engine", "ejs");
+app.use(express.static(path.join(__dirname, "public")));
+//
 app.options("*", cors()); // enable pre-flight request for DELETE request
-
-app.use((req, res, next) => {
-  req.knex = knex();
-  return next();
-});
 
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-app.use(cors()); // enable pre-flight request for DELETE request
-app.options("*", cors()); // enable pre-flight request for DELETE request
 
-app.use("/", indexRouter);
-app.use("/customers", customersRouter);
-app.use("/auth", authRouter);
+app.options("*", cors()); // enable pre-flight request for DELETE request
+app.use(cors()); // enable pre-flight request for DELETE request
+
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
+app.get("/connect/:customer_id/:provider", (req, res) => {
+  res.render("connect", { ...req.params, url: process.env.API_URL });
+});
+
+app.use("/integrations/xero", XeroIntegration);
+app.use("/integrations/salesforce", SalesforceIntegration);
+
+app.use("/api/login", Login);
+app.use("/api/schemas", require("./routes/schemas"));
+app.use("/api/:resource", Jwt, makeRouter());
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

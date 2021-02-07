@@ -1,0 +1,36 @@
+{
+  "$id": "http://rodcocr.coom/schema/customers.json",
+  "title": "Customers",
+  "description": "Generated: Mon Apr 27 2020 11:57:21 GMT-0600 (Central Standard Time)",
+  "required": ["name"],
+  "properties": {
+    "id": {
+      "type": "number",
+      "description": ""
+    },
+
+    "name": {
+      "type": "string",
+      "description": ""
+    },
+
+    "state": {
+      "type": "string",
+      "description": ""
+    },
+    "city": {
+      "type": "string",
+      "description": ""
+    },
+    "address": {
+      "type": "string",
+      "description": ""
+    },
+    "phone": {
+      "type": "string",
+      "description": ""
+    }
+  },
+  "type": "object",
+  "additionalProperties": true
+}

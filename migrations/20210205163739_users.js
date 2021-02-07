@@ -6,8 +6,9 @@ exports.up = function (knex, Promise) {
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.timestamp("updated_at").defaultTo(knex.fn.now());
     table.string("name").notNullable();
-    table.string("email");
-    table.string("password");
+    table.integer("customer_id");
+    table.string("phone");
+    table.integer("code");
   });
 };
 

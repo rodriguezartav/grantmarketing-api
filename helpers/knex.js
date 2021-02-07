@@ -9,7 +9,7 @@ function getKnex() {
 
 function prepareKnex() {
   console.log("creating connection");
-  return require("knex")(knexfile[process.env.NODE_ENV || "production"]);
+  return require("knex")(knexfile[process.env.NODE_ENV || "development"]);
 }
 
 module.exports = getKnex;
