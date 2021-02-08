@@ -12,4 +12,11 @@ function prepareKnex() {
   return require("knex")(knexfile[process.env.NODE_ENV || "development"]);
 }
 
+
+function prepareKnex() {
+  console.log("creating connection");
+  return getKnex().destroy();
+}
+
+
 module.exports = getKnex;

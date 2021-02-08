@@ -44,6 +44,9 @@ async function Refresh() {
       })
       .where("id", integration.id);
   } catch (e) {}
+  finally{
+    Knex().destroy();
+  }
 }
 
 Refresh();

@@ -36,6 +36,8 @@ async function Refresh() {
     res.render("connected");
   } catch (e) {
     return next(e);
+  }finally{
+    Knex().destroy();
   }
 }
 
