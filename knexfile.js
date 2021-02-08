@@ -60,8 +60,8 @@ module.exports = {
         },
         keepAlive: true,
       },
-      
-      
+      max: 15,
+      ssl: true,
     },
   },
 };
