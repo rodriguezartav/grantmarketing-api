@@ -52,16 +52,7 @@ module.exports = {
     pool: { min: 1, max: 8 },
     connection: {
       ...parsePgConnStr(process.env.DATABASE_URL || ""),
-      dialectOptions: {
-        ssl: {
-          require: true,
-          // Ref.: https://github.com/brianc/node-postgres/issues/2009
-          rejectUnauthorized: false,
-        },
-        keepAlive: true,
-      },
-      max: 15,
-      ssl: true,
+     
     },
   },
 };
