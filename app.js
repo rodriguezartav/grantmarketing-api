@@ -65,7 +65,7 @@ app.use(function (err, req, res, next) {
     return res.send(err.message);
   }
     
-  else res.render("error",err);
+  else res.render("error",{stack:err.stack || "", message:err.message});
 });
 
 module.exports = app;
