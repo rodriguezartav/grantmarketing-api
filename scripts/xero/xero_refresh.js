@@ -7,8 +7,9 @@ const request = require("superagent");
 const jwt_decode = require("jwt-decode");
 
 async function Refresh() {
+  var integration;
   try {
-    const integration = await Knex()
+     integration = await Knex()
       .table("integrations")
       .select()
       .where("provider_name", "xero")
@@ -31,10 +32,7 @@ async function Refresh() {
       .type("form")
       .set("Authorization", "Basic " + base64data);
 
-    let identityRes = await request
-      .get("https://api.xero.com/connections")
-      .set("Authorization", `Bearer ${response.body.access_token}`);
-
+   
     await Knex()
       .table("integrations")
       .update({
@@ -43,7 +41,16 @@ async function Refresh() {
         expiry_date: moment().add(1500, "seconds"),
       })
       .where("id", integration.id);
-  } catch (e) {}
+  } catch (e) {
+    await Knex()
+      .table("integrations")
+      .update({
+        auth_token: "",
+        refresh_token: "",
+        expiry_date: null,
+      })
+      .where("id", integration.id);
+  }
   finally{
     Knex().destroy();
   }

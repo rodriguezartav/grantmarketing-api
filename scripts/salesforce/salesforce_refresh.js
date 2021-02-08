@@ -3,8 +3,10 @@ const moment = require("moment");
 const request = require("superagent");
 
 async function Refresh() {
+  var integration;
+
   try {
-    const integration = await Knex()
+      integration = await Knex()
       .table("integrations")
       .select()
       .where("provider_name", "salesforce")
@@ -33,9 +35,15 @@ async function Refresh() {
       })
       .where("id", integration.id);
 
-    res.render("connected");
-  } catch (e) {
-    return next(e);
+   } catch (e) {
+    await Knex()
+    .table("integrations")
+    .update({
+      auth_token: "",
+      refresh_token: "",
+      expiry_date: null,
+    })
+    .where("id", integration.id);
   }finally{
     Knex().destroy();
   }
