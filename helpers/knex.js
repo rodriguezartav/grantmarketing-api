@@ -13,10 +13,7 @@ function prepareKnex() {
 }
 
 
-function prepareKnex() {
-  console.log("creating connection");
-  return getKnex().destroy();
-}
+ 
 
 
 module.exports = getKnex;
