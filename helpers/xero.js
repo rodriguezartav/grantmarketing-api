@@ -1,20 +1,16 @@
 const { XeroClient } = require("xero-node");
 const { promisify } = require("util");
-const redis = require("redis");
+const Knex = require("../helpers/knex");
 const { IS_DEV_TEST } = require("./booleans");
-let client;
-let getAsync;
-if (!IS_DEV_TEST) {
-  client = redis.createClient(process.env.REDIS_URL);
-  getAsync = promisify(client.get).bind(client);
-}
+ 
 
 async function loadXero() {
   //TODO REMOVE
+  
 }
 
-async function getToken() {
-  const redisTokens = await getAsync("xero_token");
+async function getToken(customer_id) {
+  const redisTokens = await Knex().table("integrations").where("provider_name","xero").where("customer_id",customer_id)
   var tokens = JSON.parse(redisTokens);
   return tokens;
 }

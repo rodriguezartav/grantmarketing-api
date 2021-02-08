@@ -5,7 +5,7 @@ const moment = require("moment");
 
 require("dotenv").config();
 
-const Knex = require("../helpers/knex");
+const Knex = require("./helpers/knex");
 
 const knex = Knex();
 
