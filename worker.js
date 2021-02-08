@@ -7,9 +7,10 @@ require("dotenv").config();
 
 const Knex = require("./helpers/knex");
 
-const knex = Knex();
 
 setInterval(async () => {
+  const knex = Knex();
+
   let jobs = await knex
     .table("jobs")
     .select(
@@ -58,6 +59,8 @@ setInterval(async () => {
 }, 60000);
 
 setInterval(async () => {
+  const knex = Knex();
+
   let schedules = await knex.table("schedules").select();
   for (let index = 0; index < schedules.length; index++) {
     const schedule = schedules[index];

@@ -49,7 +49,7 @@ module.exports = {
   },
   production: {
     client: "pg",
-    pool: { min: 1, max: 15 },
+    pool: { min: 1, max: 8 },
     connection: {
       ...parsePgConnStr(process.env.DATABASE_URL || ""),
       dialectOptions: {
