@@ -15,9 +15,8 @@ module.exports = class LoginService {
     var user = await this.getOne("admins", { phone: phone });
     if (user) {
       let code = parseInt(Math.random() * 100000);
-      if (IS_DEV_TEST) code = 24; // sets code for predictable login in testing/development
       await this.update("admins", { code: code }, { phone: phone });
-      if (!IS_DEV_TEST) {
+      
         //Sends email if it's not testing/developing
 
         const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -31,7 +30,6 @@ module.exports = class LoginService {
             to: phone,
           })
           .then((message) => console.log(message.sid));
-      }
     }
     return user;
   }

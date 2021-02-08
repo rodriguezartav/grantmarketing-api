@@ -60,7 +60,12 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render("error");
+  if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+    console.log(err.stack)
+    return res.send(err.message);
+  }
+    
+  else res.render("error",err);
 });
 
 module.exports = app;
