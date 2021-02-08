@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.options("*", cors()); // enable pre-flight request for DELETE request
-app.use(cors()); // enable pre-flight request for DELETE request
+app.use("*",cors()); // enable pre-flight request for DELETE request
 
 app.get("/", (req, res) => {
   res.render("index");
@@ -40,12 +40,12 @@ app.get("/connect/:customer_id/:provider", (req, res) => {
   res.render("connect", { ...req.params, url: process.env.API_URL });
 });
 
-app.use("/integrations/xero", XeroIntegration);
-app.use("/integrations/salesforce", SalesforceIntegration);
+app.use("/integrations/xero", cors(),XeroIntegration);
+app.use("/integrations/salesforce",cors(), SalesforceIntegration);
 
-app.use("/api/login", Login);
-app.use("/api/schemas", require("./routes/schemas"));
-app.use("/api/:resource", Jwt, makeRouter());
+app.use("/api/login",cors(), Login);
+app.use("/api/schemas", cors(),require("./routes/schemas"));
+app.use("/api/:resource", cors(),Jwt, makeRouter());
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
