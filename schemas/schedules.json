@@ -23,6 +23,12 @@
       "description": "",
       "reference": "customers"
     },
+    "admin_id": {
+      "type": "number",
+      "ui_type": "reference",
+      "description": "",
+      "reference": "admins"
+    },
 
     "period_in_minutes": {
       "type": "number",

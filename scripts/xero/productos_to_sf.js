@@ -47,5 +47,5 @@ function getGrupo(name) {
 try {
   Run(parseInt(process.argv[2].replace("customer_id=", "")));
 } catch (e) {
-  console.log(e);
+  console.error(e);
 }

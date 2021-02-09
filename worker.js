@@ -2,11 +2,10 @@ const util = require("util");
 const { setInterval } = require("timers");
 const execFile = util.promisify(require("child_process").execFile);
 const moment = require("moment");
-
+const sms = require("./helpers/sms");
 require("dotenv").config();
 
 const Knex = require("./helpers/knex");
-
 
 setInterval(async () => {
   const knex = Knex();
@@ -29,24 +28,30 @@ setInterval(async () => {
     await knex.table("jobs").update({ status: "working" }).where("id", job.id);
 
     try {
-      const { stdout } = await execFile("node", [
+      const { stdout, stderr, error } = await execFile("node", [
         `./scripts/${job.script_location}/${job.script_name}.js`,
         "customer_id=" + job.customer_id,
       ]);
+
       await knex.table("jobs").delete().where("id", job.id);
-
-      await knex.table("script_logs").insert({
-        script_id: job.script_id,
-        job_id: job.id,
-        log: { stdout: stdout },
-      });
-
+      if (error || stderr) {
+        await knex.table("script_logs").insert({
+          script_id: job.script_id,
+          job_id: job.id,
+          log: {
+            stderr: stderr || "",
+            error: { stack: error.stack, message: err.stack } || {},
+          },
+        });
+        throw err || stderr;
+      }
       await knex
         .table("schedules")
         .update({ last_run: moment() })
         .where("id", job.schedule_id);
     } catch (e) {
       console.log(e);
+
       await knex
         .table("jobs")
         .update({
