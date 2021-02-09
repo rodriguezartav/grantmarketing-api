@@ -17,7 +17,7 @@ async function Run(customer_id) {
       .post("https://login.salesforce.com//services/oauth2/token")
       .send({
         grant_type: "refresh_token",
-        refresh_token: salesforce_refresh_token,
+        refresh_token: integration.refresh_token,
         client_id: integration.client_id,
         client_secret: integration.client_secret,
       })
