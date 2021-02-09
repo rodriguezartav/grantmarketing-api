@@ -24,7 +24,7 @@ async function Run(customer_id) {
       .post("https://identity.xero.com/connect/token")
       .send({
         grant_type: "refresh_token",
-        refresh_token: xero_refresh_token,
+        refresh_token: integration.refresh_token,
       })
       .type("form")
       .set("Authorization", "Basic " + base64data);
