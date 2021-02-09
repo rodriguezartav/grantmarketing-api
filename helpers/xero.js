@@ -2,30 +2,27 @@ const { XeroClient } = require("xero-node");
 const { promisify } = require("util");
 const Knex = require("../helpers/knex");
 const { IS_DEV_TEST } = require("./booleans");
- 
 
 async function loadXero() {
   //TODO REMOVE
-  
 }
 
 async function getToken(customer_id) {
-  const redisTokens = await Knex().table("integrations").where("provider_name","xero").where("customer_id",customer_id)
-  var tokens = JSON.parse(redisTokens);
-  return tokens;
+  return await Knex()
+    .table("integrations")
+    .where("provider_name", "xero")
+    .where("customer_id", customer_id)
+    .first();
 }
 
-async function xeroApi(method, ...rest) {
-  if (IS_DEV_TEST) return Promise.resolve({});
-
+async function xeroApi(customer_id, method, ...rest) {
   let xero = new XeroClient({});
   try {
-    const redisTokens = await getAsync("xero_token");
-    var tokens = JSON.parse(redisTokens);
-    const tokenSet = tokens.token;
-    await xero.setTokenSet(tokenSet);
+    const integration = await getToken(customer_id);
+
+    await xero.setTokenSet({ access_token: integration.auth_token });
     var response = await xero.accountingApi[method].apply(xero.accountingApi, [
-      tokens.tenant.tenantId,
+      integration.application_id,
       ...rest,
     ]);
 
@@ -69,7 +66,6 @@ Type:"QueryParseException"
 */
 
 module.exports = {
-  redis: client,
   loadXero,
   getToken,
   xeroApi,

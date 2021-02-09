@@ -6,17 +6,14 @@ const moment = require("moment");
 const request = require("superagent");
 const jwt_decode = require("jwt-decode");
 
-async function Refresh() {
+async function Run(customer_id) {
   var integration;
   try {
-     integration = await Knex()
+    integration = await Knex()
       .table("integrations")
       .select()
       .where("provider_name", "xero")
-      .where(
-        "customer_id",
-        parseInt(process.env.argv[2].replace("customer_id=", ""))
-      )
+      .where("customer_id", customer_id)
       .first();
 
     let data = integration.client_id + ":" + integration.client_secret;
@@ -32,7 +29,6 @@ async function Refresh() {
       .type("form")
       .set("Authorization", "Basic " + base64data);
 
-   
     await Knex()
       .table("integrations")
       .update({
@@ -42,6 +38,7 @@ async function Refresh() {
       })
       .where("id", integration.id);
   } catch (e) {
+    console.log(e);
     await Knex()
       .table("integrations")
       .update({
@@ -50,10 +47,12 @@ async function Refresh() {
         expiry_date: null,
       })
       .where("id", integration.id);
-  }
-  finally{
+  } finally {
     Knex().destroy();
   }
 }
-
-Refresh();
+try {
+  Run(parseInt(process.argv[2].replace("customer_id=", "")));
+} catch (e) {
+  console.log(e);
+}
