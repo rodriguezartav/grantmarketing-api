@@ -1,5 +1,4 @@
 const util = require("util");
-const { setInterval } = require("timers");
 const execFile = util.promisify(require("child_process").execFile);
 const moment = require("moment");
 const sms = require("./helpers/sms");
