@@ -15,7 +15,7 @@ const SalesforceIntegration = require("./routes/integrations/salesforce");
 const Login = require("./routes/login");
 const Jwt = require("./middleware/jwt");
 
-if (process.env.NODE_ENV == "production") require("./worker/process0");
+if (process.env.NODE_ENV == "production") require("./workers/process0");
 
 var app = express();
 
