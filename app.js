@@ -15,6 +15,8 @@ const SalesforceIntegration = require("./routes/integrations/salesforce");
 const Login = require("./routes/login");
 const Jwt = require("./middleware/jwt");
 
+const worker = require("./worker");
+
 var app = express();
 
 // view engine setup
@@ -30,7 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.options("*", cors()); // enable pre-flight request for DELETE request
-app.use("*",cors()); // enable pre-flight request for DELETE request
+app.use("*", cors()); // enable pre-flight request for DELETE request
 
 app.get("/", (req, res) => {
   res.render("index");
@@ -40,12 +42,12 @@ app.get("/connect/:customer_id/:provider", (req, res) => {
   res.render("connect", { ...req.params, url: process.env.API_URL });
 });
 
-app.use("/integrations/xero", cors(),XeroIntegration);
-app.use("/integrations/salesforce",cors(), SalesforceIntegration);
+app.use("/integrations/xero", cors(), XeroIntegration);
+app.use("/integrations/salesforce", cors(), SalesforceIntegration);
 
-app.use("/api/login",cors(), Login);
-app.use("/api/schemas", cors(),require("./routes/schemas"));
-app.use("/api/:resource", cors(),Jwt, makeRouter());
+app.use("/api/login", cors(), Login);
+app.use("/api/schemas", cors(), require("./routes/schemas"));
+app.use("/api/:resource", cors(), Jwt, makeRouter());
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -60,12 +62,10 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-    console.log(err.stack)
+  if (req.xhr || req.headers.accept.indexOf("json") > -1) {
+    console.log(err.stack);
     return res.send(err.message);
-  }
-    
-  else res.render("error",{stack:err.stack || "", message:err.message});
+  } else res.render("error", { stack: err.stack || "", message: err.message });
 });
 
 module.exports = app;
