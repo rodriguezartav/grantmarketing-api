@@ -51,8 +51,13 @@ async function Run(customer_id) {
     Knex().destroy();
   }
 }
-try {
-  Run(parseInt(process.argv[2].replace("customer_id=", "")));
-} catch (e) {
-  console.error(e);
-}
+
+(async function () {
+  try {
+    await Run(parseInt(process.argv[2].replace("customer_id=", "")));
+    process.exit(0);
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
+})();

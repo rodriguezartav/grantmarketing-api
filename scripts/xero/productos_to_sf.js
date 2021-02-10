@@ -20,6 +20,8 @@ async function Run(customer_id) {
   taxRatesResponse.taxRates.forEach((item) => {
     rates[item.taxType] = parseFloat(item.taxComponents[0].rate);
   });
+
+  console.log(rates);
 }
 
 function getMarca(name) {
@@ -34,10 +36,12 @@ function getGrupo(name) {
   return name.split(":")[1] || "Otro";
 }
 
-try {
-  Run(parseInt(process.argv[2].replace("customer_id=", "")));
-  process.exit(0);
-} catch (e) {
-  console.error(e);
-  process.exit(1);
-}
+(async function () {
+  try {
+    await Run(parseInt(process.argv[2].replace("customer_id=", "")));
+    process.exit(0);
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
+})();
