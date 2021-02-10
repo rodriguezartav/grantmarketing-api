@@ -42,6 +42,7 @@ function getGrupo(name) {
     process.exit(0);
   } catch (e) {
     console.error(e);
+    await Knex().destroy();
     process.exit(1);
   }
 })();

@@ -41,8 +41,6 @@ async function Run(customer_id) {
         expiry_date: null,
       })
       .where("id", integration.id);
-  } finally {
-    Knex().destroy();
   }
 }
 
@@ -52,6 +50,7 @@ async function Run(customer_id) {
     process.exit(0);
   } catch (e) {
     console.error(e);
+    Knex().destroy();
     process.exit(1);
   }
 })();
