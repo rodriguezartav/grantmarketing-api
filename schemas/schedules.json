@@ -7,10 +7,7 @@
       "type": "number",
       "description": ""
     },
-    "name": {
-      "type": "string",
-      "description": ""
-    },
+
     "customer_id": {
       "type": "number",
       "ui_type": "reference",
@@ -21,7 +18,7 @@
       "type": "number",
       "ui_type": "reference",
       "description": "",
-      "reference": "customers"
+      "reference": "scripts"
     },
     "admin_id": {
       "type": "number",

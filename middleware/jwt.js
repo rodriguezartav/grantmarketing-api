@@ -17,7 +17,7 @@ var JWTMiddleware = function (req, res, next) {
   )
     return next({ status: 403, message: "Token is expired" });
   req.user = decodedToken;
-  console.log("user", req.user);
+
   next();
 };
 

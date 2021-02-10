@@ -13,23 +13,13 @@ let knex;
 async function Run(customer_id) {
   var trx;
 
-  try {
-    const itemsGetResponse = await xeroApi(customer_id, "getItems");
+  const itemsGetResponse = await xeroApi(customer_id, "getItems");
 
-    const taxRatesResponse = await xeroApi(customer_id, "getTaxRates");
-    const rates = {};
-    taxRatesResponse.taxRates.forEach((item) => {
-      rates[item.taxType] = parseFloat(item.taxComponents[0].rate);
-    });
-
-    console.log(rates);
-  } catch (e) {
-    console.log(e);
-    throw e;
-  } finally {
-    Knex().destroy();
-    process.exit(0);
-  }
+  const taxRatesResponse = await xeroApi(customer_id, "getTaxRates");
+  const rates = {};
+  taxRatesResponse.taxRates.forEach((item) => {
+    rates[item.taxType] = parseFloat(item.taxComponents[0].rate);
+  });
 }
 
 function getMarca(name) {
@@ -46,6 +36,8 @@ function getGrupo(name) {
 
 try {
   Run(parseInt(process.argv[2].replace("customer_id=", "")));
+  process.exit(0);
 } catch (e) {
   console.error(e);
+  process.exit(1);
 }
