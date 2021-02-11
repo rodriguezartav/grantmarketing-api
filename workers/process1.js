@@ -39,7 +39,7 @@ setInterval(async () => {
 
       await knex.table("executions").insert({
         schedule_id: job.schedule_id,
-        status: error ? 1 : 0,
+        result: error ? 1 : 0,
       });
 
       await knex.table("jobs").delete().where("id", job.id);
