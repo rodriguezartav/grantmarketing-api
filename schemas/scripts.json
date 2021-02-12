@@ -20,7 +20,7 @@
       "description": ""
     }
   },
-  "required": [],
+  "list": ["name", "location"],
   "type": "object",
   "additionalProperties": true
 }

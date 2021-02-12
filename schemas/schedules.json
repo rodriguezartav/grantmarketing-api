@@ -39,6 +39,14 @@
     }
   },
   "required": [],
+  "list": [
+    "admin_id",
+    "customer_id",
+    "script_id",
+    "period_in_minutes",
+    "last_run"
+  ],
+
   "type": "object",
   "additionalProperties": true
 }

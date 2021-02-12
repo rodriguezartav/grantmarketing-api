@@ -16,6 +16,7 @@ const Login = require("./routes/login");
 const Jwt = require("./middleware/jwt");
 
 if (process.env.NODE_ENV == "production") require("./workers/process0");
+if (process.env.NODE_ENV == "production") require("./integrations/worker");
 
 var app = express();
 

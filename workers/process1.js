@@ -1,8 +1,8 @@
+require("dotenv").config();
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 const moment = require("moment");
 const sms = require("../helpers/sms");
-require("dotenv").config();
 
 const Knex = require("../helpers/knex");
 
@@ -32,9 +32,20 @@ setInterval(async () => {
         .update({ status: "working" })
         .where("id", job.id);
 
+      const integrations = await knex
+        .table("integrations")
+        .select()
+        .where({ customer_id: job.customer_id });
+
+      let integrationMap = {};
+      integrations.forEach(
+        (item) => (integrationMap[item.providerName] = item)
+      );
+
       const { stdout, stderr, error } = await execFile("node", [
         `./scripts/${job.script_location}/${job.script_name}.js`,
-        "customer_id=" + job.customer_id,
+        JSON.stringify(integrationMap),
+        job.customer_id,
       ]);
 
       await knex.table("executions").insert({

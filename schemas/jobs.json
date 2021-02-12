@@ -33,7 +33,7 @@
       "description": ""
     }
   },
-  "required": [],
+  "list": ["name", "customer_id", "script_id", "status", "result"],
   "type": "object",
   "additionalProperties": true
 }

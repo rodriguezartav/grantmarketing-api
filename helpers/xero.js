@@ -7,19 +7,9 @@ async function loadXero() {
   //TODO REMOVE
 }
 
-async function getToken(customer_id) {
-  return await Knex()
-    .table("integrations")
-    .where("provider_name", "xero")
-    .where("customer_id", customer_id)
-    .first();
-}
-
-async function xeroApi(customer_id, method, ...rest) {
+async function xeroApi(integration, method, ...rest) {
   let xero = new XeroClient({});
   try {
-    const integration = await getToken(customer_id);
-
     await xero.setTokenSet({ access_token: integration.auth_token });
     var response = await xero.accountingApi[method].apply(xero.accountingApi, [
       integration.application_id,

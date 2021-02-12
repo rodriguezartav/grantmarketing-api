@@ -1,8 +1,5 @@
-const util = require("util");
-const execFile = util.promisify(require("child_process").execFile);
-const moment = require("moment");
-const sms = require("../helpers/sms");
 require("dotenv").config();
+const moment = require("moment");
 
 const Knex = require("../helpers/knex");
 

@@ -1,33 +1,18 @@
-var express = require("express");
-var router = express.Router();
-const JWT = require("../../helpers/jwt");
 const Knex = require("../../helpers/knex");
 const moment = require("moment");
 const request = require("superagent");
-const jwt_decode = require("jwt-decode");
 
-async function Run(customer_id) {
-  var integration;
+async function Run(integration) {
   try {
-    integration = await Knex()
-      .table("integrations")
-      .select()
-      .where("provider_name", "xero")
-      .where("customer_id", customer_id)
-      .first();
-
-    let data = integration.client_id + ":" + integration.client_secret;
-    let buff = Buffer.from(data);
-    let base64data = buff.toString("base64");
-
     let response = await request
-      .post("https://identity.xero.com/connect/token")
+      .post("https://login.salesforce.com//services/oauth2/token")
       .send({
         grant_type: "refresh_token",
         refresh_token: integration.refresh_token,
+        client_id: integration.client_id,
+        client_secret: integration.client_secret,
       })
-      .type("form")
-      .set("Authorization", "Basic " + base64data);
+      .type("form");
 
     await Knex()
       .table("integrations")
@@ -47,17 +32,16 @@ async function Run(customer_id) {
         expiry_date: null,
       })
       .where("id", integration.id);
-    throw e;
   }
 }
 
 (async function () {
   try {
-    await Run(parseInt(process.argv[2].replace("customer_id=", "")));
+    await Run(JSON.parse(process.argv[2]));
     process.exit(0);
   } catch (e) {
     console.error(e);
-    await Knex().destroy();
+    Knex().destroy();
     process.exit(1);
   }
 })();

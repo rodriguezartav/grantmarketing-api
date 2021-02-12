@@ -1,8 +1,8 @@
 require("dotenv").config();
-const Knex = require("../../helpers/knex");
 
 const SfHelper = require("../../helpers/sf");
 const { xeroApi, redis } = require("../../helpers/xero");
+const Knex = require("../../helpers/knex_pg");
 
 const { sfConn, bulk } = SfHelper;
 
@@ -10,18 +10,39 @@ const moment = require("moment");
 const util = require("util");
 let knex;
 
-async function Run(customer_id) {
+async function Run(integrationMap, customer_id) {
   var trx;
 
-  const itemsGetResponse = await xeroApi(customer_id, "getItems");
+  const itemsGetResponse = await xeroApi(integrationMap["xero"], "getItems");
 
-  const taxRatesResponse = await xeroApi(customer_id, "getTaxRates");
+  const taxRatesResponse = await xeroApi(integrationMap["xero"], "getTaxRates");
   const rates = {};
   taxRatesResponse.taxRates.forEach((item) => {
     rates[item.taxType] = parseFloat(item.taxComponents[0].rate);
   });
 
-  console.log(rates);
+  const conn = await sfConn(integrationMap["salesforce"]);
+
+  // knex = await getKnex();
+  //trx = await knex.transaction();
+  //
+  const items = itemsGetResponse.items.map((item) => {
+    var productSql = {
+      codigo__c: item.code,
+      name: item.name,
+      inventario__c: item.quantityOnHand,
+      tax_code__c: rates[item.salesDetails.taxType] || 13,
+      costo__c: item.purchaseDetails.unitPrice,
+      marca__c: getMarca(item.description),
+      grupo__c: getGrupo(item.description),
+      external_id__c: item.itemID,
+      descripcion__c: item.description,
+    };
+
+    return productSql;
+  });
+
+  await bulk(conn, "producto__c", "upsert", "external_id__c", items);
 }
 
 function getMarca(name) {
@@ -38,7 +59,7 @@ function getGrupo(name) {
 
 (async function () {
   try {
-    await Run(parseInt(process.argv[2].replace("customer_id=", "")));
+    await Run(JSON.parse(process.argv[2]), parseInt(process.argv[3]));
     process.exit(0);
   } catch (e) {
     console.error(e);

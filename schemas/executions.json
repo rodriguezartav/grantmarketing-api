@@ -20,7 +20,7 @@
       "description": ""
     }
   },
-  "required": [],
+  "list": ["schedule_id", "status"],
   "type": "object",
   "additionalProperties": true
 }

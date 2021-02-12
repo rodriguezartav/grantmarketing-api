@@ -18,6 +18,8 @@
     }
   },
   "required": ["name", "phone"],
+  "list": ["name", "phone"],
+
   "type": "object",
   "additionalProperties": true
 }

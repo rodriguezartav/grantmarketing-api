@@ -9,7 +9,8 @@
     },
     "provider_name": {
       "type": "string",
-      "description": ""
+      "description": "",
+      "options": ["salesforce", "xero", "postgres"]
     },
     "customer_id": {
       "type": "number",
@@ -44,6 +45,7 @@
     }
   },
   "required": ["provider_name"],
+  "list": ["provider_name", "customer_id", "expiry_date"],
   "type": "object",
   "additionalProperties": true
 }
