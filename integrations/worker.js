@@ -18,10 +18,10 @@ setInterval(async () => {
     console.log(integrations);
 
     for (let index = 0; index < integrations.length; index++) {
-      const integraton = integrations[index];
+      const integration = integrations[index];
 
       const { stdout, stderr, error } = await execFile("node", [
-        `./integrations/${integraton.name}_refresh.js`,
+        `./integrations/${integration.name}_refresh.js`,
         JSON.stringify(integration),
       ]);
 
