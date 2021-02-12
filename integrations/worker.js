@@ -21,7 +21,7 @@ setInterval(async () => {
       const integration = integrations[index];
 
       const { stdout, stderr, error } = await execFile("node", [
-        `./integrations/${integration.name}_refresh.js`,
+        `./integrations/${integration.provider_name}_refresh.js`,
         JSON.stringify(integration),
       ]);
 
