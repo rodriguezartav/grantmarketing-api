@@ -1,4 +1,4 @@
-const Knex = require("../../helpers/knex");
+const Knex = require("../helpers/knex");
 const moment = require("moment");
 const request = require("superagent");
 
