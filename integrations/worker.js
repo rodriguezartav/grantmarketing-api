@@ -23,6 +23,8 @@ setInterval(async () => {
         `./integrations/${integraton.name}_refresh.js`,
         JSON.stringify(integration),
       ]);
+
+      console.log(stdout, stderr, error);
     }
   } catch (e) {
     console.error("CRITICAL_ERROR");
