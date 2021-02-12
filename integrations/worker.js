@@ -15,8 +15,6 @@ setInterval(async () => {
       .whereNotNull("refresh_token")
       .where("expiry_date", "<", moment());
 
-    console.log(integrations);
-
     for (let index = 0; index < integrations.length; index++) {
       const integration = integrations[index];
 
