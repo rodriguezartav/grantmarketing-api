@@ -2,7 +2,6 @@ require("dotenv").config();
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 const moment = require("moment");
-const sms = require("../helpers/sms");
 
 const Knex = require("../helpers/knex");
 
@@ -14,7 +13,7 @@ setInterval(async () => {
       .table("integrations")
       .select()
       .whereNotNull("refresh_token")
-      .where("expiry_date", ">", moment());
+      .where("expiry_date", "<", moment());
 
     console.log(integrations);
 
