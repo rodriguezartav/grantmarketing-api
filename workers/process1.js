@@ -39,7 +39,7 @@ setInterval(async () => {
 
       let integrationMap = {};
       integrations.forEach(
-        (item) => (integrationMap[item.providerName] = item)
+        (item) => (integrationMap[item.provider_name] = item)
       );
 
       const { stdout, stderr, error } = await execFile("node", [
