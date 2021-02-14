@@ -57,7 +57,6 @@ Type:"QueryParseException"
 
 module.exports = {
   loadXero,
-  getToken,
   xeroApi,
   parseSingleError,
 };
