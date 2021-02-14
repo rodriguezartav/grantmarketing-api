@@ -42,11 +42,15 @@ setInterval(async () => {
         (item) => (integrationMap[item.provider_name] = item)
       );
 
-      const { stdout, stderr, error } = await execFile("node", [
-        `./scripts/${job.script_location}/${job.script_name}.js`,
-        JSON.stringify(integrationMap),
-        job.customer_id,
-      ]);
+      try {
+        let { stdout, stderr, error } = await execFile("node", [
+          `./scripts/${job.script_location}/${job.script_name}.js`,
+          JSON.stringify(integrationMap),
+          job.customer_id,
+        ]);
+      } catch (e) {
+        error = e;
+      }
 
       await knex.table("executions").insert({
         schedule_id: job.schedule_id,
@@ -74,6 +78,7 @@ setInterval(async () => {
   } catch (e) {
     console.error("CRITICAL_ERROR");
     console.error(e);
+
     throw e;
   }
 }, 6000);
