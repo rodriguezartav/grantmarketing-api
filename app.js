@@ -6,11 +6,12 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
-const knex = require("./helpers/knex");
 const cors = require("cors");
 const { makeRouter } = require("./routes/standard");
 const XeroIntegration = require("./routes/integrations/xero");
 const SalesforceIntegration = require("./routes/integrations/salesforce");
+
+const GoogleIntegration = require("./routes/integrations/google");
 
 const Login = require("./routes/login");
 const Jwt = require("./middleware/jwt");
@@ -45,6 +46,7 @@ app.get("/connect/:customer_id/:provider", (req, res) => {
 
 app.use("/integrations/xero", cors(), XeroIntegration);
 app.use("/integrations/salesforce", cors(), SalesforceIntegration);
+app.use("/integrations/google", cors(), GoogleIntegration);
 
 app.use("/api/login", cors(), Login);
 app.use("/api/schemas", cors(), require("./routes/schemas"));
