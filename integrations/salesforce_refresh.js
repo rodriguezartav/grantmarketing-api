@@ -32,6 +32,7 @@ async function Run(integration) {
         expiry_date: null,
       })
       .where("id", integration.id);
+    throw e;
   }
 }
 
