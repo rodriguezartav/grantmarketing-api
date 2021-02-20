@@ -10,17 +10,26 @@
 
     "schedule_id": {
       "type": "number",
-      "ui_type": "reference",
+      "ui_type": "deep_reference",
       "description": "",
-      "reference": "schedules"
+      "reference": "schedules",
+      "source": "name",
+      "sub_reference": "scripts"
     },
 
-    "status": {
+    "result": {
       "type": "number",
+      "ui_type": "number",
+      "description": ""
+    },
+
+    "created_at": {
+      "type": "string",
+      "ui_type": "datetime",
       "description": ""
     }
   },
-  "list": ["schedule_id", "status"],
+  "list": ["id", "schedule_id", "result", "created_at"],
   "type": "object",
   "additionalProperties": true
 }
