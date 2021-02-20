@@ -4,6 +4,7 @@ const request = require("superagent");
 
 async function Run(integration) {
   try {
+    n;
     let response = await request
       .post("https://oauth2.googleapis.com/token")
       .send({
@@ -12,6 +13,8 @@ async function Run(integration) {
         client_id: integration.client_id,
         client_secret: integration.client_secret,
       });
+
+    console.log(response.body);
 
     await Knex()
       .table("integrations")
