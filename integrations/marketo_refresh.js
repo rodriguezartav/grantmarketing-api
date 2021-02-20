@@ -4,28 +4,20 @@ const request = require("superagent");
 
 async function Run(integration) {
   try {
-    let response = await request
-      .post("https://oauth2.googleapis.com/token")
-      .form()
-      .send({
-        grant_type: "refresh_token",
-        refresh_token: integration.refresh_token,
-        client_id: integration.client_id,
-        client_secret: integration.client_secret,
-      })
-      .type("form");
+    const oauthRes = await superagent.get(
+      `${integration.application_id}/oauth/token?grant_type=client_credentials&client_id=${integration.client_id}&client_secret=${integration.client_secret}`
+    );
 
     await Knex()
       .table("integrations")
       .update({
-        auth_token: response.body.access_token,
-        refresh_token: response.body.refresh_token,
-        expiry_date: moment().add(response.body.expires_in, "seconds"),
+        auth_token: oauthRes.body.access_token,
+        refresh_token: oauthRes.body.access_token,
+        expiry_date: moment().add(oauthRes.body.expires_in, "seconds"),
       })
       .where("id", integration.id);
   } catch (e) {
     console.log(e);
-
     await Knex()
       .table("integrations")
       .update({
@@ -34,7 +26,6 @@ async function Run(integration) {
         expiry_date: null,
       })
       .where("id", integration.id);
-    throw e;
   }
 }
 

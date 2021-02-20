@@ -13,7 +13,7 @@ setInterval(async () => {
       .table("integrations")
       .select()
       .whereNotNull("refresh_token")
-      .where("expiry_date", "<", moment());
+      .where("expiry_date", ">", moment());
 
     for (let index = 0; index < integrations.length; index++) {
       const integration = integrations[index];
