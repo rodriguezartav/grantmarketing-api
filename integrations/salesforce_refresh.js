@@ -41,6 +41,8 @@ async function Run(integration) {
     await Run(JSON.parse(process.argv[2]));
     process.exit(0);
   } catch (e) {
+    console.error("CRITICAL_ERROR");
+
     console.error(e);
     Knex().destroy();
     process.exit(1);

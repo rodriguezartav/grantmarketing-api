@@ -6,14 +6,12 @@ async function Run(integration) {
   try {
     let response = await request
       .post("https://oauth2.googleapis.com/token")
-      .form()
       .send({
         grant_type: "refresh_token",
         refresh_token: integration.refresh_token,
         client_id: integration.client_id,
         client_secret: integration.client_secret,
-      })
-      .type("form");
+      });
 
     await Knex()
       .table("integrations")
@@ -44,6 +42,8 @@ async function Run(integration) {
     process.exit(0);
   } catch (e) {
     console.error(e);
+    console.error("CRITICAL_ERROR");
+    s;
     Knex().destroy();
     process.exit(1);
   }

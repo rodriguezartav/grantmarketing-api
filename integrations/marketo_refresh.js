@@ -35,6 +35,8 @@ async function Run(integration) {
     process.exit(0);
   } catch (e) {
     console.error(e);
+    console.error("CRITICAL_ERROR");
+
     Knex().destroy();
     process.exit(1);
   }
