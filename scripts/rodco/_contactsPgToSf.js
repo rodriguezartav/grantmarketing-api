@@ -1,0 +1,101 @@
+const moment = require("moment");
+const { xeroApi, redis } = require("../../helpers/xero");
+const { sfConn, bulk, query } = require("../../helpers/sf");
+const getKnex = require("../../helpers/knex_pg");
+
+let knex;
+module.exports = async function Run(integrationMap) {
+  var trx;
+
+  try {
+    const conn = await sfConn(integrationMap["salesforce"]);
+
+    knex = await getKnex(integrationMap["postgres"]);
+
+    trx = knex;
+
+    var contacts = await trx
+      .table("contacts")
+      .select([
+        "contacts.*",
+        "customers.name as customer_name",
+        "customers.id as customer_id",
+        "customers.external_id as customer_external_id",
+        "customers_balance.sum as balance",
+      ])
+      .leftJoin("customers", "customers.id", "contacts.customer_id")
+      .leftJoin("customers_balance", "customers.id", "customers_balance.id");
+
+    const clientes = await query(
+      conn,
+      "select id,external_id__c,saldo__c from account"
+    );
+    const clientesMap = {};
+    clientes.forEach((item) => {
+      clientesMap[item.external_id__c] = item.Id;
+    });
+
+    await bulk(
+      conn,
+      "Account",
+      "update",
+      contacts
+        .filter((contact) => clientesMap[contact.customer_external_id])
+        .map((contact) => {
+          return {
+            Descriptions: contact.brands,
+            Industry: contact.segment,
+
+            Id: clientesMap[contact.customer_external_id],
+          };
+        })
+    );
+
+    //
+    await bulk(
+      conn,
+      "Contact",
+      "upsert",
+      "external_id__c",
+      contacts.map((contact) => {
+        return {
+          AccountId: clientesMap[contact.customer_external_id],
+          Email: contact.email || "",
+          Description: contact.tags,
+          Department: contact.role,
+          firstName: (contact.name || " ").split(" ")[0],
+          phone: contact.linea || "",
+          LastName: (contact.name || " ").split(" ").slice(1).join(" ") || "-",
+          MobilePhone: contact.mobile || "",
+          external_id__c: contact.id,
+        };
+      })
+    );
+
+    //  await trx.commit();
+    await knex.destroy();
+    process.exit(0);
+  } catch (e) {
+    //  if (trx) await trx.rollback();
+    console.log(e);
+    await knex.destroy();
+    throw e;
+  }
+};
+
+if (process.argv[2] && process.argv[3].indexOf("{") == 0)
+  (async function () {
+    try {
+      await Run(JSON.parse(process.argv[2]), parseInt(process.argv[3]));
+      process.exit(0);
+    } catch (e) {
+      console.error(e);
+      process.exit(1);
+    }
+  })();
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}

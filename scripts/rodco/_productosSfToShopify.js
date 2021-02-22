@@ -1,0 +1,172 @@
+const moment = require("moment");
+const { xeroApi, redis } = require("../../helpers/xero");
+const { sfConn, bulk, query } = require("../../helpers/sf");
+const getKnex = require("../../helpers/knex_pg");
+
+const request = require("superagent");
+
+module.exports = async function Run(integrationMap) {
+  try {
+    const Shopify = integrationMap["shopify"];
+    const knex = await getKnex(integrationMap["postgres"]);
+
+    trx = knex;
+    const conn = await sfConn(integrationMap["salesforce"]);
+
+    const products = await query(
+      conn,
+      "select id,codigo__c,precio__c,inventario__c,presentacion__c,external_id__c from producto__c "
+    );
+
+    const productMap = {};
+    products.forEach((item) => {
+      item.precio__c = item.Precio__c * item.Presentacion__c;
+      item.inventario__c = item.inventario__c / item.Presentacion__c;
+      item.presentacion__c = item.Presentacion__c;
+
+      productMap[item.codigo__c] = item;
+    });
+
+    const locationUrl = "/admin/api/2020-04/locations.json?limit=250";
+    const locationRes = await request
+      .get(`https://${Shopify.application_id}/${locationUrl}`)
+      .set("X-Shopify-Access-Token", Shopify.client_secret);
+
+    const location = locationRes.body.locations[0];
+
+    const url = "/admin/api/2020-04/products.json?presentment_currencies=USD";
+
+    let shopifyProducts = [];
+    let lastRes = {
+      links: { next: `https://${Shopify.application_id}/${url}` },
+    };
+    while (lastRes.links.next) {
+      const res = await request
+        .get(lastRes.links.next)
+        .set("X-Shopify-Access-Token", Shopify.client_secret)
+        .set("X-Shopify-Api-Features", "include-presentment-prices");
+      lastRes = res;
+      shopifyProducts = shopifyProducts.concat(res.body.products);
+    }
+
+    let updatePromises = [];
+
+    const res = await request
+      .get(`https://${Shopify.application_id}/${url}`)
+      .set("X-Shopify-Access-Token", Shopify.client_secret)
+      .set("X-Shopify-Api-Features", "include-presentment-prices");
+
+    const sfItems = [];
+
+    const update = shopifyProducts.map((item) => {
+      let allMapped = true;
+      let newVariants = item.variants.map((variant) => {
+        let sku = variant.sku;
+
+        if (sku.length == 9) sku = "0" + sku;
+        let product = productMap[sku];
+        if (product) {
+          console.log(variant.name, variant.sku, product.precio__c);
+
+          sfItems.push({
+            external_id__c: product.external_id__c,
+            short_code__c: item.handle,
+          });
+
+          return {
+            id: variant.id,
+            sku: sku,
+            inventory_item_id: variant.inventory_item_id,
+            price: parseInt(product.precio__c * 100) / 100,
+          };
+        } else {
+          console.log(
+            item.title,
+            item.handle,
+            item.variants.map((variant) => variant.sku).join(",")
+          );
+          allMapped = false;
+          return null;
+        }
+      });
+
+      return {
+        id: item.id,
+        variants: allMapped ? newVariants : item.variants,
+        published: allMapped,
+      };
+    });
+
+    await bulk(conn, "producto__c", "upsert", "external_id__c", sfItems);
+
+    for (let index = 0; index < update.length; index++) {
+      const element = update[index];
+
+      const url = `/admin/api/2020-04/products/${element.id}.json`;
+
+      const productResponse = await request
+        .put(`https://${Shopify.application_id}/${url}`)
+        .set("X-Shopify-Access-Token", Shopify.client_secret)
+        .send({ product: element });
+
+      console.log(
+        productResponse.headers["x-shopify-shop-api-call-limit"],
+        productResponse.status
+      );
+
+      const itemUrl = `admin/api/2020-04/inventory_levels/set.json`;
+
+      const promises = element.variants.map((variant) => {
+        if (productMap[variant.sku]) {
+          try {
+            return request
+              .post(`https://${Shopify.application_id}/${itemUrl}`)
+              .set("X-Shopify-Access-Token", Shopify.client_secret)
+              .send({
+                location_id: location.id,
+                inventory_item_id: variant.inventory_item_id,
+                available:
+                  productMap[variant.sku] &&
+                  productMap[variant.sku].inventario__c > 0
+                    ? parseInt(productMap[variant.sku].inventario__c)
+                    : 0,
+              });
+          } catch (e) {
+            console.log("CRITICAL", e);
+            return Promise.resolve({ headers: {}, status: 0 });
+          }
+        } else return Promise.resolve({ headers: {}, status: 0 });
+      });
+
+      const pr = await Promise.all(promises);
+      pr.map((r) => {
+        if (r && r.headers)
+          console.log(r.headers["x-shopify-shop-api-call-limit"], r.status);
+      });
+      await sleep(2000);
+    }
+
+    process.exit(0);
+  } catch (e) {
+    console.log(e);
+    throw e;
+    process.exit(1);
+  }
+};
+
+if (process.argv[2] && process.argv[3].indexOf("{") == 0)
+  (async function () {
+    try {
+      await Run(JSON.parse(process.argv[2]), parseInt(process.argv[3]));
+      process.exit(0);
+    } catch (e) {
+      console.error(e);
+      process.exit(1);
+    }
+  })();
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}

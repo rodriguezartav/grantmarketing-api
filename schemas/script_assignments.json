@@ -1,0 +1,28 @@
+{
+  "$id": "http://rodcocr.coom/schema/users.json",
+  "title": "Users",
+  "description": "Generated: Mon Apr 27 2020 11:57:21 GMT-0600 (Central Standard Time)",
+  "properties": {
+    "id": {
+      "type": "number",
+      "description": ""
+    },
+
+    "script_id": {
+      "type": "number",
+      "ui_type": "reference",
+      "description": "",
+      "reference": "providers"
+    },
+    "customer_id": {
+      "type": "number",
+      "ui_type": "reference",
+      "description": "",
+      "reference": "customers"
+    }
+  },
+  "required": ["script_id", "customer_id"],
+  "list": ["script_id", "customer_id"],
+  "type": "object",
+  "additionalProperties": true
+}

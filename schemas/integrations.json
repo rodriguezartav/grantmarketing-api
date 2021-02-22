@@ -7,10 +7,12 @@
       "type": "number",
       "description": ""
     },
-    "provider_name": {
-      "type": "string",
+
+    "provider_id": {
+      "type": "number",
+      "ui_type": "reference",
       "description": "",
-      "options": ["salesforce", "xero", "postgres"]
+      "reference": "providers"
     },
     "customer_id": {
       "type": "number",
@@ -18,7 +20,14 @@
       "description": "",
       "reference": "customers"
     },
-
+    "api_key": {
+      "type": "string",
+      "description": ""
+    },
+    "application_id": {
+      "type": "string",
+      "description": ""
+    },
     "auth_token": {
       "type": "string",
       "description": ""
@@ -44,8 +53,8 @@
       "description": ""
     }
   },
-  "required": ["provider_name"],
-  "list": ["provider_name", "customer_id", "expiry_date"],
+  "required": ["provider_id"],
+  "list": ["provider_id", "customer_id", "expiry_date"],
   "type": "object",
   "additionalProperties": true
 }

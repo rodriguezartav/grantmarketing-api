@@ -14,6 +14,7 @@ const SalesforceIntegration = require("./routes/integrations/salesforce");
 const GoogleIntegration = require("./routes/integrations/google");
 
 const Login = require("./routes/login");
+const UserLogin = require("./routes/userLogin");
 const Jwt = require("./middleware/jwt");
 
 if (process.env.NODE_ENV == "production") require("./workers/process0");
@@ -49,12 +50,18 @@ app.use("/integrations/salesforce", cors(), SalesforceIntegration);
 app.use("/integrations/google", cors(), GoogleIntegration);
 
 app.use("/api/login", cors(), Login);
+app.use("/api/userLogin", cors(), UserLogin);
 app.use("/api/schemas", cors(), require("./routes/schemas"));
 app.use("/api/:resource", cors(), Jwt, makeRouter());
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  next(createError(404));
+  if (
+    req.xhr ||
+    (req.headers.accept && req.headers.accept.indexOf("json") > -1)
+  ) {
+    return res.status(404).json({ status: 404 });
+  } else next(createError(404));
 });
 
 // error handler
@@ -65,7 +72,10 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  if (req.xhr || req.headers.accept.indexOf("json") > -1) {
+  if (
+    req.xhr ||
+    (req.headers.accept && req.headers.accept.indexOf("json") > -1)
+  ) {
     console.log(err.stack);
     return res.send(err.message);
   } else res.render("error", { stack: err.stack || "", message: err.message });

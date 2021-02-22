@@ -11,17 +11,26 @@
       "type": "string",
       "description": ""
     },
-    "location": {
-      "type": "string",
-      "description": ""
-    },
-    "public": {
+
+    "requires_configuration": {
       "type": "boolean",
-      "default": true,
+      "default": false
+    },
+
+    "type": {
+      "type": "string",
+      "ui_type": "select",
+      "choices": [
+        { "id": "oauth", "name": "oauth" },
+        { "id": "api key", "name": "Api Key" },
+        { "id": "user/password", "name": "User/Password" }
+      ],
       "description": ""
     }
   },
-  "list": ["name", "location"],
+  "required": ["name", "type"],
+  "list": ["name", "type"],
+
   "type": "object",
   "additionalProperties": true
 }

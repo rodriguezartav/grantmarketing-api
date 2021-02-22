@@ -60,13 +60,15 @@ function sleep(ms) {
   });
 }
 
-(async function () {
-  try {
-    await Run();
-    process.exit(0);
-  } catch (e) {
-    console.error(e);
-    await Knex().destroy();
-    process.exit(1);
-  }
-})();
+if (process.argv[1].indexOf("scripts") != -1) {
+  (async function () {
+    try {
+      await Run();
+      process.exit(0);
+    } catch (e) {
+      console.error(e);
+      await Knex().destroy();
+      process.exit(1);
+    }
+  })();
+}

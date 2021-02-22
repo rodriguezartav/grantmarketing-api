@@ -1,8 +1,8 @@
 require("dotenv").config();
 
 const SfHelper = require("../../helpers/sf");
+
 const { xeroApi, redis } = require("../../helpers/xero");
-const Knex = require("../../helpers/knex_pg");
 
 const { sfConn, bulk } = SfHelper;
 
@@ -10,7 +10,7 @@ const moment = require("moment");
 const util = require("util");
 let knex;
 
-async function Run(integrationMap, customer_id) {
+module.exports = async function Run(integrationMap) {
   var trx;
 
   const itemsGetResponse = await xeroApi(integrationMap["xero"], "getItems");
@@ -42,8 +42,8 @@ async function Run(integrationMap, customer_id) {
     return productSql;
   });
 
-  await bulk(conn, "producto__c", "upsert", "external_id__c", items);
-}
+  //await bulk(conn, "producto__c", "upsert", "external_id__c", items);
+};
 
 function getMarca(name) {
   if (name.toLowerCase().indexOf("hilco") > -1) return "hilco";
@@ -57,13 +57,13 @@ function getGrupo(name) {
   return name.split(":")[1] || "Otro";
 }
 
-(async function () {
-  try {
-    await Run(JSON.parse(process.argv[2]), parseInt(process.argv[3]));
-    process.exit(0);
-  } catch (e) {
-    console.error(e);
-    await Knex().destroy();
-    process.exit(1);
-  }
-})();
+if (process.argv[3] && process.argv[3].indexOf("{") == 0)
+  (async function () {
+    try {
+      await Run(JSON.parse(process.argv[2]), parseInt(process.argv[3]));
+      process.exit(0);
+    } catch (e) {
+      console.error(e);
+      process.exit(1);
+    }
+  })();
