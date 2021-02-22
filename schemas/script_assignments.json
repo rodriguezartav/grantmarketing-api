@@ -12,7 +12,7 @@
       "type": "number",
       "ui_type": "reference",
       "description": "",
-      "reference": "providers"
+      "reference": "scripts"
     },
     "customer_id": {
       "type": "number",

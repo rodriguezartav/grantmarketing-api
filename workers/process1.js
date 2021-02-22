@@ -45,7 +45,7 @@ setInterval(async () => {
       let tryError;
       try {
         let { stdout, stderr, error } = await execFile("node", [
-          `./scripts/${job.script_location}/${job.script_name}.js`,
+          `./scripts/${job.script_location}.js`,
           JSON.stringify(integrationMap),
           job.customer_id,
         ]);
@@ -65,7 +65,6 @@ setInterval(async () => {
           script_id: job.script_id,
           job_id: job.id,
           log: {
-            stderr: stderr || "",
             error: { stack: tryError.stack, message: tryError.stack },
           },
         });

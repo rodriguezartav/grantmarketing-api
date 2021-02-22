@@ -15,13 +15,17 @@
       "type": "string",
       "description": ""
     },
+    "description": {
+      "type": "string",
+      "description": ""
+    },
     "public": {
       "type": "boolean",
       "default": true,
       "description": ""
     }
   },
-  "list": ["name", "location"],
+  "list": ["name", "location", "description"],
   "type": "object",
   "additionalProperties": true
 }
