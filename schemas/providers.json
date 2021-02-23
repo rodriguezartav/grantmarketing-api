@@ -22,8 +22,9 @@
       "ui_type": "select",
       "choices": [
         { "id": "oauth", "name": "oauth" },
-        { "id": "api key", "name": "Api Key" },
-        { "id": "user/password", "name": "User/Password" }
+        { "id": "private_oauth", "name": "private_oauth" },
+        { "id": "api_key", "name": "api_key" },
+        { "id": "user_password", "name": "user_password" }
       ],
       "description": ""
     }

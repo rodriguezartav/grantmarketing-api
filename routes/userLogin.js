@@ -75,9 +75,9 @@ async function getCode({ phone }) {
 
     await client.messages
       .create({
-        body: `Hi ${user.name},\n Your login code is: ${code}`,
+        body: `Hi ${user.name},\n Your JD login code is: ${code}`,
         from: process.env.TWILIO_NUMBER,
-        to: phone,
+        to: user.country_code + phone,
       })
       .then((message) => console.log(message.sid));
   }

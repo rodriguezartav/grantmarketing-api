@@ -11,14 +11,17 @@
       "type": "string",
       "description": ""
     },
-
+    "country_code": {
+      "type": "string",
+      "description": ""
+    },
     "phone": {
       "type": "string",
       "description": ""
     }
   },
-  "required": ["name", "phone"],
-  "list": ["name", "phone"],
+  "required": ["name", "phone", "country_code"],
+  "list": ["name", "country_code", "phone"],
 
   "type": "object",
   "additionalProperties": true

@@ -16,20 +16,20 @@ module.exports = class LoginService {
     if (user) {
       let code = parseInt(Math.random() * 100000);
       await this.update("admins", { code: code }, { phone: phone });
-      
-        //Sends email if it's not testing/developing
 
-        const accountSid = process.env.TWILIO_ACCOUNT_SID;
-        const authToken = process.env.TWILIO_AUTH_TOKEN;
-        const client = require("twilio")(accountSid, authToken);
+      //Sends email if it's not testing/developing
 
-        await client.messages
-          .create({
-            body: `Hi ${user.name},\n Your login code is: ${code}`,
-            from: process.env.TWILIO_NUMBER,
-            to: phone,
-          })
-          .then((message) => console.log(message.sid));
+      const accountSid = process.env.TWILIO_ACCOUNT_SID;
+      const authToken = process.env.TWILIO_AUTH_TOKEN;
+      const client = require("twilio")(accountSid, authToken);
+
+      await client.messages
+        .create({
+          body: `Hi ${user.name},\n Your login code is: ${code}`,
+          from: process.env.TWILIO_NUMBER,
+          to: phone,
+        })
+        .then((message) => console.log(message.sid));
     }
     return user;
   }
@@ -48,9 +48,9 @@ module.exports = class LoginService {
 
       await client.messages
         .create({
-          body: `Hi ${user.name},\n Your login code is: ${code}. Visit ${process.env.APP_URL}/code to use it`,
+          body: `Hi ${user.name},\n This is your JD login code: ${code}.`,
           from: process.env.TWILIO_NUMBER,
-          to: phone,
+          to: user.country_code + phone,
         })
         .then((message) => console.log(message.sid));
     }
