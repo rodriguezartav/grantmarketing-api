@@ -27,10 +27,12 @@ router.post("/autenticate", async function (req, res, next) {
 
     const user = await getKnex()
       .table("users")
+      .select("users.*", "customers.name as customer_name")
       .where({
         code: req.body.code,
         phone: req.body.phone,
       })
+      .join("customers", "customers.id", "users.customer_id")
       .first();
 
     if (user) {
@@ -47,6 +49,7 @@ router.post("/autenticate", async function (req, res, next) {
       return res.send({
         id: user.id,
         customer_id: user.customer_id,
+        customer_name: user.customer_name,
         name: user.name,
         token: JWT.encode(user),
       });
