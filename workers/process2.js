@@ -19,7 +19,6 @@ async function Run() {
         time_to_live: 100,
       },
     });
-    console.log(dynoRes);
 
     const logRes = await heroku.post("/apps/grantmarketing/log-sessions", {
       body: {
@@ -28,13 +27,15 @@ async function Run() {
       },
     });
 
-    https
+    const logRequest = https
       .get(logRes.logplex_url, (res) => {
         console.log("statusCode:", res.statusCode);
         console.log("headers:", res.headers);
 
         res.on("data", (d) => {
-          console.log(d.toString());
+          const line = d.toString();
+          console.log(line);
+          if (line.indexOf("END") > -1) logRequest.destroy();
         });
       })
       .on("error", (e) => {

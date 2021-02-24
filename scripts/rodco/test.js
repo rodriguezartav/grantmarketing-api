@@ -1,3 +1,7 @@
-console.log("okoko");
+const runner = require("../helpers/runner");
 
-console.log("END");
+runner(() => {
+  console.log("okoko");
+
+  console.log("END");
+});

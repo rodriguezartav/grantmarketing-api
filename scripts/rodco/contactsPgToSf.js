@@ -80,17 +80,6 @@ module.exports = async function Run(integrationMap) {
   }
 };
 
-if (process.argv[2] && process.argv[3].indexOf("{") == 0)
-  (async function () {
-    try {
-      await Run(JSON.parse(process.argv[2]), parseInt(process.argv[3]));
-      process.exit(0);
-    } catch (e) {
-      console.error(e);
-      process.exit(1);
-    }
-  })();
-
 function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
