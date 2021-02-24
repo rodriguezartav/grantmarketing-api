@@ -18,7 +18,10 @@ setInterval(async () => {
     for (let index = 0; index < integrations.length; index++) {
       const integration = integrations[index];
 
-      console.log(integration.provider_name, moment().format("DD-MM-YYYY"));
+      console.log(
+        integration.provider_name,
+        moment().format("DD-MM-YYYY HH:MM")
+      );
 
       const { stdout, stderr, error } = await execFile("node", [
         `./integrations/${integration.provider_name}_refresh.js`,
