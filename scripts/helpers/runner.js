@@ -1,6 +1,5 @@
 require("dotenv").config();
 const util = require("util");
-const moment = require("moment");
 const sms = require("../../helpers/sms");
 
 const Knex = require("../../helpers/knex");
