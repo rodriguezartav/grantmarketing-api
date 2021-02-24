@@ -27,7 +27,7 @@ module.exports = class LoginService {
         .create({
           body: `Hi ${user.name},\n Your login code is: ${code}`,
           from: process.env.TWILIO_NUMBER,
-          to: phone,
+          to: user.country_code + phone,
         })
         .then((message) => console.log(message.sid));
     }
