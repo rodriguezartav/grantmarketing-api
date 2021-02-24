@@ -1,5 +1,4 @@
-const runner = require("../helpers/runner");
-
-runner(() => {
-  console.log("okoko");
-});
+module.exports = async function test() {
+  console.log("ok");
+  return true;
+};
