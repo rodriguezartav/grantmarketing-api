@@ -70,10 +70,9 @@ module.exports = async function Run(integrationMap) {
       })
     );
 
-    //  await trx.commit();
     await knex.destroy();
   } catch (e) {
-    //  if (trx) await trx.rollback();
+    await knex.destroy();
     console.log(e);
     throw e;
   }
