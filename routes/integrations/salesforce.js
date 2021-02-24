@@ -34,7 +34,7 @@ router.get("/callback", async function (req, res, next) {
         external_user_id: oauthRes.body.id,
         auth_token: oauthRes.body.access_token,
         refresh_token: oauthRes.body.refresh_token,
-        expiry_date: moment().add(oauthRes.body.expires_in, "seconds"),
+        expiry_date: moment().add(29, "minutes"),
         application_id: oauthRes.body.instance_url,
       })
       .where("id", integration.id);
