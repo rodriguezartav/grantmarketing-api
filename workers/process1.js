@@ -16,7 +16,8 @@ setInterval(async () => {
         "jobs.*",
         "scripts.name as script_name",
         "scripts.location as script_location",
-        "admins.phone as admin_phone"
+        "admins.phone as admin_phone",
+        "admins.country_code as admin_country_code"
       )
       .join("customers", "customers.id", "jobs.customer_id")
       .join("scripts", "scripts.id", "jobs.script_id")
@@ -43,7 +44,7 @@ setInterval(async () => {
       );
 
       let tryError;
-      let resultLog;
+      let resultLog = [];
       try {
         resultLog = await HerokuRunner(integrationMap, job.script_location);
       } catch (e) {
@@ -62,11 +63,15 @@ setInterval(async () => {
           script_id: job.script_id,
           job_id: job.id,
           log: {
+            error: { message: tryError.message, stack: tryError.stack },
             lines: resultLog,
           },
         });
 
-        await sms(tryError.message.substring(0, 35), job.admin_phone);
+        await sms(
+          tryError.message.substring(0, 35),
+          job.admin_country_code + job.admin_phone
+        );
       } else
         await knex
           .table("schedules")
