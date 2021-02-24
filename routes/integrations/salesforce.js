@@ -39,25 +39,6 @@ router.get("/callback", async function (req, res, next) {
       })
       .where("id", integration.id);
 
-    const salesforceRefresh = await Knex()
-      .table("scripts")
-      .select()
-      .where("name", "salesforce_refresh")
-      .first();
-
-    const schedules = await Knex()
-      .table("schedules")
-      .select()
-      .where("customer_id", integration.customer_id)
-      .where("script_id", salesforceRefresh.id);
-    if (schedules.length == 0) {
-      await Knex().table("schedules").insert({
-        customer_id: integration.customer_id,
-        script_id: salesforceRefresh.id,
-        period_in_minutes: 25,
-      });
-    }
-
     res.render("connected");
   } catch (e) {
     return next(e);

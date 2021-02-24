@@ -28,28 +28,25 @@ module.exports = async function Run(integrationMap) {
 
     const clientes = await query(
       conn,
-      "select id,external_id__c,saldo__c from account"
+      "select id,external_id__c,saldo__c from account where external_id__c != NULL"
     );
     const clientesMap = {};
     clientes.forEach((item) => {
       clientesMap[item.external_id__c] = item.Id;
     });
 
-    await bulk(
-      conn,
-      "Account",
-      "update",
-      contacts
-        .filter((contact) => clientesMap[contact.customer_external_id])
-        .map((contact) => {
-          return {
-            Descriptions: contact.brands,
-            Industry: contact.segment,
+    const accounts = contacts
+      .filter((contact) => clientesMap[contact.customer_external_id])
+      .map((contact) => {
+        return {
+          Description: contact.brands,
+          Industry: contact.segment,
+          External_id__c: contact.customer_external_id,
+          Id: clientesMap[contact.customer_external_id],
+        };
+      });
 
-            Id: clientesMap[contact.customer_external_id],
-          };
-        })
-    );
+    await bulk(conn, "Account", "update", "external_id__c", accounts);
 
     //
     await bulk(
