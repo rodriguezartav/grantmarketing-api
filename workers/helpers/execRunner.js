@@ -3,7 +3,7 @@ const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 const moment = require("moment");
 const sms = require("../helpers/sms");
-const HerokuRunner = require("./helpers/herokuRunner");
+
 const Knex = require("../helpers/knex");
 
 setInterval(async () => {
@@ -43,9 +43,13 @@ setInterval(async () => {
       );
 
       let tryError;
-      let resultLog;
       try {
-        resultLog = await HerokuRunner(integrationMap, job.script_location);
+        let { stdout, stderr, error } = await execFile("node", [
+          `./scripts/${job.script_location}.js`,
+          JSON.stringify(integrationMap),
+          job.customer_id,
+        ]);
+        tryError = error;
       } catch (e) {
         tryError = e;
       }
@@ -56,13 +60,12 @@ setInterval(async () => {
       });
 
       await knex.table("jobs").delete().where("id", job.id);
-
       if (tryError) {
         await knex.table("script_logs").insert({
           script_id: job.script_id,
           job_id: job.id,
           log: {
-            lines: resultLog,
+            error: { stack: tryError.stack, message: tryError.stack },
           },
         });
 

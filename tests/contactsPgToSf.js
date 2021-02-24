@@ -5,9 +5,9 @@ const moment = require("moment");
 const sms = require("../helpers/sms");
 
 const Knex = require("../helpers/knex");
-const Run = require("../scripts/rodco/contactsPgToSf");
+const Runner = require("../scripts/helpers/runner");
 
-async function Test(integrationMap) {
+async function Test() {
   try {
     const knex = Knex();
 
@@ -19,7 +19,10 @@ async function Test(integrationMap) {
     let integrationMap = {};
     integrations.forEach((item) => (integrationMap[item.provider_name] = item));
 
-    await Run(integrationMap);
+    process.env.INTEGRATION_MAP = JSON.stringify(integrationMap);
+    process.env.SCRIPT = "rodco/contactsPgToSf";
+
+    await Runner();
   } catch (e) {
     console.error("CRITICAL_ERROR");
     console.error(e);

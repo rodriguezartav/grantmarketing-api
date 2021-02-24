@@ -4,6 +4,7 @@ const { sfConn, bulk, query } = require("../../helpers/sf");
 const getKnex = require("../../helpers/knex_pg");
 
 let knex;
+
 module.exports = async function Run(integrationMap) {
   var trx;
 
@@ -71,17 +72,9 @@ module.exports = async function Run(integrationMap) {
 
     //  await trx.commit();
     await knex.destroy();
-    process.exit(0);
   } catch (e) {
     //  if (trx) await trx.rollback();
     console.log(e);
-    await knex.destroy();
     throw e;
   }
 };
-
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}

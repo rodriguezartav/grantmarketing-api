@@ -8,7 +8,14 @@ function getKnex(integration) {
 }
 
 function prepareKnex(integration) {
-  console.log("creating connection");
+  console.log("creating customer connection");
+
+  process.on("beforeExit", async (code) => {
+    console.log("closing customer connection");
+
+    await Knex.destroy();
+  });
+
   return require("knex")({
     client: "pg",
     pool: { min: 1, max: 1 },

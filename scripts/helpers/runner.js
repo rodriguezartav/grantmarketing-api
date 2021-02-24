@@ -1,27 +1,14 @@
 require("dotenv").config();
 const util = require("util");
 const sms = require("../../helpers/sms");
-
-const Knex = require("../../helpers/knex");
-const Run = require("../../scripts/rodco/contactsPgToSf");
 const moment = require("moment");
 
-async function Runner(runFunction) {
-  const knex = Knex();
-
-  const integrations = await knex
-    .table("integrations")
-    .select()
-    .where({ customer_id: 1 });
-
-  let integrationMap = {};
-  integrations.forEach((item) => (integrationMap[item.provider_name] = item));
-
-  await runFunction(integrationMap);
-}
-
-module.exports = async function (runFunction) {
+module.exports = async function (scriptPath) {
+  if (!scriptPath) scriptPath = process.env.SCRIPT;
+  const integrationMap = JSON.parse(process.env.INTEGRATION_MAP);
   console.log("START");
+  const script = require("../" + scriptPath);
+
   const timeStart = moment();
   setInterval(() => {
     const now = moment();
@@ -29,14 +16,13 @@ module.exports = async function (runFunction) {
       throw new Error("Timeout");
   }, 1000);
   try {
-    await Runner(runFunction);
-    await Knex().destroy();
+    await script(integrationMap);
     console.log("END");
     process.exit(0);
   } catch (e) {
-    await Knex().destroy();
     console.error("CRITICAL_ERROR");
     console.error(e);
+    console.log("END");
     process.exit(1);
   }
 };

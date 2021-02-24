@@ -7,7 +7,7 @@ const sms = require("../helpers/sms");
 const Knex = require("../helpers/knex");
 const Run = require("../scripts/rodco/_productosSfToShopify");
 
-async function Test(integrationMap) {
+async function Test() {
   try {
     const knex = Knex();
 
@@ -19,7 +19,8 @@ async function Test(integrationMap) {
     let integrationMap = {};
     integrations.forEach((item) => (integrationMap[item.provider_name] = item));
 
-    await Run(integrationMap);
+    process.env.INTEGRATION_MAP = JSON.stringify(integrationMap);
+    await Run();
   } catch (e) {
     console.error("CRITICAL_ERROR");
     console.error(e);
