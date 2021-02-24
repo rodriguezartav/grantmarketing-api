@@ -21,6 +21,8 @@ async function Run(integration) {
       .type("form")
       .set("Authorization", "Basic " + base64data);
 
+    console.log(respons.body);
+
     await Knex()
       .table("integrations")
       .update({
