@@ -5,7 +5,7 @@ var JWTMiddleware = function (req, res, next) {
   let token = req.headers.authorization || req.headers.Authorization;
   if (!token)
     return next({ status: 403, message: "Authorization Header not Found" });
-  else token = token.replace("Bearer ", "");
+  else token = token.replace("Bearer ", "").replace("bearer ", "");
 
   if (token == "LINK") return next();
 

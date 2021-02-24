@@ -34,11 +34,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use(function (req, res, next) {
-  console.log(req.body);
-  return next();
-});
-
 app.options("*", cors()); // enable pre-flight request for DELETE request
 app.use("*", cors()); // enable pre-flight request for DELETE request
 
