@@ -28,55 +28,60 @@ setInterval(async () => {
 
     for (let index = 0; index < jobs.length; index++) {
       const job = jobs[index];
-      await knex
-        .table("jobs")
-        .update({ status: "working" })
-        .where("id", job.id);
-
-      const integrations = await knex
-        .table("integrations")
-        .select()
-        .where({ customer_id: job.customer_id });
-
-      let integrationMap = {};
-      integrations.forEach(
-        (item) => (integrationMap[item.provider_name] = item)
-      );
-
-      let tryError;
-      let resultLog = [];
       try {
-        resultLog = await HerokuRunner(integrationMap, job.script_location);
-      } catch (e) {
-        tryError = e;
-      }
+        await knex
+          .table("jobs")
+          .update({ status: "working" })
+          .where("id", job.id);
 
-      await knex.table("executions").insert({
-        schedule_id: job.schedule_id,
-        result: tryError ? 1 : 0,
-      });
+        const integrations = await knex
+          .table("integrations")
+          .select()
+          .where({ customer_id: job.customer_id });
 
-      await knex.table("jobs").delete().where("id", job.id);
+        let integrationMap = {};
+        integrations.forEach(
+          (item) => (integrationMap[item.provider_name] = item)
+        );
 
-      if (tryError) {
-        await knex.table("script_logs").insert({
-          script_id: job.script_id,
-          job_id: job.id,
-          log: {
-            error: { message: tryError.message, stack: tryError.stack },
-            lines: resultLog,
-          },
+        let tryError;
+        let resultLog = [];
+        try {
+          resultLog = await HerokuRunner(integrationMap, job.script_location);
+        } catch (e) {
+          tryError = e;
+        }
+
+        await knex.table("executions").insert({
+          schedule_id: job.schedule_id,
+          result: tryError ? 1 : 0,
         });
 
-        await sms(
-          tryError.message.substring(0, 35),
-          job.admin_country_code + job.admin_phone
-        );
-      } else
-        await knex
-          .table("schedules")
-          .update({ last_run: moment() })
-          .where("id", job.schedule_id);
+        await knex.table("jobs").delete().where("id", job.id);
+
+        if (tryError) {
+          await knex.table("script_logs").insert({
+            script_id: job.script_id,
+            job_id: job.id,
+            log: {
+              error: { message: tryError.message, stack: tryError.stack },
+              lines: resultLog,
+            },
+          });
+
+          await sms(
+            tryError.message.substring(0, 35),
+            job.admin_country_code + job.admin_phone
+          );
+        } else
+          await knex
+            .table("schedules")
+            .update({ last_run: moment() })
+            .where("id", job.schedule_id);
+      } catch (e) {
+        console.error("JOB_CRITICAL_ERROR");
+        console.error(e);
+      }
     }
   } catch (e) {
     console.error("CRITICAL_ERROR");
