@@ -5,6 +5,7 @@ const moment = require("moment");
 const sms = require("../helpers/sms");
 const HerokuRunner = require("./helpers/herokuRunner");
 const Knex = require("../helpers/knex");
+const e = require("express");
 let knex;
 
 async function Run() {
@@ -104,16 +105,26 @@ async function Run() {
         if (tryError) {
           const admin = await knex
             .table("admins")
-            .select("admins.*")
-            .leftJoin("schedules", "admins.id", "schedules.admin_id")
-            .where("schedules.id", job.schedule_id)
-            .orWhere("admins.id", 1)
-            .order("admins.id", "DESC")
+            .select()
+            .where("id", 1)
             .first();
+
+          const random = parseInt(Math.random() * 10000000);
+          var params = {
+            Body: `<h1>${tryError.message}</h1><p>${
+              tryError.stack
+            }</p><p>${resultLog
+              .map((item) => item.replace("\u0000", ""))
+              .join("<br/>")}</p>`,
+
+            Bucket: "reports.jungledynamics.com",
+            Key: "logs/" + random + ".html",
+          };
+          await s3.putObject(params);
 
           if (admin)
             await sms(
-              tryError.message.substring(0, 35),
+              `http://reports.jungledynamics.com/logs/${random}.html`,
               admin.country_code + job.phone
             );
         } else
