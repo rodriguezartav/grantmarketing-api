@@ -89,7 +89,7 @@ async function Run() {
             error: tryError
               ? { message: tryError.message, stack: tryError.stack }
               : null,
-            lines: resultLog,
+            lines: resultLog.map((item) => item.replace("\u0000", "")),
           },
         });
 
