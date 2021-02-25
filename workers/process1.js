@@ -49,9 +49,9 @@ setInterval(async () => {
         try {
           let index = 0;
           const interval = setInterval(() => {
-            if (index > 20) throw new Error("HerokuRunner Timeout");
+            if (index > 60) throw new Error("HerokuRunner Timeout");
             index++;
-          }, 10000);
+          }, 1000);
           resultLog = await HerokuRunner(integrationMap, job.script_location);
           clearInterval(interval);
         } catch (e) {
