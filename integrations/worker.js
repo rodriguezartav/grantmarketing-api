@@ -14,7 +14,7 @@ setInterval(async () => {
       .select("integrations.*", "providers.name as provider")
       .join("providers", "providers.id", "integrations.provider_id")
       .whereNotNull("refresh_token")
-      .where("expiry_date", ">", moment());
+      .where("expiry_date", "<", moment());
 
     const integrationTokens = await Knex()
       .table("integration_tokens")

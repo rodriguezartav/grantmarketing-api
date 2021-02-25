@@ -4,8 +4,6 @@ const request = require("superagent");
 
 async function Run(integration) {
   try {
-    console.log("REFRESH");
-
     const integration_tokens = await Knex()
       .table("integration_tokens")
       .select()
@@ -21,8 +19,6 @@ async function Run(integration) {
         client_id: integration_tokens.client_id,
         client_secret: integration_tokens.client_secret,
       });
-
-    console.log(response.body);
 
     await Knex()
       .table("integrations")
