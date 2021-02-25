@@ -21,7 +21,6 @@ module.exports = async function Run(integrationMap, users) {
       developer_token: process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
     });
 
-    console.log(googleIntegration);
     const customer = client.Customer({
       customer_id: googleIntegration.application_id
         .replace("-", "")
@@ -58,9 +57,9 @@ module.exports = async function Run(integrationMap, users) {
       Bucket: "reports.jungledynamics.com",
       Key: "csv/" + random + ".csv",
     };
-    await s3.putObject(params);
+    await s3.putObject(params).promise();
 
-    sms(
+    await sms(
       `Your report  http://reports.jungledynamics.com/csv/${random}.csv`,
       users[0].country_code + users[0].phone
     );

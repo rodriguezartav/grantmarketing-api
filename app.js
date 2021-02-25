@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/connect/:customer_id/:provider", (req, res) => {
-  res.render("connect", { ...req.params, url: process.env.API_URL });
+  return res.render("connect", { ...req.params, url: process.env.API_URL });
 });
 
 app.use("/integrations/xero", cors(), XeroIntegration);

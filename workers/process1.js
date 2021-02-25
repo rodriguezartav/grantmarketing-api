@@ -135,7 +135,7 @@ async function Run() {
             .update({ last_run: moment() })
             .where("id", job.schedule_id);
       } catch (e) {
-        console.error("JOB_CRITICAL_ERROR");
+        console.error("JOB CRITICAL_ERROR");
         console.error(e);
       }
     }
