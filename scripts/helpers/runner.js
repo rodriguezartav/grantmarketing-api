@@ -5,19 +5,20 @@ const moment = require("moment");
 
 module.exports = async function (scriptPath) {
   console.log("START");
-  if (!scriptPath) scriptPath = process.env.SCRIPT;
-  const integrationMap = JSON.parse(process.env.INTEGRATION_MAP);
-  console.log(scriptPath);
-  const script = require("../" + scriptPath);
-
-  const timeStart = moment();
-  console.log(timeStart);
-  setInterval(() => {
-    const now = moment();
-    if (now.diff(timeStart, "seconds") > 60 * 5 * 1000)
-      throw new Error("Timeout");
-  }, 1000);
   try {
+    if (!scriptPath) scriptPath = process.env.SCRIPT;
+    const integrationMap = JSON.parse(process.env.INTEGRATION_MAP);
+    console.log(scriptPath);
+    const script = require("../" + scriptPath);
+
+    const timeStart = moment();
+    console.log(timeStart);
+    setInterval(() => {
+      const now = moment();
+      if (now.diff(timeStart, "seconds") > 60 * 5 * 1000)
+        throw new Error("Timeout");
+    }, 1000);
+
     console.log("SCRIPT_START");
     await script(integrationMap);
     console.log("END");
