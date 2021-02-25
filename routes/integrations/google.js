@@ -77,7 +77,14 @@ router.get("/:customer_id", async function (req, res, next) {
 
   if (!integration) return res.render("404");
 
-  const url = `https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/adwords &response_type=code&client_id=${integration.client_id}&redirect_uri=${process.env.API_URL}/integrations/google/callback&state=${req.params.customer_id}`;
+  const integrationToken = await Knex()
+    .table("integration_tokens")
+    .select("integration_tokens.*", "providers.name as provider")
+    .join("providers", "providers.id", "integration_tokens.provider_id")
+    .where("providers.name", "google")
+    .first();
+
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/adwords &response_type=code&client_id=${integration.integrationToken}&redirect_uri=${process.env.API_URL}/integrations/google/callback&state=${req.params.customer_id}`;
   console.log(url);
 
   res.redirect(url);
