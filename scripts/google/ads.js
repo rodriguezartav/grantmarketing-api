@@ -11,14 +11,16 @@ module.exports = async function Run(integrationMap) {
     const googleIntegration = integrationMap["google"];
 
     const client = new GoogleAdsApi({
-      client_id: google.client_id,
-      client_secret: google.client_secret,
+      client_id: googleIntegration.client_id,
+      client_secret: googleIntegration.client_secret,
       developer_token: process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
     });
 
     console.log(googleIntegration);
     const customer = client.Customer({
-      customer_id: googleIntegration.application_id,
+      customer_id: googleIntegration.application_id
+        .replace("-", "")
+        .replace("-", ""),
       refresh_token: googleIntegration.auth_token,
     });
 
@@ -40,6 +42,7 @@ module.exports = async function Run(integrationMap) {
     });
 
     //  await trx.commit();
+    console.log(campaigns);
     process.exit(0);
   } catch (e) {
     //  if (trx) await trx.rollback();

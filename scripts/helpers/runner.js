@@ -3,7 +3,7 @@ const util = require("util");
 const sms = require("../../helpers/sms");
 const moment = require("moment");
 
-async function Run() {
+module.exports = async function Run() {
   console.log("START");
   try {
     let scriptPath = process.env.SCRIPT;
@@ -29,6 +29,6 @@ async function Run() {
     console.log("END");
     process.exit(1);
   }
-}
+};
 
-Run();
+if (process.argv[1].indexOf("tests") == -1) Run();
