@@ -94,10 +94,19 @@ async function Run() {
         });
 
         if (tryError) {
-          //await sms(
-          // tryError.message.substring(0, 35),
-          //job.admin_country_code + job.admin_phone
-          //);
+          const admin = await knex
+            .table("schedules")
+            .select("admins.*")
+            .join("admins", "admins.id", "schedules.admin_id")
+            .where(("schedules.id", job.schedule_id))
+            .orWhere("admins.id", 1)
+            .first();
+
+          if (admin)
+            await sms(
+              tryError.message.substring(0, 35),
+              admin.country_code + job.phone
+            );
         } else
           await knex
             .table("schedules")
