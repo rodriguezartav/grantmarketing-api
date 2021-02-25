@@ -55,7 +55,7 @@ module.exports = async function Run(integrationMap, users) {
       html: "<strong>Here's you google ads CSV</strong> <br/> " + csv,
     };
     //ES6
-    await sgMail.send(msg);
+    await sendGrid.send(msg);
 
     process.exit(0);
   } catch (e) {
