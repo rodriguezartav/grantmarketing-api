@@ -51,7 +51,8 @@ async function Run() {
 
         let integrationMap = {};
         integrations.forEach((item) => {
-          if (item.provider == integrationTokensMap[item.provider].provider) {
+          const integrationToken = integrationTokensMap[item.provider];
+          if (integrationToken && item.provider == integrationToken.provider) {
             item.client_id = integrationTokensMap[item.provider].client_id;
             item.client_secret =
               integrationTokensMap[item.provider].client_secret;
