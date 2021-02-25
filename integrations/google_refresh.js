@@ -5,13 +5,21 @@ const request = require("superagent");
 async function Run(integration) {
   try {
     console.log("REFRESH");
+
+    const integration_tokens = await Knex()
+      .table("integration_tokens")
+      .select()
+      .join("providers", "providers.id", "integration_tokens.provider_id")
+      .where("providers.name", "google")
+      .first();
+
     let response = await request
       .post("https://oauth2.googleapis.com/token")
       .send({
         grant_type: "refresh_token",
         refresh_token: integration.refresh_token,
-        client_id: integration.client_id,
-        client_secret: integration.client_secret,
+        client_id: integration_tokens.client_id,
+        client_secret: integration_tokens.client_secret,
       });
 
     console.log(response.body);
