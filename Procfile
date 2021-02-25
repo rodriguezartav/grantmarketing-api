@@ -1,2 +1,2 @@
 web: npm start
-worker: node ./workers/process1.js
+worker: node ./workers/process1Runner.js

@@ -5,10 +5,11 @@ const moment = require("moment");
 const sms = require("../helpers/sms");
 const HerokuRunner = require("./helpers/herokuRunner");
 const Knex = require("../helpers/knex");
+let knex;
 
-setInterval(async () => {
+async function Run() {
   try {
-    const knex = Knex();
+    knex = Knex();
 
     let jobs = await knex
       .table("jobs")
@@ -91,10 +92,13 @@ setInterval(async () => {
         console.error(e);
       }
     }
+    await knex.destroy();
   } catch (e) {
+    if (knex) await knex.destroy();
     console.error("CRITICAL_ERROR");
     console.error(e);
-
     throw e;
   }
-}, 6000);
+}
+
+Run();
