@@ -27,14 +27,6 @@ setInterval(async () => {
         (item) => item.provider == integration.provider
       );
 
-      console.log(
-        "REFRESH",
-        integration.provider,
-        moment(integration.expiry_date).format("DD-MM-YYYY HH:MM"),
-        moment().format("DD-MM-YYYY HH:MM"),
-        moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
-      );
-
       if (integrationToken && integrationToken.client_id) {
         integration.client_id = integrationToken.client_id;
         integration.client_secret = integrationToken.client_secret;
@@ -43,6 +35,13 @@ setInterval(async () => {
       }
 
       if (integration.refresh_token) {
+        console.log(
+          "REFRESH",
+          integration.provider,
+          moment(integration.expiry_date).format("DD-MM-YYYY HH:MM:SS"),
+          moment().format("DD-MM-YYYY HH:MM:SS")
+        );
+
         const { stdout, stderr, error } = await execFile("node", [
           `./integrations/${integration.provider}_refresh.js`,
           JSON.stringify(integration),

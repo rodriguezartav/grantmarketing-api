@@ -20,6 +20,8 @@ async function Run(integration) {
         client_secret: integration_tokens.client_secret,
       });
 
+    console.log(response.body);
+
     await Knex()
       .table("integrations")
       .update({
