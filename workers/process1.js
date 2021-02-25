@@ -18,13 +18,11 @@ async function Run() {
         "jobs.*",
         "scripts.name as script_name",
         "scripts.location as script_location",
-        "admins.phone as admin_phone",
         "admins.country_code as admin_country_code"
       )
       .join("customers", "customers.id", "jobs.customer_id")
       .join("scripts", "scripts.id", "jobs.script_id")
       .join("schedules", "schedules.id", "jobs.schedule_id")
-      .join("admins", "admins.id", "schedules.admin_id")
       .whereNotNull("scripts.location")
       .where("status", "pending");
 
@@ -39,8 +37,7 @@ async function Run() {
         const integrationTokens = await Knex()
           .table("integration_tokens")
           .select("integration_tokens.*", "providers.name as provider")
-          .join("providers", "providers.id", "integration_tokens.provider_id")
-          .first();
+          .join("providers", "providers.id", "integration_tokens.provider_id");
 
         const integrationTokensMap = {};
         integrationTokens.forEach((item) => {
