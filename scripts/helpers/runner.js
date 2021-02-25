@@ -3,10 +3,10 @@ const util = require("util");
 const sms = require("../../helpers/sms");
 const moment = require("moment");
 
-module.exports = async function (scriptPath) {
+async function Run() {
   console.log("START");
   try {
-    if (!scriptPath) scriptPath = process.env.SCRIPT;
+    let scriptPath = process.env.SCRIPT;
     const integrationMap = JSON.parse(process.env.INTEGRATION_MAP);
     console.log(scriptPath);
     const script = require("../" + scriptPath);
@@ -29,4 +29,6 @@ module.exports = async function (scriptPath) {
     console.log("END");
     process.exit(1);
   }
-};
+}
+
+Run();
