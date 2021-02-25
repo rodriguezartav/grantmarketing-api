@@ -60,7 +60,10 @@ module.exports = async function Run(integrationMap, users) {
     };
     await s3.putObject(params);
 
-    sms(`Your report  http://reports.jungledynamics.com/csv/${random}.csv`);
+    sms(
+      `Your report  http://reports.jungledynamics.com/csv/${random}.csv`,
+      users[0].country_code + users[0].phone
+    );
 
     process.exit(0);
   } catch (e) {

@@ -127,7 +127,7 @@ async function Run() {
           if (admin)
             await sms(
               `http://reports.jungledynamics.com/logs/${random}.html`,
-              admin.country_code + job.phone
+              admin.country_code + admin.phone
             );
         } else
           await knex
