@@ -11,7 +11,7 @@ const moment = require("moment");
 module.exports = async function Run(integrationMap, users) {
   try {
     const googleIntegration = integrationMap["google"];
-    const sendGrid = sendGrid(integrationMap["sendgrid"]);
+    const sendGrid = SendGrid(integrationMap["sendgrid"]);
 
     const client = new GoogleAdsApi({
       client_id: googleIntegration.client_id,

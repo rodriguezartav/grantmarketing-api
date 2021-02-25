@@ -74,7 +74,6 @@ async function Run() {
         let tryError = null;
         let resultLog = [];
         try {
-          let index = 0;
           resultLog = await HerokuRunner(
             integrationMap,
             job.script_location,
