@@ -8,6 +8,7 @@ const Knex = require("../helpers/knex");
 let knex;
 
 async function Run() {
+  console.log("Procces 1 Start");
   try {
     knex = Knex();
 
