@@ -57,7 +57,6 @@ router.get("/callback", async function (req, res, next) {
         auth_token: oauthRes.body.access_token,
         refresh_token: oauthRes.body.refresh_token,
         expiry_date: moment().add(oauthRes.body.expires_in, "seconds"),
-        application_id: oauthRes.body.instance_url,
       })
       .where("id", integration.id);
 
