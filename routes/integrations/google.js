@@ -30,7 +30,8 @@ router.get("/callback", async function (req, res, next) {
 
       integration.client_id = integration_tokens.client_id;
       integration.client_secret = integration_tokens.client_secret;
-      integration.application_id = integration_tokens.application_id;
+      if (!integration.application_id)
+        integration.application_id = integration_tokens.application_id;
     }
 
     console.log(
