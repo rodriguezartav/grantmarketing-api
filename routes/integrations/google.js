@@ -11,12 +11,26 @@ router.get("/callback", async function (req, res, next) {
   try {
     const integration = await Knex()
       .table("integrations")
-      .select()
-      .where("provider_name", "google")
+      .select("integrations.*", "providers.type as provider_type")
+      .join("providers", "providers.id", "integrations.provider_id")
+      .where("providers.name", "google")
       .where("customer_id", parseInt(req.query.state))
       .first();
 
     if (!integration) return res.send(404);
+
+    if (integration.provider_type == "oauth") {
+      const integration_tokens = await Knex()
+        .table("integration_tokens")
+        .select()
+        .join("providers", "providers.id", "integration_tokens.provider_id")
+        .where("providers.name", "google")
+        .first();
+
+      integration.client_id = integration_tokens.client_id;
+      integration.client_secret = integration_tokens.client_secret;
+      integration.application_id = integration_tokens.application_id;
+    }
 
     const oauthRes = await superagent
       .post("https://oauth2.googleapis.com/token")
