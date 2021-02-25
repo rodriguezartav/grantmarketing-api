@@ -37,7 +37,7 @@ async function Run(integration) {
       .table("integrations")
       .update({
         auth_token: "",
-        refresh_token: "",
+
         expiry_date: null,
       })
       .where("id", integration.id);
