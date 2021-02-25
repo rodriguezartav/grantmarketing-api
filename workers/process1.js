@@ -44,10 +44,16 @@ setInterval(async () => {
           (item) => (integrationMap[item.provider_name] = item)
         );
 
-        let tryError;
+        let tryError = null;
         let resultLog = [];
         try {
+          let index = 0;
+          const interval = setInterval(() => {
+            if (index > 20) throw new Error("HerokuRunner Timeout");
+            index++;
+          }, 10000);
           resultLog = await HerokuRunner(integrationMap, job.script_location);
+          clearInterval(interval);
         } catch (e) {
           tryError = e;
         }
@@ -59,16 +65,18 @@ setInterval(async () => {
 
         await knex.table("jobs").delete().where("id", job.id);
 
-        if (tryError) {
-          await knex.table("script_logs").insert({
-            script_id: job.script_id,
-            job_id: job.id,
-            log: {
-              error: { message: tryError.message, stack: tryError.stack },
-              lines: resultLog,
-            },
-          });
+        await knex.table("script_logs").insert({
+          script_id: job.script_id,
+          job_id: job.id,
+          log: {
+            error: tryError
+              ? { message: tryError.message, stack: tryError.stack }
+              : null,
+            lines: resultLog,
+          },
+        });
 
+        if (tryError) {
           await sms(
             tryError.message.substring(0, 35),
             job.admin_country_code + job.admin_phone
