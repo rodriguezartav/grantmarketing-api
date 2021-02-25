@@ -6,7 +6,7 @@ const { enums } = require("googleapis");
 const { GoogleAdsApi } = require("google-ads-api");
 const moment = require("moment");
 
-async function Run(integrationMap) {
+module.exports = async function Run(integrationMap) {
   try {
     const googleTokens = await Knex()
       .table("integration_tokens")
@@ -54,4 +54,4 @@ async function Run(integrationMap) {
     await knex.destroy();
     throw e;
   }
-}
+};
