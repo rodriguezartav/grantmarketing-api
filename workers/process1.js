@@ -23,8 +23,8 @@ setInterval(async () => {
       .join("scripts", "scripts.id", "jobs.script_id")
       .join("schedules", "schedules.id", "jobs.schedule_id")
       .join("admins", "admins.id", "schedules.admin_id")
-      .where("status", "pending")
-      .whereNotNull("scripts.location");
+      .whereNotNull("scripts.location")
+      .where("status", "pending");
 
     for (let index = 0; index < jobs.length; index++) {
       const job = jobs[index];

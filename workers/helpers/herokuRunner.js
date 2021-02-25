@@ -24,8 +24,6 @@ module.exports = function Run(integrationMap, script) {
         },
       });
 
-      console.log(dynoRes);
-
       const logRes = await heroku.post("/apps/grantmarketing/log-sessions", {
         body: {
           dyno: dynoRes.name,
@@ -33,14 +31,13 @@ module.exports = function Run(integrationMap, script) {
         },
       });
 
-      console.log(logRes);
-
       let lines = [];
       const logRequest = https
         .get(logRes.logplex_url, (res) => {
           res.on("data", (d) => {
             const line = d.toString();
             lines.push(line);
+            console.log(line);
             if (line.indexOf("END") > -1) {
               logRequest.destroy();
               resolve(lines.join(","));
