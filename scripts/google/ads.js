@@ -9,16 +9,17 @@ const moment = require("moment");
 async function Run(integrationMap) {
   try {
     const google = await Knex()
-      .table("integrations")
+      .table("integration_tokens")
       .select()
+      .join("providers", "providers.id", "integration_tokens.provider_id")
       .where("customer_id", 1)
-      .where("provider_name", "google")
+      .where("providers.name", "google")
       .first();
 
     const client = new GoogleAdsApi({
       client_id: google.client_id,
       client_secret: google.client_secret,
-      developer_token: google.api_key,
+      developer_token: process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
     });
 
     const customer = client.Customer({
