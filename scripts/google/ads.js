@@ -4,7 +4,7 @@ const { Parser } = require("json2csv");
 const { google } = require("googleapis");
 const { enums } = require("googleapis");
 const SendGrid = require("../../helpers/sendgrid");
-
+const sms = require("../../helpers/sms");
 const { GoogleAdsApi } = require("google-ads-api");
 const moment = require("moment");
 
@@ -44,11 +44,21 @@ module.exports = async function Run(integrationMap, users) {
       limit: 20,
     });
 
-    let csv = "No data";
+    let csv = "campaing,cost";
     if (campaigns.length > 0) {
       const json2csvParser = new Parser();
       csv = json2csvParser.parse(campaigns);
     }
+
+    const random = parseInt(Math.random() * 10000000);
+    var params = {
+      Body: csv,
+      Bucket: "reports.jungledynamics.com",
+      Key: "csv/" + random + ".csv",
+    };
+    await s3.putObject(params);
+
+    sms(`Your report  http://reports.jungledynamics.com/csv/${random}.csv`);
 
     const msg = {
       to: "roberto@rodcocr.com",
