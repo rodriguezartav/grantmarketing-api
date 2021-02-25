@@ -7,6 +7,8 @@ const SendGrid = require("../../helpers/sendgrid");
 const sms = require("../../helpers/sms");
 const { GoogleAdsApi } = require("google-ads-api");
 const moment = require("moment");
+const AWS = require("aws-sdk");
+var s3 = new AWS.S3();
 
 module.exports = async function Run(integrationMap, users) {
   try {
@@ -59,16 +61,6 @@ module.exports = async function Run(integrationMap, users) {
     await s3.putObject(params);
 
     sms(`Your report  http://reports.jungledynamics.com/csv/${random}.csv`);
-
-    const msg = {
-      to: "roberto@rodcocr.com",
-      from: "roberto@coalicionsur.org",
-      subject: "Google Ads CSV",
-      text: "Here's you google ads CSV \n" + csv,
-      html: "<strong>Here's you google ads CSV</strong> <br/> " + csv,
-    };
-    //ES6
-    await sendGrid.send(msg);
 
     process.exit(0);
   } catch (e) {
