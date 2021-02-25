@@ -44,12 +44,15 @@ module.exports = async function Run(integrationMap, users) {
       limit: 20,
     });
 
-    const json2csvParser = new Parser();
-    const csv = json2csvParser.parse(campaigns);
+    let csv = "No data";
+    if (campaigns.length > 0) {
+      const json2csvParser = new Parser();
+      csv = json2csvParser.parse(campaigns);
+    }
 
     const msg = {
       to: "roberto@rodcocr.com",
-      from: "roberto@coalicionsur.org", // Use the email address or domain you verified above
+      from: "roberto@coalicionsur.org",
       subject: "Google Ads CSV",
       text: "Here's you google ads CSV \n" + csv,
       html: "<strong>Here's you google ads CSV</strong> <br/> " + csv,

@@ -14,7 +14,7 @@ async function Test() {
       .table("integrations")
       .select("integrations.*", "providers.name as provider")
       .join("providers", "providers.id", "integrations.provider_id")
-      .where({ customer_id: 1 });
+      .where({ customer_id: 8 });
 
     const integrationToken = await Knex()
       .table("integration_tokens")
@@ -33,6 +33,7 @@ async function Test() {
 
     process.env.INTEGRATION_MAP = JSON.stringify(integrationMap);
     process.env.SCRIPT = "google/ads";
+    process.env.USERS = JSON.stringify([]);
 
     await Runner();
   } catch (e) {
