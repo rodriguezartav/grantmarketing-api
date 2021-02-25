@@ -6,6 +6,7 @@ const moment = require("moment");
 async function Run() {
   console.log("START");
   try {
+    let users = JSON.parse(process.env.USERS);
     let scriptPath = process.env.SCRIPT;
     const integrationMap = JSON.parse(process.env.INTEGRATION_MAP);
     console.log(scriptPath);
@@ -20,7 +21,7 @@ async function Run() {
     }, 1000);
 
     console.log("SCRIPT_START");
-    await script(integrationMap);
+    await script(integrationMap, users);
     console.log("END");
     process.exit(0);
   } catch (e) {

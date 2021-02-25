@@ -49,6 +49,11 @@ async function Run() {
           .join("providers", "providers.id", "integrations.provider_id")
           .where({ customer_id: job.customer_id });
 
+        const users = await Knex()
+          .table("users")
+          .select()
+          .where("customer_id", job.customer_id);
+
         let integrationMap = {};
         integrations.forEach((item) => {
           const integrationToken = integrationTokensMap[item.provider];
@@ -70,7 +75,11 @@ async function Run() {
         let resultLog = [];
         try {
           let index = 0;
-          resultLog = await HerokuRunner(integrationMap, job.script_location);
+          resultLog = await HerokuRunner(
+            integrationMap,
+            job.script_location,
+            users
+          );
         } catch (e) {
           tryError = e;
         }

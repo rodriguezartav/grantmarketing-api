@@ -5,7 +5,7 @@ const https = require("https");
 const Heroku = require("heroku-client");
 const heroku = new Heroku({ token: process.env.HEROKU_API_TOKEN });
 
-module.exports = function Run(integrationMap, script) {
+module.exports = function Run(integrationMap, script, users) {
   let promise = new Promise(async (resolve, reject) => {
     try {
       const dynoRes = await heroku.post("/apps/grantmarketing/dynos", {
@@ -16,6 +16,7 @@ module.exports = function Run(integrationMap, script) {
             LINES: "24",
             INTEGRATION_MAP: JSON.stringify(integrationMap),
             SCRIPT: script,
+            USERS: JSON.stringify(users),
           },
           force_no_tty: null,
           size: "Hobby.",

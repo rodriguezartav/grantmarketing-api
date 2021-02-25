@@ -1,14 +1,17 @@
 if (!process.env.NODE_ENV) require("dotenv").config();
 const Knex = require("../../helpers/knex");
-
+const { Parser } = require("json2csv");
 const { google } = require("googleapis");
 const { enums } = require("googleapis");
+const SendGrid = require("../../helpers/sendgrid");
+
 const { GoogleAdsApi } = require("google-ads-api");
 const moment = require("moment");
 
-module.exports = async function Run(integrationMap) {
+module.exports = async function Run(integrationMap, users) {
   try {
     const googleIntegration = integrationMap["google"];
+    const sendGrid = sendGrid(integrationMap["sendgrid"]);
 
     const client = new GoogleAdsApi({
       client_id: googleIntegration.client_id,
@@ -41,8 +44,19 @@ module.exports = async function Run(integrationMap) {
       limit: 20,
     });
 
-    //  await trx.commit();
-    console.log(campaigns);
+    const json2csvParser = new Parser();
+    const csv = json2csvParser.parse(campaigns);
+
+    const msg = {
+      to: "roberto@rodcocr.com",
+      from: "roberto@coalicionsur.org", // Use the email address or domain you verified above
+      subject: "Google Ads CSV",
+      text: "Here's you google ads CSV \n" + csv,
+      html: "<strong>Here's you google ads CSV</strong> <br/> " + csv,
+    };
+    //ES6
+    await sgMail.send(msg);
+
     process.exit(0);
   } catch (e) {
     //  if (trx) await trx.rollback();

@@ -27,6 +27,7 @@
     "http-errors": "^1.6.3",
     "jade": "~1.11.0",
     "jsforce": "^1.10.1",
+    "json2csv": "^5.0.6",
     "jwt-decode": "^3.1.2",
     "jwt-simple": "^0.5.6",
     "knex": "^0.20.11",
