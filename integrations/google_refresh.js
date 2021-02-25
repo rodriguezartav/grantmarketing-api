@@ -47,9 +47,15 @@ async function Run(integration) {
     await Run(JSON.parse(process.argv[2]));
     process.exit(0);
   } catch (e) {
-    console.log("REFRESH_ERROR");
+    console.log(
+      "REFRESH_ERROR",
+      moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+    );
     console.error(e);
-    console.error("CRITICAL_ERROR");
+    console.error(
+      "CRITICAL_ERROR",
+      moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+    );
     s;
     Knex().destroy();
     process.exit(1);

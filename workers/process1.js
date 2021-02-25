@@ -11,7 +11,10 @@ const AWS = require("aws-sdk");
 var s3 = new AWS.S3();
 
 async function Run() {
-  console.log("Procces 1 Start");
+  console.log(
+    "Process1 Start",
+    moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+  );
   try {
     knex = Knex();
 
@@ -135,14 +138,21 @@ async function Run() {
             .update({ last_run: moment() })
             .where("id", job.schedule_id);
       } catch (e) {
-        console.error("JOB CRITICAL_ERROR");
+        console.error(
+          "JOB CRITICAL_ERROR",
+          moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+        );
         console.error(e);
       }
     }
     await knex.destroy();
+    process.exit(0);
   } catch (e) {
     if (knex) await knex.destroy();
-    console.error("CRITICAL_ERROR");
+    console.error(
+      "CRITICAL_ERROR",
+      moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+    );
     console.error(e);
     throw e;
   }

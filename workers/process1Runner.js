@@ -6,9 +6,8 @@ try {
     let { stdout, stderr, error } = await execFile("node", [
       `./workers/process1.js`,
     ]);
-    console.log(stdout, stderr, error);
   }, 60000);
 } catch (e) {
-  console.log("CRITICAL_ERROR");
+  console.log("CRITICAL_ERROR", process.exit(0));
   console.error(e);
 }

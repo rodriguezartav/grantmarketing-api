@@ -27,7 +27,13 @@ setInterval(async () => {
         (item) => item.provider == integration.provider
       );
 
-      console.log(integration.provider, moment().format("DD-MM-YYYY HH:MM"));
+      console.log(
+        "REFRESH",
+        integration.provider,
+        moment(integration.expiry_date).format("DD-MM-YYYY HH:MM"),
+        moment().format("DD-MM-YYYY HH:MM"),
+        moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+      );
 
       if (integrationToken && integrationToken.client_id) {
         integration.client_id = integrationToken.client_id;
