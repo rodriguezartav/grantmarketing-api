@@ -4,7 +4,6 @@ const request = require("superagent");
 
 async function Run(integration) {
   try {
-    n;
     let response = await request
       .post("https://oauth2.googleapis.com/token")
       .send({

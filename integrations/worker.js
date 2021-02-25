@@ -36,12 +36,14 @@ setInterval(async () => {
           integration.application_id = integrationToken.application_id;
       }
 
-      const { stdout, stderr, error } = await execFile("node", [
-        `./integrations/${integration.provider}_refresh.js`,
-        JSON.stringify(integration),
-      ]);
+      if (integration.refresh_token) {
+        const { stdout, stderr, error } = await execFile("node", [
+          `./integrations/${integration.provider}_refresh.js`,
+          JSON.stringify(integration),
+        ]);
 
-      console.log(stdout, stderr, error);
+        console.log(stdout, stderr, error);
+      }
     }
   } catch (e) {
     console.error("CRITICAL_ERROR");
