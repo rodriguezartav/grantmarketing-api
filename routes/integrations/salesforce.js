@@ -10,8 +10,9 @@ router.get("/callback", async function (req, res, next) {
   try {
     const integration = await Knex()
       .table("integrations")
-      .select()
-      .where("provider_name", "salesforce")
+      .select("integrations.*", "providers.name as provider")
+      .join("providers", "providers.id", "integrations.provider_id")
+      .where("providers.name", "salesforce")
       .where("customer_id", parseInt(req.query.state))
       .first();
 
@@ -48,8 +49,9 @@ router.get("/callback", async function (req, res, next) {
 router.get("/:customer_id", async function (req, res, next) {
   const integration = await Knex()
     .table("integrations")
-    .select()
-    .where("provider_name", "salesforce")
+    .select("integrations.*", "providers.name as provider")
+    .join("providers", "providers.id", "integrations.provider_id")
+    .where("providers.name", "salesforce")
     .where("customer_id", req.params.customer_id)
     .first();
 

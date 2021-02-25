@@ -11,20 +11,18 @@ setInterval(async () => {
 
     let integrations = await knex
       .table("integrations")
-      .select()
+      .select("integrations.*", "providers.name as provider")
+      .join("providers", "providers.id", "integrations.provider_id")
       .whereNotNull("refresh_token")
       .where("expiry_date", ">", moment());
 
     for (let index = 0; index < integrations.length; index++) {
       const integration = integrations[index];
 
-      console.log(
-        integration.provider_name,
-        moment().format("DD-MM-YYYY HH:MM")
-      );
+      console.log(integration.provider, moment().format("DD-MM-YYYY HH:MM"));
 
       const { stdout, stderr, error } = await execFile("node", [
-        `./integrations/${integration.provider_name}_refresh.js`,
+        `./integrations/${integration.provider}_refresh.js`,
         JSON.stringify(integration),
       ]);
 

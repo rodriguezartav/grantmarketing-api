@@ -37,13 +37,12 @@ async function Run() {
 
         const integrations = await knex
           .table("integrations")
-          .select()
+          .select("integrations.*", "providers.name as provider")
+          .join("providers", "providers.id", "integrations.provider_id")
           .where({ customer_id: job.customer_id });
 
         let integrationMap = {};
-        integrations.forEach(
-          (item) => (integrationMap[item.provider_name] = item)
-        );
+        integrations.forEach((item) => (integrationMap[item.provider] = item));
 
         let tryError = null;
         let resultLog = [];

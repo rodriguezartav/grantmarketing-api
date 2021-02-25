@@ -13,11 +13,12 @@ async function Test() {
 
     const integrations = await knex
       .table("integrations")
-      .select()
+      .select("integrations.*", "providers.name as provider")
+      .join("providers", "providers.id", "integrations.provider_id")
       .where({ customer_id: 1 });
 
     let integrationMap = {};
-    integrations.forEach((item) => (integrationMap[item.provider_name] = item));
+    integrations.forEach((item) => (integrationMap[item.provider] = item));
 
     process.env.INTEGRATION_MAP = JSON.stringify(integrationMap);
     process.env.SCRIPT = "rodco/contactsPgToSf";

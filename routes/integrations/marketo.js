@@ -10,8 +10,9 @@ router.get("/:customer_id", async function (req, res, next) {
   try {
     const integration = await Knex()
       .table("integrations")
-      .select()
-      .where("provider_name", "marketo")
+      .select("integrations.*", "providers.name as provider")
+      .join("providers", "providers.id", "integrations.provider_id")
+      .where("provider..name", "marketo")
       .where("customer_id", parseInt(req.query.state))
       .first();
 
