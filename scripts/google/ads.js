@@ -8,13 +8,14 @@ const moment = require("moment");
 
 async function Run(integrationMap) {
   try {
-    const google = await Knex()
+    const googleTokens = await Knex()
       .table("integration_tokens")
       .select()
       .join("providers", "providers.id", "integration_tokens.provider_id")
-      .where("customer_id", 1)
       .where("providers.name", "google")
       .first();
+
+    const googleIntegration = integrationMap["google"];
 
     const client = new GoogleAdsApi({
       client_id: google.client_id,
@@ -23,7 +24,7 @@ async function Run(integrationMap) {
     });
 
     const customer = client.Customer({
-      customer_id: "7333589176",
+      customer_id: googleIntegration.application_id,
       refresh_token: google.auth_token,
     });
 
@@ -53,23 +54,4 @@ async function Run(integrationMap) {
     await knex.destroy();
     throw e;
   }
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
-if (process.argv[1].indexOf("scripts") != -1) {
-  (async function () {
-    try {
-      await Run();
-      process.exit(0);
-    } catch (e) {
-      console.error(e);
-      await Knex().destroy();
-      process.exit(1);
-    }
-  })();
 }
