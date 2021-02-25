@@ -49,12 +49,7 @@ async function Run() {
         let resultLog = [];
         try {
           let index = 0;
-          const interval = setInterval(() => {
-            if (index > 60) throw new Error("HerokuRunner Timeout");
-            index++;
-          }, 1000);
           resultLog = await HerokuRunner(integrationMap, job.script_location);
-          clearInterval(interval);
         } catch (e) {
           tryError = e;
         }

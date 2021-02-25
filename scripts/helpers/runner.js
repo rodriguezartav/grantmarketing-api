@@ -16,7 +16,7 @@ async function Run() {
     setInterval(() => {
       const now = moment();
       if (now.diff(timeStart, "seconds") > 60 * 5 * 1000)
-        throw new Error("Timeout");
+        throw new Error("Script Timeout");
     }, 1000);
 
     console.log("SCRIPT_START");
