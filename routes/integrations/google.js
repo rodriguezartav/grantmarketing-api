@@ -83,8 +83,4 @@ router.get("/:customer_id", async function (req, res, next) {
   res.redirect(url);
 });
 
-function base64encode(str) {
-  let buff = new Buffer(str);
-  return buff.toString("base64");
-}
 module.exports = router;
