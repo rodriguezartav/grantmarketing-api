@@ -41,6 +41,7 @@ async function Run() {
           .select("integration_tokens.*", "providers.name as provider")
           .join("providers", "providers.id", "integration_tokens.provider_id")
           .first();
+
         const integrationTokensMap = {};
         integrationTokens.forEach((item) => {
           integrationTokensMap[item.provider] = item;
@@ -59,10 +60,10 @@ async function Run() {
             item.client_secret =
               integrationTokensMap[item.provider].client_secret;
             if (
-              !integrationTokensMap[item.provider].application_id &&
+              !item.application_id &&
               integrationTokensMap[item.provider].application_id
             )
-              item.client_id =
+              item.application_id =
                 integrationTokensMap[item.provider].application_id;
           }
           integrationMap[item.provider] = item;
