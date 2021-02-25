@@ -17,8 +17,7 @@ async function Run() {
       .select(
         "jobs.*",
         "scripts.name as script_name",
-        "scripts.location as script_location",
-        "admins.country_code as admin_country_code"
+        "scripts.location as script_location"
       )
       .join("customers", "customers.id", "jobs.customer_id")
       .join("scripts", "scripts.id", "jobs.script_id")
@@ -94,10 +93,10 @@ async function Run() {
         });
 
         if (tryError) {
-          await sms(
-            tryError.message.substring(0, 35),
-            job.admin_country_code + job.admin_phone
-          );
+          //await sms(
+          // tryError.message.substring(0, 35),
+          //job.admin_country_code + job.admin_phone
+          //);
         } else
           await knex
             .table("schedules")
