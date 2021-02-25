@@ -25,7 +25,7 @@ async function Run() {
     console.log("END");
     process.exit(0);
   } catch (e) {
-    console.error("SCRIPT_CRITICAL_ERROR");
+    console.error("SCRIPT_ERROR");
     console.error(e);
     console.log("END");
     process.exit(1);
