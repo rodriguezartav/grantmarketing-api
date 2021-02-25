@@ -63,8 +63,7 @@ module.exports = async function Run(integrationMap, users) {
       `Your report  http://reports.jungledynamics.com/csv/${random}.csv`,
       users[0].country_code + users[0].phone
     );
-
-    process.exit(0);
+    return true;
   } catch (e) {
     //  if (trx) await trx.rollback();
     console.log(e);
