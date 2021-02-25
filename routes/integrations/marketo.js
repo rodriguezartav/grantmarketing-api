@@ -12,7 +12,7 @@ router.get("/:customer_id", async function (req, res, next) {
       .table("integrations")
       .select("integrations.*", "providers.name as provider")
       .join("providers", "providers.id", "integrations.provider_id")
-      .where("provider..name", "marketo")
+      .where("providers.name", "marketo")
       .where("customer_id", parseInt(req.query.state))
       .first();
 

@@ -35,6 +35,16 @@ async function Run() {
           .update({ status: "working" })
           .where("id", job.id);
 
+        const integrationTokens = await Knex()
+          .table("integration_tokens")
+          .select("integration_tokens.*", "providers.name as provider")
+          .join("providers", "providers.id", "integration_tokens.provider_id")
+          .first();
+        const integrationTokensMap = {};
+        integrationTokens.forEach((item) => {
+          integrationTokensMap[item.provider] = item;
+        });
+
         const integrations = await knex
           .table("integrations")
           .select("integrations.*", "providers.name as provider")
@@ -42,7 +52,20 @@ async function Run() {
           .where({ customer_id: job.customer_id });
 
         let integrationMap = {};
-        integrations.forEach((item) => (integrationMap[item.provider] = item));
+        integrations.forEach((item) => {
+          if (item.provider == integrationTokensMap[item.provider].provider) {
+            item.client_id = integrationTokensMap[item.provider].client_id;
+            item.client_secret =
+              integrationTokensMap[item.provider].client_secret;
+            if (
+              !integrationTokensMap[item.provider].application_id &&
+              integrationTokensMap[item.provider].application_id
+            )
+              item.client_id =
+                integrationTokensMap[item.provider].application_id;
+          }
+          integrationMap[item.provider] = item;
+        });
 
         let tryError = null;
         let resultLog = [];
