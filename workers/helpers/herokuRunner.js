@@ -40,7 +40,7 @@ module.exports = function Run(integrationMap, script) {
             console.log(line);
             if (line.indexOf("END") > -1) {
               logRequest.destroy();
-              resolve(lines.join(","));
+              resolve(lines);
             }
           });
         })
