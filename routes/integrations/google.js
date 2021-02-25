@@ -8,7 +8,6 @@ const jwt_decode = require("jwt-decode");
 const { TenNinetyNineContact } = require("xero-node");
 
 router.get("/callback", async function (req, res, next) {
-  console.log(req.query);
   try {
     const integration = await Knex()
       .table("integrations")
@@ -34,11 +33,6 @@ router.get("/callback", async function (req, res, next) {
         integration.application_id = integration_tokens.application_id;
     }
 
-    console.log(
-      integration,
-      `${process.env.API_URL}/integrations/google/callback`
-    );
-
     const oauthRes = await superagent
       .post("https://oauth2.googleapis.com/token")
 
@@ -61,7 +55,7 @@ router.get("/callback", async function (req, res, next) {
       })
       .where("id", integration.id);
 
-    res.render("connected");
+    res.redirect(`${process.env.WEB_URL}/connected`);
   } catch (e) {
     return next(e);
   }
@@ -76,7 +70,7 @@ router.get("/:customer_id", async function (req, res, next) {
     .where("customer_id", req.params.customer_id)
     .first();
 
-  if (!integration) return res.render("404");
+  if (!integration) return res.sendStatus("404");
 
   const integrationToken = await Knex()
     .table("integration_tokens")
@@ -86,7 +80,6 @@ router.get("/:customer_id", async function (req, res, next) {
     .first();
 
   const url = `https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/adwords &response_type=code&client_id=${integrationToken.client_id}&redirect_uri=${process.env.API_URL}/integrations/google/callback&state=${req.params.customer_id}&prompt=consent`;
-  console.log(url);
 
   res.redirect(url);
 });

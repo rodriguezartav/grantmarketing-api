@@ -31,7 +31,7 @@ router.get("/:customer_id", async function (req, res, next) {
       })
       .where("id", integration.id);
 
-    res.render("connected");
+    res.redirect(`${process.env.WEB_URL}/connected`);
   } catch (e) {
     return next(e);
   }

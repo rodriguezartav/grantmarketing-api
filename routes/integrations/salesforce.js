@@ -40,7 +40,7 @@ router.get("/callback", async function (req, res, next) {
       })
       .where("id", integration.id);
 
-    res.render("connected");
+    res.redirect(`${process.env.WEB_URL}/connected`);
   } catch (e) {
     return next(e);
   }
@@ -55,7 +55,7 @@ router.get("/:customer_id", async function (req, res, next) {
     .where("customer_id", req.params.customer_id)
     .first();
 
-  if (!integration) return res.render("404");
+  if (!integration) return res.sendStatus("404");
 
   res.redirect(
     `https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=${integration.client_id}&redirect_uri=${process.env.API_URL}/integrations/salesforce/callback&state=${req.params.customer_id}`

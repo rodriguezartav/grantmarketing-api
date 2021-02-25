@@ -23,8 +23,7 @@ if (process.env.NODE_ENV == "production") require("./integrations/worker");
 var app = express();
 
 // view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
+
 app.use(express.static(path.join(__dirname, "public")));
 //
 app.options("*", cors()); // enable pre-flight request for DELETE request
@@ -36,14 +35,6 @@ app.use(cookieParser());
 
 app.options("*", cors()); // enable pre-flight request for DELETE request
 app.use("*", cors()); // enable pre-flight request for DELETE request
-
-app.get("/", (req, res) => {
-  res.render("index");
-});
-
-app.get("/connect/:customer_id/:provider", (req, res) => {
-  return res.render("connect", { ...req.params, url: process.env.API_URL });
-});
 
 app.use("/integrations/xero", cors(), XeroIntegration);
 app.use("/integrations/salesforce", cors(), SalesforceIntegration);
@@ -72,13 +63,12 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  if (
-    req.xhr ||
-    (req.headers.accept && req.headers.accept.indexOf("json") > -1)
-  ) {
-    console.log(err.stack);
-    return res.send(err.message);
-  } else res.render("error", { stack: err.stack || "", message: err.message });
+
+  return res.json({
+    message: err.message,
+    status: err.status || 500,
+    stack: e.stack,
+  });
 });
 
 module.exports = app;

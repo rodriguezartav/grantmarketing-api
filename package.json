@@ -35,12 +35,12 @@
     "moment": "^2.29.1",
     "morgan": "~1.9.1",
     "pg": "^7.12.1",
-    "postcss": "^8.2.5",
+    "postcss": "^8.2.6",
     "postcss-cli": "^8.3.1",
     "server-event": "^1.0.1",
     "split": "^1.0.1",
     "superagent": "^6.1.0",
-    "tailwindcss": "^2.0.2",
+    "tailwindcss": "^2.0.3",
     "twilio": "^3.55.1",
     "xero-node": "^4.9.1"
   }
