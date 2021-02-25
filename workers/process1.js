@@ -7,6 +7,8 @@ const HerokuRunner = require("./helpers/herokuRunner");
 const Knex = require("../helpers/knex");
 const e = require("express");
 let knex;
+const AWS = require("aws-sdk");
+var s3 = new AWS.S3();
 
 async function Run() {
   console.log("Procces 1 Start");
@@ -91,17 +93,6 @@ async function Run() {
 
         await knex.table("jobs").delete().where("id", job.id);
 
-        await knex.table("script_logs").insert({
-          script_id: job.script_id,
-          job_id: job.id,
-          log: {
-            error: tryError
-              ? { message: tryError.message, stack: tryError.stack }
-              : null,
-            lines: resultLog.map((item) => item.replace("\u0000", "")),
-          },
-        });
-
         if (tryError) {
           const admin = await knex
             .table("admins")
@@ -121,6 +112,17 @@ async function Run() {
             Key: "logs/" + random + ".html",
           };
           await s3.putObject(params);
+
+          await knex.table("script_logs").insert({
+            script_id: job.script_id,
+            job_id: job.id,
+            log: {
+              error: tryError
+                ? { message: tryError.message, stack: tryError.stack }
+                : null,
+              linke: `http://reports.jungledynamics.com/logs/${random}.html`,
+            },
+          });
 
           if (admin)
             await sms(
