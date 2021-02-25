@@ -32,6 +32,11 @@ router.get("/callback", async function (req, res, next) {
       integration.application_id = integration_tokens.application_id;
     }
 
+    console.log(
+      integration,
+      `${process.env.API_URL}/integrations/google/callback`
+    );
+
     const oauthRes = await superagent
       .post("https://oauth2.googleapis.com/token")
 
