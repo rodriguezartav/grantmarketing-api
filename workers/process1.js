@@ -95,11 +95,12 @@ async function Run() {
 
         if (tryError) {
           const admin = await knex
-            .table("schedules")
+            .table("admins")
             .select("admins.*")
-            .join("admins", "admins.id", "schedules.admin_id")
-            .where(("schedules.id", job.schedule_id))
+            .leftJoin("schedules", "admins.id", "schedules.admin_id")
+            .where("schedules.id", job.schedule_id)
             .orWhere("admins.id", 1)
+            .order("admins.id", "DESC")
             .first();
 
           if (admin)
