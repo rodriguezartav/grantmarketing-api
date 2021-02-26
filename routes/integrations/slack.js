@@ -47,7 +47,7 @@ router.get("/callback", async function (req, res, next) {
       .table("integrations")
       .update({
         external_user_id: oauthRes.body.bot.bot_user_id,
-        api_key: oauthRes.body.bot.bot_access_token,
+        api_key: oauthRes.body.bot ? oauthRes.body.bot.bot_access_token : null,
         auth_token: oauthRes.body.access_token,
         expiry_date: moment().add(1000, "months"),
       })
@@ -77,7 +77,7 @@ router.get("/:customer_id", async function (req, res, next) {
     .where("providers.name", "slack")
     .first();
 
-  const url = `https://slack.com/oauth/authorize&scope=write&client_id=${integrationToken.client_id}&redirect_uri=${process.env.API_URL}/integrations/slack/callback&state=${req.params.customer_id}`;
+  const url = `https://slack.com/oauth/v1/authorize?scope=chat:write&client_id=${integrationToken.client_id}&redirect_uri=${process.env.API_URL}/integrations/slack/callback&state=${req.params.customer_id}`;
 
   res.redirect(url);
 });
