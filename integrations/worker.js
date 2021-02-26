@@ -38,8 +38,8 @@ setInterval(async () => {
         console.log(
           "REFRESH",
           integration.provider,
-          moment(integration.expiry_date).format("DD-MM-YYYY HH:MM:SS"),
-          moment().format("DD-MM-YYYY HH:MM:SS")
+          moment(integration.expiry_date).format("DD-MM-YYYY HH:MM:ss"),
+          moment().format("DD-MM-YYYY HH:MM:ss")
         );
 
         const { stdout, stderr, error } = await execFile("node", [
@@ -47,11 +47,11 @@ setInterval(async () => {
           JSON.stringify(integration),
         ]);
 
-        console.log(stdout, stderr, error);
+        console.log("REFRESH_DONE", stdout, stderr, error);
       }
     }
   } catch (e) {
-    console.error("CRITICAL_ERROR");
+    console.error("REFRESH CRITICAL_ERROR");
     console.error(e);
     throw e;
   }

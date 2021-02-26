@@ -20,7 +20,7 @@ function prepareKnex() {
       timezone: "UTC",
       typeCast: function (field, next) {
         if (field.type == "DATETIME" || field.type == "TIMESTAMP") {
-          return moment(field.string()).format("YYYY-MM-DD HH:mm:ss");
+          return moment(field.string()).format("YYYY-MM-DD HH:MM:ss");
         }
         if (field.type == "NEWDECIMAL" || field.type == "LONG") {
           var value = field.string();
