@@ -66,7 +66,7 @@ app.use(function (err, req, res, next) {
   return res.json({
     message: err.message,
     status: err.status || 500,
-    stack: e.stack,
+    stack: err.stack,
   });
 });
 
