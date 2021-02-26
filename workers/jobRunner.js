@@ -86,7 +86,8 @@ var s3 = new AWS.S3();
         let { url, log } = await HerokuRunner(
           integrationMap,
           job.script_location,
-          users
+          users,
+          job.scriptOptions
         );
 
         console.log("HEROKU END", url);

@@ -24,6 +24,7 @@ setInterval(async () => {
       ) {
         await knex.table("jobs").insert({
           status: "pending",
+          script_options: schedule.script_options,
           schedule_id: schedule.id,
           script_id: schedule.script_id,
           customer_id: schedule.customer_id,

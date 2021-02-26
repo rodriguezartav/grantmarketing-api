@@ -3,16 +3,16 @@ const Knex = require("../../helpers/knex");
 const { Parser } = require("json2csv");
 const { google } = require("googleapis");
 const { enums } = require("googleapis");
-//const SendGrid = require("../../helpers/sendgrid");
+const SendGrid = require("../../helpers/sendgrid");
 const sms = require("../../helpers/sms");
 const { GoogleAdsApi } = require("google-ads-api");
 const moment = require("moment");
 const AWS = require("aws-sdk");
 var s3 = new AWS.S3();
 
-module.exports = async function Run(integrationMap, users) {
+async function Run(integrationMap, users, scriptOptions) {
   const googleIntegration = integrationMap["google"];
-  //const sendGrid = SendGrid(integrationMap["sendgrid"]);
+  const sendGrid = SendGrid();
 
   const client = new GoogleAdsApi({
     client_id: googleIntegration.client_id,
@@ -44,8 +44,6 @@ module.exports = async function Run(integrationMap, users) {
     limit: 20,
   });
 
-  console.log(campaigns);
-
   let csv = "campaing,cost";
   if (campaigns.length > 0) {
     const json2csvParser = new Parser();
@@ -60,9 +58,28 @@ module.exports = async function Run(integrationMap, users) {
   };
   await s3.putObject(params).promise();
 
-  await sms(
-    `Your report  http://reports.jungledynamics.com/csv/${random}.csv`,
-    users[0].country_code + users[0].phone
-  );
+  const msg = {
+    to: scriptOptions.email,
+    from: "roberto@coalicionsur.org",
+    subject: "Your Google Ads Report",
+    text: `http://reports.jungledynamics.com/csv/${random}.csv`,
+    html: `http://reports.jungledynamics.com/csv/${random}.csv`,
+  };
+  //ES6
+  await sendgrid.send(msg);
+
   return true;
+}
+
+Run.options = {
+  properties: {
+    email: {
+      type: "string",
+      label: "Email",
+      description: "Email used to send report",
+    },
+  },
+  required: ["email"],
 };
+
+module.exports = Run;

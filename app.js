@@ -42,7 +42,8 @@ app.use("/integrations/slack", cors(), SlackIntegration);
 
 app.use("/api/login", cors(), Login);
 app.use("/api/userLogin", cors(), UserLogin);
-app.use("/api/schemas", cors(), require("./routes/schemas"));
+app.use("/vpi/schemas", cors(), require("./routes/schemas"));
+app.use("/vpi/scripts", cors(), require("./routes/scripts"));
 app.use("/api/:resource", cors(), Jwt, makeRouter());
 
 // catch 404 and forward to error handler
