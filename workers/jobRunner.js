@@ -117,13 +117,13 @@ async function Run() {
         );
       } catch (e) {
         console.error(
-          "JOBRUNNER CRITICAL_ERROR",
+          "JOB CRITICAL_ERROR",
           moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
         );
         console.error(e);
       }
     }
-    console.error(
+    console.log(
       "JOBRUNNER_END",
       moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
     );
@@ -136,7 +136,7 @@ async function Run() {
       moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
     );
     console.error(e);
-    throw e;
+    process.exit(1);
   }
 }
 
