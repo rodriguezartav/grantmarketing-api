@@ -77,7 +77,7 @@ router.get("/:customer_id", async function (req, res, next) {
     .where("providers.name", "slack")
     .first();
 
-  const url = `https://slack.com/oauth/v1/authorize?scope=chat:write&client_id=${integrationToken.client_id}&redirect_uri=${process.env.API_URL}/integrations/slack/callback&state=${req.params.customer_id}`;
+  const url = `https://slack.com/oauth/v2/authorize?scope=chat:write&client_id=${integrationToken.client_id}&redirect_uri=${process.env.API_URL}/integrations/slack/callback&state=${req.params.customer_id}`;
 
   res.redirect(url);
 });
