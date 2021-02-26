@@ -82,11 +82,15 @@ async function Run() {
           integrationMap[item.provider] = item;
         });
 
+        console.log("HEROKU START");
+
         let { url, log } = await HerokuRunner(
           integrationMap,
           job.script_location,
           users
         );
+
+        console.log("HEROKU END", url);
 
         await knex.table("script_logs").insert({
           script_id: job.script_id,
