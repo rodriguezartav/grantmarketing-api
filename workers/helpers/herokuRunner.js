@@ -35,13 +35,14 @@ module.exports = function Run(integrationMap, script, users) {
       let lines = [];
       const logRequest = https
         .get(logRes.logplex_url, (res) => {
-          res.on("data", (d) => {
+          res.on("data", async (d) => {
             const line = d.toString();
             lines.push(line);
             console.log(line);
             if (line.indexOf("END") > -1) {
               logRequest.destroy();
-              resolve(lines);
+              const url = await saveToS3(lines);
+              resolve({ url, log: lines.join(",") });
             }
           });
         })
@@ -57,3 +58,17 @@ module.exports = function Run(integrationMap, script, users) {
 
   return promise;
 };
+
+async function saveToS3(lines) {
+  const random = parseInt(Math.random() * 10000000);
+  var params = {
+    Body: `<h1>Log</h1></p><p>${lines
+      .map((item) => item.replace("\u0000", ""))
+      .join("<br/>")}</p>`,
+
+    Bucket: "logs.jungledynamics.com",
+    Key: "logs/" + random + ".html",
+  };
+  await s3.putObject(params);
+  return `https://logs.jungledynamics.com/${random}.html`;
+}

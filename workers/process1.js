@@ -31,6 +31,16 @@ async function Run() {
       .whereNotNull("scripts.location")
       .where("status", "pending");
 
+    const integrationTokens = await Knex()
+      .table("integration_tokens")
+      .select("integration_tokens.*", "providers.name as provider")
+      .join("providers", "providers.id", "integration_tokens.provider_id");
+
+    const integrationTokensMap = {};
+    integrationTokens.forEach((item) => {
+      integrationTokensMap[item.provider] = item;
+    });
+
     for (let index = 0; index < jobs.length; index++) {
       const job = jobs[index];
       try {
@@ -38,16 +48,6 @@ async function Run() {
           .table("jobs")
           .update({ status: "working" })
           .where("id", job.id);
-
-        const integrationTokens = await Knex()
-          .table("integration_tokens")
-          .select("integration_tokens.*", "providers.name as provider")
-          .join("providers", "providers.id", "integration_tokens.provider_id");
-
-        const integrationTokensMap = {};
-        integrationTokens.forEach((item) => {
-          integrationTokensMap[item.provider] = item;
-        });
 
         const integrations = await knex
           .table("integrations")
@@ -77,66 +77,28 @@ async function Run() {
           integrationMap[item.provider] = item;
         });
 
-        let tryError = null;
-        let resultLog = [];
-        try {
-          resultLog = await HerokuRunner(
-            integrationMap,
-            job.script_location,
-            users
-          );
-        } catch (e) {
-          tryError = e;
-        }
+        let { url, log } = await HerokuRunner(
+          integrationMap,
+          job.script_location,
+          users
+        );
 
-        await knex.table("executions").insert({
-          schedule_id: job.schedule_id,
-          result: tryError ? 1 : 0,
+        await knex.table("script_logs").insert({
+          script_id: job.script_id,
+          job_id: job.id,
+          log: {
+            link: url,
+          },
         });
 
         await knex.table("jobs").delete().where("id", job.id);
 
-        if (tryError) {
-          const admin = await knex
-            .table("admins")
-            .select()
-            .where("id", 1)
-            .first();
+        await knex
+          .table("schedules")
+          .update({ last_run: moment() })
+          .where("id", job.schedule_id);
 
-          const random = parseInt(Math.random() * 10000000);
-          var params = {
-            Body: `<h1>${tryError.message}</h1><p>${
-              tryError.stack
-            }</p><p>${resultLog
-              .map((item) => item.replace("\u0000", ""))
-              .join("<br/>")}</p>`,
-
-            Bucket: "reports.jungledynamics.com",
-            Key: "logs/" + random + ".html",
-          };
-          await s3.putObject(params);
-
-          await knex.table("script_logs").insert({
-            script_id: job.script_id,
-            job_id: job.id,
-            log: {
-              error: tryError
-                ? { message: tryError.message, stack: tryError.stack }
-                : null,
-              linke: `http://reports.jungledynamics.com/logs/${random}.html`,
-            },
-          });
-
-          if (admin)
-            await sms(
-              `http://reports.jungledynamics.com/logs/${random}.html`,
-              admin.country_code + admin.phone
-            );
-        } else
-          await knex
-            .table("schedules")
-            .update({ last_run: moment() })
-            .where("id", job.schedule_id);
+        await handleError(log, url);
       } catch (e) {
         console.error(
           "JOB CRITICAL_ERROR",
@@ -159,3 +121,11 @@ async function Run() {
 }
 
 Run();
+
+async function handleError(log, url) {
+  const admin = await knex.table("admins").select().where("id", 1).first();
+
+  if (log.indexOf("SCRIPT_ERROR") > -1) {
+    await sms(url, admin.country_code + admin.phone);
+  }
+}
