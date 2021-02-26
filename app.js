@@ -10,7 +10,7 @@ const cors = require("cors");
 const { makeRouter } = require("./routes/standard");
 const XeroIntegration = require("./routes/integrations/xero");
 const SalesforceIntegration = require("./routes/integrations/salesforce");
-
+const SlackIntegration = require("./routes/integrations/slack");
 const GoogleIntegration = require("./routes/integrations/google");
 
 const Login = require("./routes/login");
@@ -38,6 +38,7 @@ app.use("*", cors()); // enable pre-flight request for DELETE request
 app.use("/integrations/xero", cors(), XeroIntegration);
 app.use("/integrations/salesforce", cors(), SalesforceIntegration);
 app.use("/integrations/google", cors(), GoogleIntegration);
+app.use("/integrations/slack", cors(), SlackIntegration);
 
 app.use("/api/login", cors(), Login);
 app.use("/api/userLogin", cors(), UserLogin);
