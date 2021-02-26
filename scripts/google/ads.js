@@ -44,6 +44,8 @@ module.exports = async function Run(integrationMap, users) {
     limit: 20,
   });
 
+  console.log(campaigns);
+
   let csv = "campaing,cost";
   if (campaigns.length > 0) {
     const json2csvParser = new Parser();
