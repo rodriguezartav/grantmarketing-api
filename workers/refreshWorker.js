@@ -47,11 +47,11 @@ setInterval(async () => {
           JSON.stringify(integration),
         ]);
 
-        
-
         console.log("REFRESH_RESULT", stdout, stderr, error || "");
-        console.log("REFRESH_DONE",  moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm");
-
+        console.log(
+          "REFRESH_DONE",
+          moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+        );
       }
     }
   } catch (e) {
