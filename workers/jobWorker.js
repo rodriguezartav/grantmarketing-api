@@ -3,7 +3,6 @@ const execFile = util.promisify(require("child_process").execFile);
 
 try {
   setInterval(async () => {
-    console.log("*");
     let { stdout, stderr, error } = await execFile("node", [
       `./workers/jobRunner.js`,
     ]);

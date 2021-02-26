@@ -70,6 +70,6 @@ async function saveToS3(lines) {
     Bucket: "logs.jungledynamics.com",
     Key: "logs/" + random + ".html",
   };
-  await s3.putObject(params);
+  await s3.putObject(params).promise();
   return `https://logs.jungledynamics.com/${random}.html`;
 }

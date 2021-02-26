@@ -116,13 +116,13 @@ var s3 = new AWS.S3();
           await sms(url, admin.country_code + admin.phone);
         }
 
-        console.error(
+        console.log(
           "JOB_END",
           job.id,
           moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
         );
       } catch (e) {
-        console.error(
+        console.log(
           "JOB CRITICAL_ERROR",
           moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
         );
