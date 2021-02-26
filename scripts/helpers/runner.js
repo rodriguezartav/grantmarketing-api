@@ -4,7 +4,10 @@ const sms = require("../../helpers/sms");
 const moment = require("moment");
 
 async function Run() {
-  console.log("START", moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm"));
+  console.log(
+    "SCRIPT_START",
+    moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+  );
   try {
     let users = JSON.parse(process.env.USERS);
     let scriptPath = process.env.SCRIPT;
@@ -21,10 +24,7 @@ async function Run() {
         throw new Error("Script Timeout");
     }, 1000);
 */
-    console.log(
-      "SCRIPT_START",
-      moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
-    );
+
     await script(integrationMap, users);
     console.log("END", moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm"));
     process.exit(0);
@@ -34,7 +34,10 @@ async function Run() {
       moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
     );
     console.error(e);
-    console.log("END", moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm"));
+    console.log(
+      "ERROR END",
+      moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+    );
     process.exit(1);
   }
 }
