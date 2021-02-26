@@ -1,5 +1,6 @@
 require("dotenv").config();
-
+const AWS = require("aws-sdk");
+var s3 = new AWS.S3();
 const https = require("https");
 
 const Heroku = require("heroku-client");

@@ -15,8 +15,6 @@ async function Run() {
     console.log(scriptPath);
     const script = require("../" + scriptPath);
 
-    const timeStart = moment();
-    console.log(timeStart);
     /*
     setInterval(() => {
       const now = moment();

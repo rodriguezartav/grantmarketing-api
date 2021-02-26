@@ -44,7 +44,7 @@ module.exports = {
         },
         keepAlive: true,
       },
-      ssl: true,
+      ssl: { rejectUnauthorized: false, required: true },
     },
   },
   production: {
@@ -61,7 +61,7 @@ module.exports = {
         keepAlive: true,
       },
       max: 15,
-      ssl: true,
+      ssl: { rejectUnauthorized: false, required: true },
     },
   },
 };

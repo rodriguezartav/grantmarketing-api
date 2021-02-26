@@ -1,16 +1,13 @@
 require("dotenv").config();
-const util = require("util");
-const execFile = util.promisify(require("child_process").execFile);
 const moment = require("moment");
 const sms = require("../helpers/sms");
 const HerokuRunner = require("./helpers/herokuRunner");
 const Knex = require("../helpers/knex");
-const e = require("express");
-let knex;
 const AWS = require("aws-sdk");
 var s3 = new AWS.S3();
 
-async function Run() {
+(async function () {
+  var knex;
   console.log(
     "JOBRUNNER_START",
     moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
@@ -109,7 +106,16 @@ async function Run() {
           .update({ last_run: moment() })
           .where("id", job.schedule_id);
 
-        await handleError(log, url);
+        const admin = await knex
+          .table("admins")
+          .select()
+          .where("id", 1)
+          .first();
+
+        if (log.indexOf("SCRIPT_ERROR") > -1) {
+          await sms(url, admin.country_code + admin.phone);
+        }
+
         console.error(
           "JOB_END",
           job.id,
@@ -138,14 +144,4 @@ async function Run() {
     console.error(e);
     process.exit(1);
   }
-}
-
-Run();
-
-async function handleError(log, url) {
-  const admin = await knex.table("admins").select().where("id", 1).first();
-
-  if (log.indexOf("SCRIPT_ERROR") > -1) {
-    await sms(url, admin.country_code + admin.phone);
-  }
-}
+})();
