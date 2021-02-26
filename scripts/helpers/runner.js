@@ -26,7 +26,10 @@ async function Run() {
 */
 
     await script(integrationMap, users);
-    console.log("END", moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm"));
+    console.log(
+      "SCRIPT_END",
+      moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+    );
     process.exit(0);
   } catch (e) {
     console.error(
@@ -35,7 +38,8 @@ async function Run() {
     );
     console.error(e);
     console.log(
-      "ERROR END",
+      "SCRIPT_END",
+      "WITH_ERROR",
       moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
     );
     process.exit(1);

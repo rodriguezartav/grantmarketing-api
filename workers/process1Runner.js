@@ -8,6 +8,6 @@ try {
     ]);
   }, 60000);
 } catch (e) {
-  console.log("CRITICAL_ERROR", process.exit(0));
+  console.log("PROCESS_RUNNER CRITICAL_ERROR", process.exit(0));
   console.error(e);
 }
