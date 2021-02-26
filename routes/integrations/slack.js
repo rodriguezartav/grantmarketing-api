@@ -46,7 +46,9 @@ router.get("/callback", async function (req, res, next) {
     await Knex()
       .table("integrations")
       .update({
-        external_user_id: oauthRes.body.bot.bot_user_id,
+        external_user_id: oauthRes.body.bot
+          ? oauthRes.body.bot.bot_user_id
+          : null,
         api_key: oauthRes.body.bot ? oauthRes.body.bot.bot_access_token : null,
         auth_token: oauthRes.body.access_token,
         expiry_date: moment().add(1000, "months"),
