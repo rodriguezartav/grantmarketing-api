@@ -12,7 +12,7 @@ var s3 = new AWS.S3();
 
 async function Run() {
   console.log(
-    "PROCESS1_START",
+    "JOBRUNNER_START",
     moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
   );
   try {
@@ -41,10 +41,12 @@ async function Run() {
       integrationTokensMap[item.provider] = item;
     });
 
+    console.log(jobs);
+
     for (let index = 0; index < jobs.length; index++) {
       const job = jobs[index];
       try {
-        console.error(
+        console.log(
           "JOB_START",
           job.id,
           moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
@@ -115,14 +117,14 @@ async function Run() {
         );
       } catch (e) {
         console.error(
-          "PROCESS1 CRITICAL_ERROR",
+          "JOBRUNNER CRITICAL_ERROR",
           moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
         );
         console.error(e);
       }
     }
     console.error(
-      "PROCESS1_END",
+      "JOBRUNNER_END",
       moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
     );
     await knex.destroy();
@@ -130,7 +132,7 @@ async function Run() {
   } catch (e) {
     if (knex) await knex.destroy();
     console.error(
-      "PROCESS1 CRITICAL_ERROR",
+      "JOBRUNNER CRITICAL_ERROR",
       moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
     );
     console.error(e);
