@@ -1,10 +1,10 @@
 var express = require("express");
 var router = express.Router();
-const JWT = require("../helpers/jwt");
-const Knex = require("../helpers/knex");
 const moment = require("moment");
 const request = require("superagent");
 const jwt_decode = require("jwt-decode");
+const JWT = require("../../helpers/jwt");
+const Knex = require("../../helpers/knex");
 
 async function Run(integration) {
   try {
