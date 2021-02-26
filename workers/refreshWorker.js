@@ -43,7 +43,7 @@ setInterval(async () => {
         );
 
         const { stdout, stderr, error } = await execFile("node", [
-          `./integrations/${integration.provider}_refresh.js`,
+          `./scripts/${integration.provider}/refresh.js`,
           JSON.stringify(integration),
         ]);
 

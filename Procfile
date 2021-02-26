@@ -1,2 +1,3 @@
 web: npm start
-worker: node ./workers/process1Runner.js
+worker: node ./workers/jobWorker.js
+refresh: node ./workers/refreshWorker.js
