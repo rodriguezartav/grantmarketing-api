@@ -9,12 +9,12 @@ async function Run() {
     moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
   );
   try {
-    const scriptOptions = process.env.SCRIPT_OPTIONS || "{}";
+    let scriptOptions = process.env.SCRIPT_OPTIONS || "{}";
     console.log(scriptOptions);
     let users = JSON.parse(process.env.USERS);
     let scriptPath = process.env.SCRIPT;
     const integrationMap = JSON.parse(process.env.INTEGRATION_MAP);
-    const scriptOptions = JSON.parse(scriptOptions);
+    scriptOptions = JSON.parse(scriptOptions);
     console.log(scriptPath);
     const script = require("../" + scriptPath);
 
