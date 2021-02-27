@@ -3,7 +3,7 @@ const Knex = require("../../helpers/knex");
 const { Parser } = require("json2csv");
 const { google } = require("googleapis");
 const { enums } = require("googleapis");
-const SendGrid = require("../../helpers/sendgrid");
+const Mailgun = require("../../helpers/mailgun");
 const { GoogleAdsApi } = require("google-ads-api");
 const moment = require("moment");
 const AWS = require("aws-sdk");
@@ -11,7 +11,7 @@ var s3 = new AWS.S3();
 
 async function Run(integrationMap, users, scriptOptions) {
   const googleIntegration = integrationMap["google"];
-  const sendGrid = SendGrid();
+  const mailgun = Mailgun();
 
   const client = new GoogleAdsApi({
     client_id: googleIntegration.client_id,
@@ -57,15 +57,17 @@ async function Run(integrationMap, users, scriptOptions) {
   };
   await s3.putObject(params).promise();
 
-  const msg = {
+  //ES6
+  const data = {
+    from: "rodriguezartav@jungledynamics.com",
     to: scriptOptions.email,
-    from: "roberto@coalicionsur.org",
     subject: "Your Google Ads Report",
     text: `http://reports.jungledynamics.com/csv/${random}.csv`,
-    html: `http://reports.jungledynamics.com/csv/${random}.csv`,
   };
-  //ES6
-  await sendGrid.send(msg);
+
+  await mailgun.messages().send(data, function (error, body) {
+    console.log(body);
+  });
 
   return true;
 }
