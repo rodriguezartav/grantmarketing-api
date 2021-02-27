@@ -65,7 +65,7 @@ async function Run(integrationMap, users, scriptOptions) {
     html: `http://reports.jungledynamics.com/csv/${random}.csv`,
   };
   //ES6
-  await sendgrid.send(msg);
+  await sendGrid.send(msg);
 
   return true;
 }
