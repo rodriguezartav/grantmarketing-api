@@ -2,6 +2,8 @@ require("dotenv").config();
 const AWS = require("aws-sdk");
 var s3 = new AWS.S3();
 const https = require("https");
+const fs = require("promise-fs");
+const Handlebars = require("handlebars");
 
 const Heroku = require("heroku-client");
 const heroku = new Heroku({ token: process.env.HEROKU_API_TOKEN });
@@ -62,12 +64,16 @@ module.exports = function Run(integrationMap, script, users, scriptOptions) {
 };
 
 async function saveToS3(lines) {
+  const file = await fs.readFile("./workers/templates/log.html", "utf-8");
+
+  const template = Handlebars.compile(file);
+  const body = template({
+    code: `${lines.map((item) => item.replace("\u0000", "")).join("<br/>")}`,
+  });
+
   const random = parseInt(Math.random() * 10000000);
   var params = {
-    Body: `<h1>Log</h1></p><p>${lines
-      .map((item) => item.replace("\u0000", ""))
-      .join("<br/>")}</p>`,
-
+    Body: body,
     Bucket: "logs.jungledynamics.com",
     Key: "logs/" + random + ".html",
   };
