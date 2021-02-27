@@ -4,7 +4,6 @@ const { Parser } = require("json2csv");
 const { google } = require("googleapis");
 const { enums } = require("googleapis");
 const SendGrid = require("../../helpers/sendgrid");
-const sms = require("../../helpers/sms");
 const { GoogleAdsApi } = require("google-ads-api");
 const moment = require("moment");
 const AWS = require("aws-sdk");

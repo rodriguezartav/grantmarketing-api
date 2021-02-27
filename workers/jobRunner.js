@@ -8,10 +8,7 @@ var s3 = new AWS.S3();
 
 (async function () {
   var knex;
-  console.log(
-    "JOBRUNNER_START",
-    moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
-  );
+
   try {
     knex = Knex();
 
@@ -37,8 +34,6 @@ var s3 = new AWS.S3();
     integrationTokens.forEach((item) => {
       integrationTokensMap[item.provider] = item;
     });
-
-    console.log(jobs);
 
     for (let index = 0; index < jobs.length; index++) {
       const job = jobs[index];
@@ -87,7 +82,7 @@ var s3 = new AWS.S3();
           integrationMap,
           job.script_location,
           users,
-          job.scriptOptions
+          job.script_options
         );
 
         console.log("HEROKU END", url);
@@ -130,10 +125,7 @@ var s3 = new AWS.S3();
         console.error(e);
       }
     }
-    console.log(
-      "JOBRUNNER_END",
-      moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
-    );
+
     await knex.destroy();
     process.exit(0);
   } catch (e) {

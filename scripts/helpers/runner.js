@@ -12,7 +12,7 @@ async function Run() {
     let users = JSON.parse(process.env.USERS);
     let scriptPath = process.env.SCRIPT;
     const integrationMap = JSON.parse(process.env.INTEGRATION_MAP);
-    const scriptOptions = JSON.parse(process.env.SCRIPT_OPTIONS);
+    const scriptOptions = JSON.parse(process.env.SCRIPT_OPTIONS || "{}");
     console.log(scriptPath);
     const script = require("../" + scriptPath);
 
