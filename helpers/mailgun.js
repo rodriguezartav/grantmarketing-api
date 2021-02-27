@@ -6,5 +6,3 @@ module.exports = function Mailgun(apiKey, domain = "jungledynamics.com") {
     domain: domain,
   });
 };
-
-module.exports = Mailgun;
