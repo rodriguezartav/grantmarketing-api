@@ -66,10 +66,12 @@ setInterval(async () => {
 
     if (jobs.length > 0) {
       await slack.chat.postMessage({
-        text: `Some jobs seem to be stock. ${jobs.map(
-          (item) =>
-            `${item.script_name} ${item.customer_name} ${item.created_at}`
-        )}`,
+        text: `Some jobs seem to be stuck. (${jobs
+          .map(
+            (item) =>
+              `${item.script_name} ${item.customer_name} ${item.created_at}`
+          )
+          .join("\n")} `,
         channel: slack.generalChannelId,
       });
     }
@@ -78,4 +80,4 @@ setInterval(async () => {
     console.error(e);
     throw e;
   }
-}, (60 * 1000) & 5);
+}, 60 * 1000 * 5);
