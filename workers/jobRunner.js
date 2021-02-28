@@ -3,6 +3,7 @@ const moment = require("moment");
 const sms = require("../helpers/sms");
 const HerokuRunner = require("./helpers/herokuRunner");
 const Knex = require("../helpers/knex");
+const Slack = require("../helpers/slack");
 const AWS = require("aws-sdk");
 var s3 = new AWS.S3();
 
@@ -11,6 +12,7 @@ var s3 = new AWS.S3();
 
   try {
     knex = Knex();
+    const slack = Slack();
 
     let jobs = await knex
       .table("jobs")
@@ -109,8 +111,19 @@ var s3 = new AWS.S3();
           .first();
 
         if (log.indexOf("SCRIPT_ERROR") > -1) {
-          await sms(url, admin.country_code + admin.phone);
+          const result = await web.chat.postMessage({
+            text: url,
+            channel: web.channels[0],
+          });
+          console.log(result);
+          //await sms(url, admin.country_code + admin.phone);
         }
+
+        const result = await web.chat.postMessage({
+          text: "Job end",
+          channel: web.channels[0],
+        });
+        console.log(result);
 
         console.log(
           "JOB_END",

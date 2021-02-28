@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@sendgrid/mail": "^7.4.2",
+    "@slack/web-api": "^6.0.0",
     "@tailwindcss/forms": "^0.2.1",
     "ajv": "^6.12.2",
     "autoprefixer": "^10.2.4",
