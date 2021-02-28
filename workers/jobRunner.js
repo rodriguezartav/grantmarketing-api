@@ -12,7 +12,7 @@ var s3 = new AWS.S3();
 
   try {
     knex = Knex();
-    const slack = Slack();
+    const slack = await Slack();
 
     let jobs = await knex
       .table("jobs")
