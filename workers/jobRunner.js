@@ -42,10 +42,12 @@ var s3 = new AWS.S3();
       const job = jobs[index];
       try {
         console.log(
-          "JOB_START",
-          job.id,
-          moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+          `API_EVENT:::JOB_RUNNER:::START:::${JSON.stringify({
+            job_id: job.id,
+            time: moment().unix(),
+          })}`
         );
+
         await knex
           .table("jobs")
           .update({ status: "working" })
@@ -79,16 +81,13 @@ var s3 = new AWS.S3();
           integrationMap[item.provider] = item;
         });
 
-        console.log("HEROKU START");
-
         let { url, log } = await HerokuRunner(
           integrationMap,
           job.script_location,
           users,
-          job.script_options
+          job.script_options,
+          job
         );
-
-        console.log("HEROKU END", url);
 
         await knex.table("script_logs").insert({
           script_id: job.script_id,
@@ -105,34 +104,33 @@ var s3 = new AWS.S3();
           .update({ last_run: moment() })
           .where("id", job.schedule_id);
 
-        const admin = await knex
-          .table("admins")
-          .select()
-          .where("id", 1)
-          .first();
-
-        if (log.indexOf("SCRIPT_ERROR") > -1) {
-          const result = await slack.chat.postMessage({
+        if (log.indexOf("SCRIPTRUNNER:::ERROR") > -1) {
+          await slack.chat.postMessage({
             text: `Error: ${job.customer_name} ${job.script_name} ${url}`,
             channel: slack.generalChannelId,
           });
         }
 
-        const result = await slack.chat.postMessage({
+        await slack.chat.postMessage({
           text: `${job.customer_name} Job end ${job.script_name}`,
           channel: slack.generalChannelId,
         });
 
         console.log(
-          "JOB_END",
-          job.id,
-          moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+          `API_EVENT:::JOB_RUNNER:::END:::${JSON.stringify({
+            job_id: job.id,
+            time: moment().unix(),
+          })}`
         );
       } catch (e) {
         console.log(
-          "JOB CRITICAL_ERROR",
-          moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+          `API_EVENT:::JOB_RUNNER:::CRITICAL_ERROR:::${JSON.stringify({
+            job_id: job.id,
+            error: { message: e.message, stack: e.stack },
+            time: moment().unix(),
+          })}`
         );
+
         console.error(e);
       }
     }
@@ -141,10 +139,13 @@ var s3 = new AWS.S3();
     process.exit(0);
   } catch (e) {
     if (knex) await knex.destroy();
-    console.error(
-      "JOBRUNNER CRITICAL_ERROR",
-      moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm")
+    console.log(
+      `API_EVENT:::JOB_RUNNER:::CRITICAL_ERROR:::${JSON.stringify({
+        error: { message: e.message, stack: e.stack },
+        time: moment().unix(),
+      })}`
     );
+
     console.error(e);
     process.exit(1);
   }

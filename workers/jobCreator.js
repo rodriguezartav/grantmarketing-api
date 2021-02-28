@@ -8,8 +8,6 @@ setInterval(async () => {
   try {
     const knex = Knex();
 
-    const slack = await Slack();
-
     let schedules = await knex.table("schedules").select();
     for (let index = 0; index < schedules.length; index++) {
       const schedule = schedules[index];
@@ -25,17 +23,30 @@ setInterval(async () => {
           .add(schedule.period_in_minutes, "minutes")
           .unix() < moment().unix()
       ) {
-        await knex.table("jobs").insert({
-          status: "pending",
-          script_options: schedule.script_options,
-          schedule_id: schedule.id,
-          script_id: schedule.script_id,
-          customer_id: schedule.customer_id,
-        });
+        const ids = await knex
+          .table("jobs")
+          .insert({
+            status: "pending",
+            script_options: schedule.script_options,
+            schedule_id: schedule.id,
+            script_id: schedule.script_id,
+            customer_id: schedule.customer_id,
+          })
+          .returning("id");
+
+        console.log(
+          `API_EVENT:::JOB_CREATOR:::INSERT_JOB:::${JSON.stringify({
+            job_id: ids[0],
+            schedule_id: schedule.id,
+            script_id: schedule.script_id,
+            customer_id: schedule.customer_id,
+            time: moment().unix(),
+          })}`
+        );
       }
     }
   } catch (e) {
-    console.error("CRITICAL_ERROR");
+    console.error(`CRITICAL_ERROR:::${e.message}:::${e.stack}```);
     console.error(e);
     throw e;
   }

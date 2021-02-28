@@ -6,7 +6,6 @@ try {
     let { stdout, stderr, error } = await execFile("node", [
       `./workers/jobRunner.js`,
     ]);
-    console.log(stdout, stderr, error);
   }, 60000);
 } catch (e) {
   console.log("PROCESS_RUNNER CRITICAL_ERROR", process.exit(0));

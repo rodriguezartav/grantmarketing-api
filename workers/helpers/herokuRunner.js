@@ -9,7 +9,13 @@ const moment = require("moment");
 const Heroku = require("heroku-client");
 const heroku = new Heroku({ token: process.env.HEROKU_API_TOKEN });
 
-module.exports = function Run(integrationMap, script, users, scriptOptions) {
+module.exports = function Run(
+  integrationMap,
+  script,
+  users,
+  scriptOptions,
+  job
+) {
   let promise = new Promise(async (resolve, reject) => {
     try {
       const dynoRes = await heroku.post("/apps/grantmarketing/dynos", {
@@ -20,8 +26,18 @@ module.exports = function Run(integrationMap, script, users, scriptOptions) {
             LINES: "24",
             INTEGRATION_MAP: JSON.stringify(integrationMap),
             SCRIPT_OPTIONS: JSON.stringify(scriptOptions),
+            JOB: JSON.stringify(job),
             SCRIPT: script,
-            USERS: JSON.stringify(users),
+            USERS: JSON.stringify(
+              users.map((item) => {
+                return {
+                  name: item.name,
+                  id: item.id,
+                  phone: item.phone,
+                  email: item.email,
+                };
+              })
+            ),
           },
           force_no_tty: null,
           size: "Hobby.",
@@ -29,6 +45,16 @@ module.exports = function Run(integrationMap, script, users, scriptOptions) {
           time_to_live: 100,
         },
       });
+
+      console.log(
+        `API_EVENT:::HEROKU_RUNNER:::START:::${JSON.stringify({
+          job_id: job.id,
+          time: moment().unix(),
+          herokuScript_name: dynoRes.name,
+          integrationMap: Object.keys(integrationMap),
+          scriptOptions: scriptOptions,
+        })}`
+      );
 
       const logRes = await heroku.post("/apps/grantmarketing/log-sessions", {
         body: {
@@ -43,20 +69,50 @@ module.exports = function Run(integrationMap, script, users, scriptOptions) {
           res.on("data", async (d) => {
             const line = d.toString();
             lines.push(line);
-            console.log(line);
-            if (line.indexOf("END") > -1) {
+            if (line.indexOf("SCRIPTRUNNER:::END") > -1) {
               logRequest.destroy();
               const url = await saveToS3(lines, script);
+
+              console.log(
+                `API_EVENT:::HEROKU_RUNNER:::END:::${JSON.stringify({
+                  job_id: job.id,
+                  time: moment().unix(),
+                })}`
+              );
+
               resolve({ url, log: lines.join(",") });
             }
           });
         })
         .on("error", (e) => {
           console.error(e);
+          console.log(
+            `API_EVENT:::HEROKU_RUNNER:::LOG_ERROR:::${JSON.stringify({
+              job_id: job.id,
+              error: {
+                message: e.message,
+                stack: e.stack,
+                status: e.status || e.statusCode,
+              },
+              time: moment().unix(),
+            })}`
+          );
           reject(e);
         });
     } catch (e) {
       console.log(e);
+      console.log(
+        `API_EVENT:::HEROKU_RUNNER:::ERROR:::${JSON.stringify({
+          job_id: job.id,
+          error: {
+            message: e.message,
+            stack: e.stack,
+            status: e.status || e.statusCode,
+          },
+          time: moment().unix(),
+        })}`
+      );
+
       reject(e);
     }
   });
