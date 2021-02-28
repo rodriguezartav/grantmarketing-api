@@ -65,10 +65,8 @@ async function Run(integrationMap, users, scriptOptions) {
     text: `http://reports.jungledynamics.com/csv/${random}.csv`,
   };
 
-  await mailgun.messages().send(data, function (error, body) {
-    console.log(body);
-  });
-
+  const res = await mailgun.messages().send(data);
+  console.log(res);
   return true;
 }
 
