@@ -1,11 +1,10 @@
 const moment = require("moment");
-const { xeroApi, redis } = require("../../helpers/xero");
+const { xeroApi } = require("../../helpers/xero");
 const getKnex = require("../../helpers/knex_pg");
 
 module.exports = async function Run(integrationMap) {
   try {
     knex = await getKnex(integrationMap["postgres"]);
-    trx = await knex.transaction();
 
     let xeroPayments = await xeroApi(
       integrationMap["xero"],
@@ -38,7 +37,7 @@ module.exports = async function Run(integrationMap) {
       const item = xeroPayments[index];
       if (item.invoice) {
         try {
-          let pgInvoice = await trx
+          let pgInvoice = await knex
             .table("invoices")
             .select()
             .where("external_id", item.invoice.invoiceID)
@@ -46,19 +45,19 @@ module.exports = async function Run(integrationMap) {
             .orWhere("number", "0010000" + item.invoice.invoiceNumber)
             .first();
 
-          let pgPayment = await trx
+          let pgPayment = await knex
             .table("payments")
             .select()
             .where("external_id", item.paymentID)
             .first();
 
           if (item.status == "DELETED")
-            await trx
+            await knex
               .table("payments")
               .delete()
               .where("external_id", item.paymentID);
           else if (!pgPayment && pgInvoice) {
-            await trx.table("payments").insert({
+            await knex.table("payments").insert({
               external_id: item.paymentID,
               customer_id: pgInvoice.customer_id,
               invoice_id: pgInvoice.id,
@@ -69,26 +68,20 @@ module.exports = async function Run(integrationMap) {
               total: item.amount,
             });
           } else if (pgPayment && pgInvoice) {
-            //const parts = item.reference.split("//");
-            await trx
+            await knex
               .table("payments")
               .update({
                 reference: item.reference || referenceMap[item.paymentID],
               })
               .where({ external_id: item.paymentID });
           }
-        } catch (e) {
-          console.log(e);
-        }
+        } catch (e) {}
       }
     }
 
-    await trx.commit();
     knex && (await knex.destroy());
   } catch (e) {
-    if (trx) await trx.rollback();
     knex && (await knex.destroy());
-    redis && console.log(e);
     process.exit(1);
   }
 };

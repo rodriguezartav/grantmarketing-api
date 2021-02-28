@@ -5,7 +5,7 @@ const moment = require("moment");
 const sms = require("../helpers/sms");
 const IntegrationMap = require("../scripts/helpers/integrationMap");
 const Knex = require("../helpers/knex");
-const Run = require("../scripts/rodco/productsXeroToPg");
+const Run = require("../scripts/rodco/paymentsXeroToPg");
 
 async function Test() {
   try {
