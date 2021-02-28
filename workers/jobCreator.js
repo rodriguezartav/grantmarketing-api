@@ -43,7 +43,7 @@ setInterval(async () => {
           .join("customers", "customers.id", "jobs.customer_id")
           .join("scripts", "scripts.id", "jobs.script_id")
           .whereIn("status", ["working"])
-          .where("created_at", ">", moment().add(-10, "minutes"))
+          .where("jobs.created_at", ">", moment().add(-10, "minutes"))
           .where("schedule_id", schedule.id);
 
         if (jobs.length > 0) {
