@@ -122,7 +122,6 @@ var s3 = new AWS.S3();
           text: `${job.customer_name} Job end ${job.script_name}`,
           channel: slack.generalChannelId,
         });
-        console.log(result);
 
         console.log(
           "JOB_END",
