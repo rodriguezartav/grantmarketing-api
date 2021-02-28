@@ -19,7 +19,8 @@ var s3 = new AWS.S3();
       .select(
         "jobs.*",
         "scripts.name as script_name",
-        "scripts.location as script_location"
+        "scripts.location as script_location",
+        "customers.name as customer_name"
       )
       .join("customers", "customers.id", "jobs.customer_id")
       .join("scripts", "scripts.id", "jobs.script_id")
@@ -112,15 +113,13 @@ var s3 = new AWS.S3();
 
         if (log.indexOf("SCRIPT_ERROR") > -1) {
           const result = await slack.chat.postMessage({
-            text: url,
+            text: `Error: ${job.customer_name} ${job.script_name} ${url}`,
             channel: slack.generalChannelId,
           });
-          console.log(result);
-          //await sms(url, admin.country_code + admin.phone);
         }
 
         const result = await slack.chat.postMessage({
-          text: "Job end",
+          text: `${job.customer_name} Job end ${job.script_name}`,
           channel: slack.generalChannelId,
         });
         console.log(result);
