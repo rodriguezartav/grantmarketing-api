@@ -113,7 +113,7 @@ var s3 = new AWS.S3();
         if (log.indexOf("SCRIPT_ERROR") > -1) {
           const result = await slack.chat.postMessage({
             text: url,
-            channel: slack.channels[0],
+            channel: slack.generalChannelId,
           });
           console.log(result);
           //await sms(url, admin.country_code + admin.phone);
@@ -121,7 +121,7 @@ var s3 = new AWS.S3();
 
         const result = await slack.chat.postMessage({
           text: "Job end",
-          channel: slack.channels[0],
+          channel: slack.generalChannelId,
         });
         console.log(result);
 

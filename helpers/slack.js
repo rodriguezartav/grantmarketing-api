@@ -10,7 +10,11 @@ module.exports = async function Slack(integration) {
     types: "public_channel",
   });
   console.log(result);
-  web.chanels = result.channels;
+  web.channels = result.channels;
+  web.channelsMap = {};
+
+  result.channels.forEach((item) => (web.channelsMap[item.name] = item));
+  web.generalChannelId = web.channelsMap["general"].id;
 
   return web;
 };
