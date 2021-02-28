@@ -40,6 +40,12 @@ app.use("/integrations/salesforce", cors(), SalesforceIntegration);
 app.use("/integrations/google", cors(), GoogleIntegration);
 app.use("/integrations/slack", cors(), SlackIntegration);
 
+app.use(
+  "/webhooks/papertrail",
+  cors(),
+  require("./routes/webhooks/papertrail")
+);
+
 app.use("/api/login", cors(), Login);
 app.use("/api/userLogin", cors(), UserLogin);
 app.use("/vpi/schemas", cors(), require("./routes/schemas"));
