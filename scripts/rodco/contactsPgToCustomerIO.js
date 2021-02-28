@@ -1,9 +1,6 @@
-let CIO = require("customerio-node");
-const cio = new CIO("ff58bfdb81cf900d60f9", "349938720d7a408b0e1f");
-const moment = require("moment");
+let CIO = require("../../helpers/customerio");
 
 const moment = require("moment");
-const { xeroApi, redis } = require("../../helpers/xero");
 
 const getKnex = require("../../helpers/knex_pg");
 
@@ -11,6 +8,7 @@ let knex;
 module.exports = async function Run(integrationMap) {
   try {
     knex = await getKnex(integrationMap["postgres"]);
+    const cio = CIO(integrationMap["customerio"]);
 
     var contacts = await knex
       .table("contacts")
