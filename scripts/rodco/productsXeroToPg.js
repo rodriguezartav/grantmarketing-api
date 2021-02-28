@@ -48,7 +48,7 @@ module.exports = async function Run(integrationMap) {
           await trx("products").insert(productSql);
         } else await trx("products").update(productSql).where("id", product.id);
       } catch (e) {
-        console.log(item.code, product ? product.code : e);
+        console.log("error", item.code, product ? product.code : e);
       }
     }
 

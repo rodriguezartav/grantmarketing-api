@@ -62,7 +62,7 @@ module.exports = async function Run(integrationMap) {
         if (sku.length == 9) sku = "0" + sku;
         let product = productMap[sku];
         if (product) {
-          console.log(variant.name, variant.sku, product.precio__c);
+          //console.log(variant.name, variant.sku, product.precio__c);
 
           sfItems.push({
             external_id__c: product.external_id__c,
@@ -76,11 +76,11 @@ module.exports = async function Run(integrationMap) {
             price: parseInt(product.precio__c * 100) / 100,
           };
         } else {
-          console.log(
-            item.title,
-            item.handle,
-            item.variants.map((variant) => variant.sku).join(",")
-          );
+          //console.log(
+          // item.title,
+          //item.handle,
+          //item.variants.map((variant) => variant.sku).join(",")
+          //);
           allMapped = false;
           return null;
         }
