@@ -4,6 +4,7 @@ var s3 = new AWS.S3();
 const https = require("https");
 const fs = require("promise-fs");
 const Handlebars = require("handlebars");
+const moment = require("moment");
 
 const Heroku = require("heroku-client");
 const heroku = new Heroku({ token: process.env.HEROKU_API_TOKEN });
@@ -45,7 +46,7 @@ module.exports = function Run(integrationMap, script, users, scriptOptions) {
             console.log(line);
             if (line.indexOf("END") > -1) {
               logRequest.destroy();
-              const url = await saveToS3(lines);
+              const url = await saveToS3(lines, script);
               resolve({ url, log: lines.join(",") });
             }
           });
@@ -63,12 +64,14 @@ module.exports = function Run(integrationMap, script, users, scriptOptions) {
   return promise;
 };
 
-async function saveToS3(lines) {
+async function saveToS3(lines, script) {
   const file = await fs.readFile("./workers/templates/log.html", "utf-8");
 
   const template = Handlebars.compile(file);
   const body = template({
-    code: `${lines.map((item) => item.replace("\u0000", "")).join("<br/>")}`,
+    lines,
+    script,
+    time: moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm"),
   });
 
   const random = parseInt(Math.random() * 10000000);

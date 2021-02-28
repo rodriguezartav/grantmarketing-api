@@ -16,7 +16,16 @@
 
   <body>
     <!-- Add your site or application content here -->
-    {{{code}}}
+
+    <h1>{{ script }}</h1>
+
+    <h2>{{ times }}</h2>
+
+    <ul class="people_list">
+      {{#each lines}}
+      <li>{{this}}</li>
+      {{/each}}
+    </ul>
 
     <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
   </body>
