@@ -1,3 +1,9 @@
+//Defined in ProcFile
+
+//
+// This file calls from Job runner - it run as a fork to keep jobWorker from crasing.
+//
+
 const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 

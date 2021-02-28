@@ -1,3 +1,7 @@
+//
+// This file is called from Job Worker - it run as a fork to keep jobWorker from crasing.
+//
+
 require("dotenv").config();
 const moment = require("moment");
 const sms = require("../helpers/sms");

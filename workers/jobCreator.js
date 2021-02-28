@@ -1,3 +1,7 @@
+//
+// This file creates Jobs - it's called from the main server App.
+//
+
 require("dotenv").config();
 const moment = require("moment");
 
@@ -56,8 +60,6 @@ setInterval(async () => {
   try {
     const knex = Knex();
 
-    const slack = await Slack();
-
     const jobs = await knex
       .table("jobs")
       .select(
@@ -76,6 +78,8 @@ setInterval(async () => {
     });
 
     if (lateJobs.length > 0) {
+      const slack = await Slack();
+
       await slack.chat.postMessage({
         text: `Some jobs seem to be stuck. (${jobs
           .map(

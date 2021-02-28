@@ -1,3 +1,7 @@
+//
+// This file runs standalone as a node script in a heroku one-of process - opts are passed via env vars
+//
+
 require("dotenv").config();
 const util = require("util");
 const sms = require("../../helpers/sms");
@@ -57,4 +61,5 @@ async function Run() {
 
 module.exports = Run;
 
+//hack for tests - ignore in production
 if (process.argv[1].indexOf("tests") == -1) Run();

@@ -1,3 +1,7 @@
+//
+// This file is called from Job Runner - it's separate because it uses no DB connectios. Architecture decision.
+//
+
 require("dotenv").config();
 const AWS = require("aws-sdk");
 var s3 = new AWS.S3();
