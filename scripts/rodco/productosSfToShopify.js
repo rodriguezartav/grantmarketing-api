@@ -1,16 +1,12 @@
 const moment = require("moment");
 const { xeroApi, redis } = require("../../helpers/xero");
 const { sfConn, bulk, query } = require("../../helpers/sf");
-const getKnex = require("../../helpers/knex_pg");
 
 const request = require("superagent");
 
 module.exports = async function Run(integrationMap) {
   try {
     const Shopify = integrationMap["shopify"];
-    const knex = await getKnex(integrationMap["postgres"]);
-
-    trx = knex;
     const conn = await sfConn(integrationMap["salesforce"]);
 
     const products = await query(

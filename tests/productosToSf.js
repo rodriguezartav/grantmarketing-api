@@ -3,25 +3,18 @@ const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 const moment = require("moment");
 const sms = require("../helpers/sms");
-
+const IntegrationMap = require("../scripts/helpers/integrationMap");
 const Knex = require("../helpers/knex");
-const Run = require("../scripts/rodco/_productosSfToShopify");
+const Run = require("../scripts/rodco/productosSfToShopify");
 
 async function Test() {
   try {
     const knex = Knex();
 
-    const integrations = await knex
-      .table("integrations")
-      .select("integrations.*", "providers.name as provider")
-      .join("providers", "providers.id", "integrations.provider_id")
-      .where({ customer_id: 1 });
-
-    let integrationMap = {};
-    integrations.forEach((item) => (integrationMap[item.provider] = item));
+    let integrationMap = await IntegrationMap(knex, 1);
 
     process.env.INTEGRATION_MAP = JSON.stringify(integrationMap);
-    await Run();
+    await Run(integrationMap);
   } catch (e) {
     console.error("CRITICAL_ERROR");
     console.error(e);

@@ -54,7 +54,7 @@
     }
   },
   "required": ["provider_id"],
-  "list": ["provider_id", "customer_id", "expiry_date"],
+  "list": ["id", "provider_id", "customer_id", "expiry_date"],
   "type": "object",
   "additionalProperties": true
 }
