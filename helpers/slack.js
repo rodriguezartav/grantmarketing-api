@@ -9,7 +9,7 @@ module.exports = async function Slack(integration) {
   const result = await web.conversations.list({
     types: "public_channel",
   });
-  console.log(result);
+
   web.channels = result.channels;
   web.channelsMap = {};
 
