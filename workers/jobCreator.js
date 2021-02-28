@@ -32,29 +32,6 @@ setInterval(async () => {
           script_id: schedule.script_id,
           customer_id: schedule.customer_id,
         });
-      } else {
-        const jobs = await knex
-          .table("jobs")
-          .select(
-            "jobs.*",
-            "scripts.name as script_name",
-            "customers.name as customer_name"
-          )
-          .join("customers", "customers.id", "jobs.customer_id")
-          .join("scripts", "scripts.id", "jobs.script_id")
-          .whereIn("status", ["working"])
-          .where("jobs.created_at", ">", moment().add(-10, "minutes"))
-          .where("schedule_id", schedule.id);
-
-        if (jobs.length > 0) {
-          await slack.chat.postMessage({
-            text: `Some jobs seem to be stock. ${jobs.map(
-              (item) =>
-                `${item.script_name} ${item.customer_name} ${item.created_at}`
-            )}`,
-            channel: slack.generalChannelId,
-          });
-        }
       }
     }
   } catch (e) {
@@ -63,3 +40,42 @@ setInterval(async () => {
     throw e;
   }
 }, 30 * 1000);
+
+setInterval(async () => {
+  try {
+    const knex = Knex();
+
+    const slack = await Slack();
+
+    const jobs = await knex
+      .table("jobs")
+      .select(
+        "jobs.*",
+        "scripts.name as script_name",
+        "customers.name as customer_name"
+      )
+      .join("customers", "customers.id", "jobs.customer_id")
+      .join("scripts", "scripts.id", "jobs.script_id")
+      .whereIn("status", ["working"]);
+
+    const lateJobs = jobs.filter((item) => {
+      if (moment(item.created_at).add(10, "minutes").unix() > moment().unix())
+        return true;
+      return false;
+    });
+
+    if (jobs.length > 0) {
+      await slack.chat.postMessage({
+        text: `Some jobs seem to be stock. ${jobs.map(
+          (item) =>
+            `${item.script_name} ${item.customer_name} ${item.created_at}`
+        )}`,
+        channel: slack.generalChannelId,
+      });
+    }
+  } catch (e) {
+    console.error("CRITICAL_ERROR");
+    console.error(e);
+    throw e;
+  }
+}, (60 * 1000) & 5);
