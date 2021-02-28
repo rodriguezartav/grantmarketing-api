@@ -9,14 +9,10 @@ const getKnex = require("../../helpers/knex_pg");
 
 let knex;
 module.exports = async function Run(integrationMap) {
-  var trx;
-
   try {
     knex = await getKnex(integrationMap["postgres"]);
 
-    trx = knex;
-
-    var contacts = await trx
+    var contacts = await knex
       .table("contacts")
       .select([
         "contacts.*",
@@ -49,27 +45,13 @@ module.exports = async function Run(integrationMap) {
       await sleep(350);
     }
 
-    //  await trx.commit();
     await knex.destroy();
-    process.exit(0);
   } catch (e) {
-    //  if (trx) await trx.rollback();
     console.log(e);
     await knex.destroy();
     throw e;
   }
 };
-
-if (process.argv[2] && process.argv[3].indexOf("{") == 0)
-  (async function () {
-    try {
-      await Run(JSON.parse(process.argv[2]), parseInt(process.argv[3]));
-      process.exit(0);
-    } catch (e) {
-      console.error(e);
-      process.exit(1);
-    }
-  })();
 
 function sleep(ms) {
   return new Promise((resolve) => {

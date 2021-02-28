@@ -29,8 +29,12 @@ function prepareKnex(integration) {
         },
         keepAlive: true,
       },
-      max: 15,
-      ssl: true,
+      max: 1,
+      ssl: {
+        require: true,
+        // Ref.: https://github.com/brianc/node-postgres/issues/2009
+        rejectUnauthorized: false,
+      },
     },
   });
 }

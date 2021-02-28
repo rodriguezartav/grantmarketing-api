@@ -3,9 +3,10 @@ const { xeroApi, redis } = require("../../helpers/xero");
 const getKnex = require("../../helpers/knex_pg");
 
 module.exports = async function Run(integrationMap) {
-  var trx;
-
   try {
+    knex = await getKnex(integrationMap["postgres"]);
+    trx = await knex.transaction();
+
     let xeroPayments = await xeroApi(
       integrationMap["xero"],
       "getPayments",
@@ -25,9 +26,6 @@ module.exports = async function Run(integrationMap) {
         referenceMap[payment.paymentID] = batchPayment.reference;
       });
     });
-
-    knex = await getKnex();
-    trx = await knex.transaction();
 
     xeroPayments = xeroPayments.payments.filter((item) => {
       return (
@@ -86,24 +84,11 @@ module.exports = async function Run(integrationMap) {
     }
 
     await trx.commit();
+    knex && (await knex.destroy());
   } catch (e) {
     if (trx) await trx.rollback();
     knex && (await knex.destroy());
     redis && console.log(e);
     process.exit(1);
   }
-  await knex.destroy();
-
-  process.exit(0);
 };
-
-if (process.argv[2] && process.argv[3].indexOf("{") == 0)
-  (async function () {
-    try {
-      await Run(JSON.parse(process.argv[2]), parseInt(process.argv[3]));
-      process.exit(0);
-    } catch (e) {
-      console.error(e);
-      process.exit(1);
-    }
-  })();

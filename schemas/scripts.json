@@ -25,7 +25,7 @@
       "description": ""
     }
   },
-  "list": ["name", "location", "description"],
+  "list": ["id", "name", "location", "description"],
   "type": "object",
   "additionalProperties": true
 }

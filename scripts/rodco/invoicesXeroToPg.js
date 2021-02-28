@@ -8,6 +8,9 @@ module.exports = async function Run(integrationMap) {
   var trx;
 
   try {
+    knex = await getKnex(integrationMap["postgres"]);
+    trx = await knex.transaction();
+
     let xeroNcs = { creditNotes: [] };
     let index = 1;
     while (index < 4) {
@@ -51,9 +54,6 @@ module.exports = async function Run(integrationMap) {
       xeroInvoices.invoices = xeroInvoices.invoices.concat(response.invoices);
       index++;
     }
-
-    knex = await getKnex(integrationMap["postgres"]);
-    trx = await knex.transaction();
 
     let products = await trx.table("products").select();
 
@@ -149,26 +149,12 @@ module.exports = async function Run(integrationMap) {
 
     await trx.commit();
     await knex.destroy();
-
-    process.exit(0);
   } catch (e) {
     if (trx) await trx.rollback();
     knex && (await knex.destroy());
-    redis && console.log(e);
     throw e;
   }
 };
-
-if (process.argv[2] && process.argv[3].indexOf("{") == 0)
-  (async function () {
-    try {
-      await Run(JSON.parse(process.argv[2]), parseInt(process.argv[3]));
-      process.exit(0);
-    } catch (e) {
-      console.error(e);
-      process.exit(1);
-    }
-  })();
 
 async function insertInvoice(
   knex,

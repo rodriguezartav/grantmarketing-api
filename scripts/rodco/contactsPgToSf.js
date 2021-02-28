@@ -6,16 +6,12 @@ const getKnex = require("../../helpers/knex_pg");
 let knex;
 
 module.exports = async function Run(integrationMap) {
-  var trx;
-
   try {
     const conn = await sfConn(integrationMap["salesforce"]);
 
     knex = await getKnex(integrationMap["postgres"]);
 
-    trx = knex;
-
-    var contacts = await trx
+    var contacts = await knex
       .table("contacts")
       .select([
         "contacts.*",

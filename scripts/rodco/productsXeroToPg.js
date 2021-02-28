@@ -45,9 +45,8 @@ module.exports = async function Run(integrationMap) {
       try {
         if (!productSql.id) {
           delete productSql.id;
-          await knex("products").insert(productSql);
-        } else
-          await knex("products").update(productSql).where("id", product.id);
+          await trx("products").insert(productSql);
+        } else await trx("products").update(productSql).where("id", product.id);
       } catch (e) {
         console.log(item.code, product ? product.code : e);
       }
@@ -55,8 +54,6 @@ module.exports = async function Run(integrationMap) {
 
     await trx.commit();
     await knex.destroy();
-
-    process.exit(0);
   } catch (e) {
     if (trx) await trx.rollback();
     await knex.destroy();
@@ -65,14 +62,3 @@ module.exports = async function Run(integrationMap) {
     throw e;
   }
 };
-
-if (process.argv[2] && process.argv[3].indexOf("{") == 0)
-  (async function () {
-    try {
-      await Run(JSON.parse(process.argv[2]), parseInt(process.argv[3]));
-      process.exit(0);
-    } catch (e) {
-      console.error(e);
-      process.exit(1);
-    }
-  })();

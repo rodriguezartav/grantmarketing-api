@@ -113,28 +113,12 @@ module.exports = async function Run(integrationMap) {
         .where("id", id);
     }
 
-    console.log("done");
     await trx.commit();
     await knex.destroy();
-
-    process.exit(0);
   } catch (e) {
     console.log(e);
     if (trx) await trx.rollback();
-
     await knex.destroy();
-
     throw e;
   }
 };
-
-if (process.argv[2] && process.argv[3].indexOf("{") == 0)
-  (async function () {
-    try {
-      await Run(JSON.parse(process.argv[2]), parseInt(process.argv[3]));
-      process.exit(0);
-    } catch (e) {
-      console.error(e);
-      process.exit(1);
-    }
-  })();
