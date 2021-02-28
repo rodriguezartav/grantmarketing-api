@@ -64,7 +64,7 @@ setInterval(async () => {
       return false;
     });
 
-    if (jobs.length > 0) {
+    if (lateJobs.length > 0) {
       await slack.chat.postMessage({
         text: `Some jobs seem to be stuck. (${jobs
           .map(
