@@ -32,7 +32,7 @@ async function JobRunner() {
       .whereNotNull("scripts.location")
       .where("status", "pending");
 
-    const integrationTokens = await Knex()
+    const integrationTokens = await knex
       .table("integration_tokens")
       .select("integration_tokens.*", "providers.name as provider")
       .join("providers", "providers.id", "integration_tokens.provider_id");
@@ -64,7 +64,7 @@ async function JobRunner() {
           .join("providers", "providers.id", "integrations.provider_id")
           .where({ customer_id: job.customer_id });
 
-        const users = await Knex()
+        const users = await knex
           .table("users")
           .select()
           .where("customer_id", job.customer_id);
