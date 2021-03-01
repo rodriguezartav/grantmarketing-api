@@ -45,7 +45,7 @@ async function JobRunner(knex) {
           `API_EVENT:::JOB_RUNNER:::START:::${JSON.stringify({
             script_location: job.script_location,
             job_id: job.id,
-            time: moment().valueOf()f(),
+            time: moment().valueOf(),
           })}`
         );
 
