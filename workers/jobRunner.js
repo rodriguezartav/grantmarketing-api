@@ -11,7 +11,7 @@ const Slack = require("../helpers/slack");
 const AWS = require("aws-sdk");
 var s3 = new AWS.S3();
 
-(async function () {
+async function JobRunner() {
   var knex;
 
   try {
@@ -140,7 +140,6 @@ var s3 = new AWS.S3();
     }
 
     await knex.destroy();
-    process.exit(0);
   } catch (e) {
     if (knex) await knex.destroy();
     console.log(
@@ -151,6 +150,7 @@ var s3 = new AWS.S3();
     );
 
     console.error(e);
-    process.exit(1);
   }
-})();
+}
+
+module.exports = JobRunner;
