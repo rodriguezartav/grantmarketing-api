@@ -116,7 +116,7 @@ async function JobRunner(knex) {
           `API_EVENT:::JOB_RUNNER:::END:::${JSON.stringify({
             script_location: job.script_location,
             job_id: job.id,
-            time: moment().valueOf()f(),
+            time: moment().valueOf(),
           })}`
         );
       } catch (e) {
@@ -127,7 +127,7 @@ async function JobRunner(knex) {
             job_id: job.id,
             script_location: job.script_location,
             error: { message: e.message, stack: e.stack },
-            time: moment().valueOf()f(),
+            time: moment().valueOf(),
           })}`
         );
 
@@ -138,7 +138,7 @@ async function JobRunner(knex) {
     console.log(
       `API_EVENT:::JOB_RUNNER:::CRITICAL_ERROR:::${JSON.stringify({
         error: { message: e.message, stack: e.stack },
-        time: moment().valueOf()f(),
+        time: moment().valueOf(),
       })}`
     );
 
