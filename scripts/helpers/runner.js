@@ -39,7 +39,7 @@ const moment = require("moment");
               job_id: process.env.JOB_ID,
               scriptPath: process.env.SCRIPT,
               line: initiator,
-              message: arguments.join(" "),
+              message: arguments,
               time: moment().valueOf(),
             }),
         ]);
