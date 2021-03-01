@@ -27,7 +27,7 @@ router.post("/", async function (req, res) {
   console.log(parsedEvents);
 
   await slack.chat.postMessage({
-    text: `Received Events ` + JSON.parse(parsedEvents),
+    text: `Received Events ` + JSON.stringify(parsedEvents),
     channel: slack.generalChannelId,
   });
 
