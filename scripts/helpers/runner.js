@@ -12,12 +12,34 @@ const moment = require("moment");
     var old = console.log;
     console.log = function () {
       if (arguments[0].indexOf("API_EVENT") != 0) {
+        let initiator = "unknown place";
+        try {
+          throw new Error();
+        } catch (e) {
+          if (typeof e.stack === "string") {
+            let isFirst = true;
+            for (const line of e.stack.split("\n")) {
+              const matches = line.match(/^\s+at\s+(.*)/);
+              if (matches) {
+                if (!isFirst) {
+                  // first line - current function
+                  // second line - caller (what we are looking for)
+                  initiator = matches[1];
+                  break;
+                }
+                isFirst = false;
+              }
+            }
+          }
+        }
+
         old.apply(this, [
           "API_EVENT:::SCRIPT:::LOGS:::" +
             JSON.stringify({
               job_id: process.env.JOB_ID,
               scriptPath: process.env.SCRIPT,
-              message: arguments.join(", "),
+              line: initiator,
+              message: arguments.join(" "),
               time: moment().valueOf(),
             }),
         ]);
