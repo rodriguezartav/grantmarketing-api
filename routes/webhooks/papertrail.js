@@ -7,6 +7,7 @@ const Knex = require("../../helpers/knex");
 router.post("/", async function (req, res) {
   try {
     const knex = Knex();
+    const slack = await Slack();
 
     const parsed = JSON.parse(req.body.payload);
     const events = parsed.events;
