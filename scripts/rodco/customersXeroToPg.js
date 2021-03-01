@@ -89,7 +89,6 @@ module.exports = async function Run(integrationMap) {
       )
         customerSql.credit_term = item.paymentTerms.sales.day;
 
-      console.log("saving Cusotmers");
       try {
         if (!customerSql.id) {
           delete customerSql.id;

@@ -99,20 +99,36 @@ module.exports = function Run(
             const line = d.toString();
             lines.push(line);
             if (line.indexOf("SCRIPTRUNNER:::END") > -1) {
-              clearInterval(timeoutInterval);
+              try {
+                clearInterval(timeoutInterval);
 
-              logRequest.destroy();
-              const url = await saveToS3(lines, script);
+                logRequest.destroy();
+                const url = await saveToS3(lines, script);
 
-              console.log(
-                `API_EVENT:::HEROKU_RUNNER:::END:::${JSON.stringify({
-                  job_id: job.id,
-                  script,
-                  time: moment().unix(),
-                })}`
-              );
+                console.log(
+                  `API_EVENT:::HEROKU_RUNNER:::END:::${JSON.stringify({
+                    job_id: job.id,
+                    script,
+                    time: moment().unix(),
+                  })}`
+                );
 
-              resolve({ url, log: lines.join(",") });
+                resolve({ url, log: lines.join(",") });
+              } catch (e) {
+                console.log(
+                  `API_EVENT:::HEROKU_RUNNER:::LOG_ERROR:::${JSON.stringify({
+                    job_id: job.id,
+                    script,
+                    error: {
+                      message: e.message,
+                      stack: e.stack,
+                      status: e.status || e.statusCode,
+                    },
+                    time: moment().unix(),
+                  })}`
+                );
+                return reject(e);
+              }
             }
           });
         })
