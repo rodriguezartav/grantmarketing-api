@@ -13,8 +13,6 @@ module.exports = async function Run(integrationMap) {
       "getContacts"
     );
 
-    console.log(itemsGetResponse);
-
     knex = await getKnex(integrationMap["postgres"]);
 
     var customers = await knex.table("customers").select();
