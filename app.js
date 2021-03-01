@@ -5,6 +5,7 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const bodyParser = require("body-parser");
 
 const cors = require("cors");
 const { makeRouter } = require("./routes/standard");
@@ -23,6 +24,10 @@ if (process.env.NODE_ENV == "production") require("./workers/refreshWorker");
 var app = express();
 
 // view engine setup
+
+// Tell the bodyparser middleware to accept more data
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(express.static(path.join(__dirname, "public")));
 //

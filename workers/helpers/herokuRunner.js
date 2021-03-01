@@ -83,7 +83,7 @@ module.exports = function Run(
         );
 
         reject(new Error("Script Timeout"));
-      }, 1000 * 60 * 10);
+      }, 1000 * 60 * 9);
 
       const logRes = await heroku.post("/apps/grantmarketing/log-sessions", {
         body: {
