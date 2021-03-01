@@ -33,10 +33,10 @@ router.post("/", async function (req, res) {
             script_id: data.script_id,
             schedule_id: data.schedule_id,
             customer_id: data.customer_id,
-            event_type: eventType,
-            location: location,
 
-            events: { list: [] },
+            events: {
+              list: [{ ...data, event_type: eventType, location: location }],
+            },
           };
         else {
           eventsByJobId[data.job_id].events.list.push(data);
