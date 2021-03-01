@@ -15,7 +15,7 @@ async function JobRunner() {
   var knex;
 
   try {
-    knex = Knex();
+    knex = Knex.g();
     const slack = await Slack();
 
     let jobs = await knex
@@ -127,7 +127,7 @@ async function JobRunner() {
         await knex.table("jobs").delete().where("id", job.id);
 
         console.log(
-          `API_EVENT:::JOB_RUNNER:::CRITICAL_ERROR:::${JSON.stringify({
+          `API_EVENT:::JOB_RUNNER:::ERROR:::${JSON.stringify({
             job_id: job.id,
             script_location: job.script_location,
             error: { message: e.message, stack: e.stack },
