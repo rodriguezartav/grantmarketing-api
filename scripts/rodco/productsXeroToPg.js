@@ -47,7 +47,12 @@ module.exports = async function Run(integrationMap) {
         } else
           await knex("products").update(productSql).where("id", product.id);
       } catch (e) {
-        console.log("error", item.code, product ? product.code : e);
+        console.log(
+          "error updating product",
+          e.message,
+          item.code,
+          product ? product.code : e
+        );
       }
     }
 

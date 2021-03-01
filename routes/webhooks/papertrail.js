@@ -3,7 +3,7 @@ var router = express.Router();
 
 // Home page route.
 router.post("/", function (req, res) {
-  console.log(req.body.events);
+  console.log(req.body);
   return res.sendStatus(200);
 });
 
