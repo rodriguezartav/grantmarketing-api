@@ -24,8 +24,8 @@ router.post("/", async function (req, res) {
       return { location, eventType, data };
     });
 
-  for (let index = 0; index < parseEvents.length; index++) {
-    const element = parseEvents[index];
+  for (let index = 0; index < parsedEvents.length; index++) {
+    const element = parsedEvents[index];
     await slack.chat.postMessage({
       text: `${element.location} ${element.eventType} ${JSON.stringify(
         element.data
