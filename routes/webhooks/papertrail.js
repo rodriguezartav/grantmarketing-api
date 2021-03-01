@@ -5,14 +5,13 @@ const Knex = require("../../helpers/knex");
 
 // Home page route.
 router.post("/", async function (req, res) {
+  const slack = await Slack();
   try {
     const knex = Knex();
-    const slack = await Slack();
 
     const parsed = JSON.parse(req.body.payload);
     const events = parsed.events;
     const search = parsed.saved_search.query;
-    const slack = await Slack();
 
     const eventsByJobId = {};
 
