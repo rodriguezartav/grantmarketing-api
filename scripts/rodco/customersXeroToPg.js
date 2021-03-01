@@ -6,7 +6,12 @@ const getKnex = require("../../helpers/knex_pg");
 let knex;
 module.exports = async function Run(integrationMap) {
   try {
-    console.log("Getting Cusotmers");
+    console.log(
+      `API_EVENT:::SCRIPT:::EVENT:::${JSON.stringify({
+        message: "Getting Cusotmers",
+        time: moment().unix(),
+      })}`
+    );
 
     const itemsGetResponse = await xeroApi(
       integrationMap["xero"],
@@ -87,6 +92,13 @@ module.exports = async function Run(integrationMap) {
       )
         customerSql.credit_term = item.paymentTerms.sales.day;
 
+      console.log(
+        `API_EVENT:::SCRIPT:::EVENT:::${JSON.stringify({
+          message: "Saving",
+          time: moment().unix(),
+        })}`
+      );
+
       try {
         if (!customerSql.id) {
           delete customerSql.id;
@@ -112,6 +124,13 @@ module.exports = async function Run(integrationMap) {
         })
         .where("id", id);
     }
+
+    console.log(
+      `API_EVENT:::SCRIPT:::EVENT:::${JSON.stringify({
+        message: "COMPLETE",
+        time: moment().unix(),
+      })}`
+    );
 
     await knex.destroy();
     return true;
