@@ -4,16 +4,14 @@ const { xeroApi, redis } = require("../../helpers/xero");
 const getKnex = require("../../helpers/knex_pg");
 
 module.exports = async function Run(integrationMap) {
-  var trx;
   let knex;
 
   try {
     const itemsGetResponse = await xeroApi(integrationMap["xero"], "getItems");
 
     knex = await getKnex(integrationMap["postgres"]);
-    trx = await knex.transaction();
 
-    var products = await trx.table("products").select();
+    var products = await knex.table("products").select();
     var productMap = {};
     products.forEach((item) => {
       productMap[item.code] = item;
@@ -45,18 +43,17 @@ module.exports = async function Run(integrationMap) {
       try {
         if (!productSql.id) {
           delete productSql.id;
-          await trx("products").insert(productSql);
-        } else await trx("products").update(productSql).where("id", product.id);
+          await knex("products").insert(productSql);
+        } else
+          await knex("products").update(productSql).where("id", product.id);
       } catch (e) {
         console.log("error", item.code, product ? product.code : e);
       }
     }
 
-    await trx.commit();
     await knex.destroy();
   } catch (e) {
-    if (trx) await trx.rollback();
-    await knex.destroy();
+    if (knex) await knex.destroy();
 
     console.log(e);
     throw e;
