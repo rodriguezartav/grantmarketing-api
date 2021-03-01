@@ -15,7 +15,7 @@ async function JobRunner() {
   var knex;
 
   try {
-    knex = Knex.g();
+    knex = await Knex();
     const slack = await Slack();
 
     let jobs = await knex
