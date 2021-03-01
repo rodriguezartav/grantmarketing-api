@@ -21,6 +21,7 @@ router.post("/", async function (req, res) {
       const data = JSON.parse(messageParts[messageParts.length - 1]);
       const location = messageParts[0];
       const eventType = messageParts[1];
+      return { location, eventType, data };
     });
 
   console.log(parsedEvents);
