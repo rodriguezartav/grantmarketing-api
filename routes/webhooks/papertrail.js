@@ -3,8 +3,8 @@ var router = express.Router();
 
 // Home page route.
 router.post("/", function (req, res) {
-  console.log(req.body);
   return res.sendStatus(200);
+  console.log(JSON.parse(req.body.payload));
 });
 
 module.exports = router;
