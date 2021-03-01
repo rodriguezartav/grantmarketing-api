@@ -1,11 +1,13 @@
 var express = require("express");
 var router = express.Router();
+const Slack = require("../../helpers/slack");
 
 // Home page route.
-router.post("/", function (req, res) {
+router.post("/", async function (req, res) {
   const parsed = JSON.parse(req.body.payload);
   const events = parsed.events;
   const search = parsed.saved_search.query;
+  const slack = await Slack();
 
   const parsedEvents = events
     .filter((item) => {
@@ -22,6 +24,11 @@ router.post("/", function (req, res) {
     });
 
   console.log(parsedEvents);
+
+  await slack.chat.postMessage({
+    text: `Received Events ` + JSON.parse(parsedEvents),
+    channel: slack.generalChannelId,
+  });
 
   return res.sendStatus(200);
 });

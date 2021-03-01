@@ -116,11 +116,6 @@ var s3 = new AWS.S3();
           });
         }
 
-        await slack.chat.postMessage({
-          text: `${job.customer_name} Job end ${job.script_name}`,
-          channel: slack.generalChannelId,
-        });
-
         console.log(
           `API_EVENT:::JOB_RUNNER:::END:::${JSON.stringify({
             script_location: job.script_location,
