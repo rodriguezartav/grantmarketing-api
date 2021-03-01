@@ -92,13 +92,6 @@ module.exports = async function Run(integrationMap) {
       )
         customerSql.credit_term = item.paymentTerms.sales.day;
 
-      console.log(
-        `API_EVENT:::SCRIPT:::EVENT:::${JSON.stringify({
-          message: "Saving",
-          time: moment().unix(),
-        })}`
-      );
-
       try {
         if (!customerSql.id) {
           delete customerSql.id;
@@ -112,13 +105,6 @@ module.exports = async function Run(integrationMap) {
         console.log(item.taxNumber, customer ? product.identification : e);
       }
     }
-
-    console.log(
-      `API_EVENT:::SCRIPT:::EVENT:::${JSON.stringify({
-        message: "done Saving",
-        time: moment().unix(),
-      })}`
-    );
 
     for (let index = 0; index < ids.length; index++) {
       const id = ids[index];
