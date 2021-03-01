@@ -5,18 +5,20 @@ const getKnex = require("../../helpers/knex_pg");
 
 let knex;
 module.exports = async function Run(integrationMap) {
-  var trx;
-
   try {
+    console.log("Getting Cusotmers");
+
     const itemsGetResponse = await xeroApi(
       integrationMap["xero"],
       "getContacts"
     );
 
-    knex = await getKnex(integrationMap["postgres"]);
-    trx = await knex.transaction();
+    console.log(itemsGetResponse);
 
-    var customers = await trx.table("customers").select();
+    knex = await getKnex(integrationMap["postgres"]);
+
+    var customers = await knex.table("customers").select();
+
     var customerMap = {};
     var customerMapName = {};
     var customerMapExternalId = {};
@@ -87,12 +89,13 @@ module.exports = async function Run(integrationMap) {
       )
         customerSql.credit_term = item.paymentTerms.sales.day;
 
+      console.log("saving Cusotmers");
       try {
         if (!customerSql.id) {
           delete customerSql.id;
-          await trx.table("customers").insert(customerSql);
+          await knex.table("customers").insert(customerSql);
         } else
-          await trx
+          await knex
             .table("customers")
             .update(customerSql)
             .where("id", customer.id);
@@ -103,7 +106,7 @@ module.exports = async function Run(integrationMap) {
 
     for (let index = 0; index < ids.length; index++) {
       const id = ids[index];
-      await trx
+      await knex
         .table("customers")
         .update({
           active: false,
@@ -113,12 +116,11 @@ module.exports = async function Run(integrationMap) {
         .where("id", id);
     }
 
-    await trx.commit();
     await knex.destroy();
+    return true;
   } catch (e) {
     console.log(e);
-    if (trx) await trx.rollback();
-    await knex.destroy();
+    if (knex) await knex.destroy();
     throw e;
   }
 };
