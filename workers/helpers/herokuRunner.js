@@ -47,7 +47,7 @@ module.exports = function Run(
           force_no_tty: null,
           size: "Hobby.",
           type: "run",
-          time_to_live: 100,
+          time_to_live: 60 * 10,
         },
       });
 

@@ -113,6 +113,13 @@ module.exports = async function Run(integrationMap) {
       }
     }
 
+    console.log(
+      `API_EVENT:::SCRIPT:::EVENT:::${JSON.stringify({
+        message: "done Saving",
+        time: moment().unix(),
+      })}`
+    );
+
     for (let index = 0; index < ids.length; index++) {
       const id = ids[index];
       await knex
