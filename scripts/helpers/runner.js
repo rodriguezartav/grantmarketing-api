@@ -12,12 +12,10 @@ async function Run() {
 
   try {
     let scriptOptions = process.env.SCRIPT_OPTIONS || "{}";
-    console.log(scriptOptions);
     let users = JSON.parse(process.env.USERS);
     let scriptPath = process.env.SCRIPT;
     const integrationMap = JSON.parse(process.env.INTEGRATION_MAP);
     scriptOptions = JSON.parse(scriptOptions);
-    console.log(scriptPath);
 
     console.log(
       `API_EVENT:::SCRIPTRUNNER:::START:::${JSON.stringify({

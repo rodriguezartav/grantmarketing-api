@@ -21,10 +21,8 @@ module.exports = function Run(
   job
 ) {
   let promise = new Promise(async (resolve, reject) => {
-  
-
     try {
-      let logRequest
+      let logRequest;
       const dynoRes = await heroku.post("/apps/grantmarketing/dynos", {
         body: {
           command: `node ./scripts/helpers/runner.js`,
@@ -64,15 +62,18 @@ module.exports = function Run(
         })}`
       );
 
-      const timeoutInterval = setInterval(() => {
+      const timeoutInterval = setInterval(async () => {
         clearInterval(timeoutInterval);
-        
-         await heroku.post(`/apps/${grantmarketing}/dynos/${dynoRes.name}/actions/stop`, {
-          body: {},
-        });  
 
-        if(logRequest) logRequest.destroy();
- 
+        await heroku.post(
+          `/apps/${grantmarketing}/dynos/${dynoRes.name}/actions/stop`,
+          {
+            body: {},
+          }
+        );
+
+        if (logRequest) logRequest.destroy();
+
         console.log(
           `API_EVENT:::HEROKU_RUNNER:::TIME_OUT:::${JSON.stringify({
             job_id: job.id,
@@ -84,7 +85,6 @@ module.exports = function Run(
         reject(new Error("Script Timeout"));
       }, 1000 * 60 * 10);
 
-
       const logRes = await heroku.post("/apps/grantmarketing/log-sessions", {
         body: {
           dyno: dynoRes.name,
@@ -93,7 +93,7 @@ module.exports = function Run(
       });
 
       let lines = [];
-       logRequest = https
+      logRequest = https
         .get(logRes.logplex_url, (res) => {
           res.on("data", async (d) => {
             const line = d.toString();
