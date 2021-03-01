@@ -80,7 +80,12 @@ router.post("/", async function (req, res) {
 
     return res.sendStatus(200);
   } catch (e) {
-    return res.status(500).json({ message: e.message });
+    await slack.chat.postMessage({
+      text: `Error in logs ${e.message} ${e.stack}`,
+      channel: slack.generalChannelId,
+    });
+
+    return res.sendStatus(200);
   }
 });
 
