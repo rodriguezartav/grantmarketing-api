@@ -19,8 +19,8 @@ router.post("/", async function (req, res) {
       const { message, program, received_at } = item;
       const messageParts = message.split(":::");
       const data = JSON.parse(messageParts[messageParts.length - 1]);
-      const location = messageParts[0];
-      const eventType = messageParts[1];
+      const location = messageParts[1];
+      const eventType = messageParts[2];
       return { location, eventType, data };
     });
 
