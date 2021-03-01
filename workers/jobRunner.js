@@ -6,16 +6,12 @@ require("dotenv").config();
 const moment = require("moment");
 const sms = require("../helpers/sms");
 const HerokuRunner = require("./helpers/herokuRunner");
-const Knex = require("../helpers/knex");
 const Slack = require("../helpers/slack");
 const AWS = require("aws-sdk");
 var s3 = new AWS.S3();
 
-async function JobRunner() {
-  var knex;
-
+async function JobRunner(knex) {
   try {
-    knex = await Knex();
     const slack = await Slack();
 
     let jobs = await knex
@@ -138,10 +134,7 @@ async function JobRunner() {
         console.error(e);
       }
     }
-
-    await knex.destroy();
   } catch (e) {
-    if (knex) await knex.destroy();
     console.log(
       `API_EVENT:::JOB_RUNNER:::CRITICAL_ERROR:::${JSON.stringify({
         error: { message: e.message, stack: e.stack },
