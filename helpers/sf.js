@@ -3,6 +3,7 @@ var conn = new jsforce.Connection();
 const Knex = require("../helpers/knex");
 
 async function sfConn(integration) {
+  console.log("creating salesforce connection");
   return new jsforce.Connection({
     instanceUrl: integration.application_id,
     accessToken: integration.auth_token,

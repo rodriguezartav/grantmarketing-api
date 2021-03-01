@@ -44,7 +44,7 @@ setInterval(async () => {
             schedule_id: schedule.id,
             script_id: schedule.script_id,
             customer_id: schedule.customer_id,
-            time: moment().unix(),
+            time: moment().valueOf(),
           })}`
         );
       }

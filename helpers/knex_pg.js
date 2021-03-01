@@ -8,12 +8,13 @@ function getKnex(integration) {
 }
 
 function prepareKnex(integration) {
-  console.log("creating customer connection");
+  console.log("creating postgres connection");
 
   process.on("beforeExit", async (code) => {
     console.log("closing customer connection");
 
     await Knex.destroy();
+    Knex = null;
   });
 
   return require("knex")({

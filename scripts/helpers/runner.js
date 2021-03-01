@@ -7,8 +7,27 @@ const util = require("util");
 const sms = require("../../helpers/sms");
 const moment = require("moment");
 
+(function () {
+  if (window.console && console.log) {
+    var old = console.log;
+    console.log = function () {
+      if (arguments[0].indexOf("API_EVENT") != 0) {
+        old.apply(this, [
+          "API_EVENT:::SCRIPT:::LOGS:::" +
+            JSON.stringify({
+              job_id: process.env.JOB_ID,
+              scriptPath: process.env.SCRIPT,
+              message: arguments.join(", "),
+              time: moment().valueOf(),
+            }),
+        ]);
+      }
+    };
+  }
+})();
+
 async function Run() {
-  const job = JSON.parse(process.env.JOB || "{}");
+  const job_id = process.env.JOB_ID;
 
   try {
     let scriptOptions = process.env.SCRIPT_OPTIONS || "{}";
@@ -19,20 +38,20 @@ async function Run() {
 
     console.log(
       `API_EVENT:::SCRIPTRUNNER:::START:::${JSON.stringify({
-        job_id: job.id,
+        job_id: job_id,
         scriptPath,
-        time: moment(),
+        time: moment().valueOf(),
       })}`
     );
 
     const script = require("../" + scriptPath);
-    await script(integrationMap, users, scriptOptions, job);
+    await script(integrationMap, users, scriptOptions, job_id);
 
     console.log(
       `API_EVENT:::SCRIPTRUNNER:::END:::${JSON.stringify({
-        job_id: job.id,
+        job_id: job_id,
         scriptPath,
-        time: moment(),
+        time: moment().valueOf(),
       })}`
     );
 
@@ -40,18 +59,18 @@ async function Run() {
   } catch (e) {
     console.log(
       `API_EVENT:::SCRIPTRUNNER:::END:::${JSON.stringify({
-        job_id: job.id,
+        job_id: job_id,
         scriptPath: process.env.SCRIPT,
-        time: moment(),
+        time: moment().valueOf(),
       })}`
     );
 
     console.log(
       `API_EVENT:::SCRIPTRUNNER:::ERROR:::${JSON.stringify({
-        job_id: job.id,
+        job_id: job_id,
         scriptPath: process.env.SCRIPT,
         error: { message: e.message, stack: e.stack },
-        time: moment(),
+        time: moment().valueOf(),
       })}`
     );
 

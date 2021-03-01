@@ -8,6 +8,7 @@ async function loadXero() {
 }
 
 async function xeroApi(integration, method, ...rest) {
+  console.log("creating xero connection");
   let xero = new XeroClient({});
   try {
     await xero.setTokenSet({ access_token: integration.auth_token });

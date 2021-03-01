@@ -31,7 +31,7 @@ module.exports = function Run(
             LINES: "24",
             INTEGRATION_MAP: JSON.stringify(integrationMap),
             SCRIPT_OPTIONS: JSON.stringify(scriptOptions),
-            JOB: JSON.stringify(job),
+            JOB_ID: job.id,
             SCRIPT: script,
             USERS: JSON.stringify(
               users.map((item) => {
@@ -54,7 +54,7 @@ module.exports = function Run(
       console.log(
         `API_EVENT:::HEROKU_RUNNER:::START:::${JSON.stringify({
           job_id: job.id,
-          time: moment().unix(),
+          time: moment().valueOf(),
           herokuScript_name: dynoRes.name,
           integrationMap: Object.keys(integrationMap),
           script: script,
@@ -78,7 +78,7 @@ module.exports = function Run(
           `API_EVENT:::HEROKU_RUNNER:::TIMEOUT_ERROR:::${JSON.stringify({
             job_id: job.id,
             script,
-            time: moment().unix(),
+            time: moment().valueOf(),
           })}`
         );
 
@@ -109,7 +109,7 @@ module.exports = function Run(
                   `API_EVENT:::HEROKU_RUNNER:::END:::${JSON.stringify({
                     job_id: job.id,
                     script,
-                    time: moment().unix(),
+                    time: moment().valueOf(),
                   })}`
                 );
 
@@ -124,7 +124,7 @@ module.exports = function Run(
                       stack: e.stack,
                       status: e.status || e.statusCode,
                     },
-                    time: moment().unix(),
+                    time: moment().valueOf(),
                   })}`
                 );
                 return reject(e);
@@ -143,7 +143,7 @@ module.exports = function Run(
                 stack: e.stack,
                 status: e.status || e.statusCode,
               },
-              time: moment().unix(),
+              time: moment().valueOf(),
             })}`
           );
           reject(e);
@@ -159,7 +159,7 @@ module.exports = function Run(
             stack: e.stack,
             status: e.status || e.statusCode,
           },
-          time: moment().unix(),
+          time: moment().valueOf(),
         })}`
       );
 
