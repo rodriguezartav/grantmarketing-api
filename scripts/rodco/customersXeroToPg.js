@@ -13,7 +13,7 @@ module.exports = async function Run(integrationMap) {
 
   var customers = await knex.table("customers").select();
 
-  console.log("got", customerss.length, "from salesforce");
+  console.log("got", customers.length, "from salesforce");
 
   console.log("formating salesforce contacts");
   var customerMap = {};
