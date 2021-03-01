@@ -1,6 +1,5 @@
 const moment = require("moment");
-const { xeroApi, redis } = require("../../helpers/xero");
-
+const { xeroApi } = require("../../helpers/xero");
 const getKnex = require("../../helpers/knex_pg");
 
 let knex;

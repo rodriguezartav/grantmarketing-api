@@ -43,7 +43,7 @@ const moment = require("moment");
               time: moment().valueOf(),
             }),
         ]);
-      }
+      } else old.apply(this, arguments);
     };
   }
 })();
