@@ -66,7 +66,7 @@ module.exports = function Run(
         clearInterval(timeoutInterval);
 
         await heroku.post(
-          `/apps/${grantmarketing}/dynos/${dynoRes.name}/actions/stop`,
+          `/apps/${"grantmarketing"}/dynos/${dynoRes.name}/actions/stop`,
           {
             body: {},
           }
