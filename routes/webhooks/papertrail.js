@@ -56,7 +56,7 @@ router.post("/", async function (req, res) {
       .whereIn("job_id", Object.keys(eventsByJobId));
 
     let flowsById = {};
-    flows.forEach((flow) => (flowsById[flow.job_id] = flow.id));
+    flows.forEach((flow) => (flowsById[flow.job_id] = flow));
 
     for (let index = 0; index < Object.keys(eventsByJobId).length; index++) {
       const jobId = Object.keys(eventsByJobId)[index];
