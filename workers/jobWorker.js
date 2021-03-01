@@ -7,13 +7,13 @@ const JobRunner = require("./jobRunner");
 try {
   setInterval(async () => {
     try {
-      JobRunner();
+      await JobRunner();
     } catch (e) {
       console.log(e);
-      console.log("PROCESS_RUNNER CRITICAL_ERROR", process.exit(0));
+      console.log("PROCESS_RUNNER ERROR");
     }
   }, 60000);
 } catch (e) {
-  console.log("PROCESS_RUNNER CRITICAL_ERROR", process.exit(0));
+  console.log("PROCESS_RUNNER CRITICAL_ERROR");
   console.error(e);
 }
