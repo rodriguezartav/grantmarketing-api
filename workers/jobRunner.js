@@ -6,14 +6,11 @@ require("dotenv").config();
 const moment = require("moment");
 const sms = require("../helpers/sms");
 const HerokuRunner = require("./helpers/herokuRunner");
-const Slack = require("../helpers/slack");
 const AWS = require("aws-sdk");
 var s3 = new AWS.S3();
 
 async function JobRunner(knex) {
   try {
-    const slack = await Slack();
-
     let jobs = await knex
       .table("jobs")
       .select(
@@ -104,13 +101,6 @@ async function JobRunner(knex) {
           .table("schedules")
           .update({ last_run: moment() })
           .where("id", job.schedule_id);
-
-        if (log.indexOf("SCRIPTRUNNER:::ERROR") > -1) {
-          await slack.chat.postMessage({
-            text: `Error: ${job.customer_name} ${job.script_name} ${url}`,
-            channel: slack.generalChannelId,
-          });
-        }
 
         console.log(
           `API_EVENT:::JOB_RUNNER:::END:::${JSON.stringify({
