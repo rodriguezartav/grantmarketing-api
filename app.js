@@ -18,6 +18,7 @@ const UserLogin = require("./routes/userLogin");
 const Jwt = require("./middleware/jwt");
 
 if (process.env.NODE_ENV == "production") require("./workers/jobCreator");
+if (process.env.NODE_ENV == "production") require("./workers/refreshWorker");
 
 var app = express();
 
