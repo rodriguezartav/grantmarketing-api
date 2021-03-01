@@ -75,7 +75,7 @@ module.exports = function Run(
         if (logRequest) logRequest.destroy();
 
         console.log(
-          `API_EVENT:::HEROKU_RUNNER:::TIME_OUT:::${JSON.stringify({
+          `API_EVENT:::HEROKU_RUNNER:::TIMEOUT_ERROR:::${JSON.stringify({
             job_id: job.id,
             script,
             time: moment().unix(),

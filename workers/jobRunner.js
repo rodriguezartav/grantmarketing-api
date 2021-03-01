@@ -129,6 +129,8 @@ var s3 = new AWS.S3();
           })}`
         );
       } catch (e) {
+        await knex.table("jobs").delete().where("id", job.id);
+
         console.log(
           `API_EVENT:::JOB_RUNNER:::CRITICAL_ERROR:::${JSON.stringify({
             job_id: job.id,
