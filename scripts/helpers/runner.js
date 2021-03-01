@@ -22,6 +22,7 @@ async function Run() {
     console.log(
       `API_EVENT:::SCRIPTRUNNER:::START:::${JSON.stringify({
         job_id: job.id,
+        scriptPath,
         time: moment(),
       })}`
     );
@@ -32,6 +33,7 @@ async function Run() {
     console.log(
       `API_EVENT:::SCRIPTRUNNER:::END:::${JSON.stringify({
         job_id: job.id,
+        scriptPath,
         time: moment(),
       })}`
     );
@@ -41,6 +43,7 @@ async function Run() {
     console.log(
       `API_EVENT:::SCRIPTRUNNER:::END:::${JSON.stringify({
         job_id: job.id,
+        scriptPath: process.env.SCRIPT,
         time: moment(),
       })}`
     );
@@ -48,6 +51,7 @@ async function Run() {
     console.log(
       `API_EVENT:::SCRIPTRUNNER:::ERROR:::${JSON.stringify({
         job_id: job.id,
+        scriptPath: process.env.SCRIPT,
         error: { message: e.message, stack: e.stack },
         time: moment(),
       })}`

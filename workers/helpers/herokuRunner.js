@@ -56,6 +56,7 @@ module.exports = function Run(
           time: moment().unix(),
           herokuScript_name: dynoRes.name,
           integrationMap: Object.keys(integrationMap),
+          script: script,
           scriptOptions: scriptOptions,
         })}`
       );
@@ -80,6 +81,7 @@ module.exports = function Run(
               console.log(
                 `API_EVENT:::HEROKU_RUNNER:::END:::${JSON.stringify({
                   job_id: job.id,
+                  script,
                   time: moment().unix(),
                 })}`
               );
@@ -93,6 +95,7 @@ module.exports = function Run(
           console.log(
             `API_EVENT:::HEROKU_RUNNER:::LOG_ERROR:::${JSON.stringify({
               job_id: job.id,
+              script,
               error: {
                 message: e.message,
                 stack: e.stack,
@@ -108,6 +111,7 @@ module.exports = function Run(
       console.log(
         `API_EVENT:::HEROKU_RUNNER:::ERROR:::${JSON.stringify({
           job_id: job.id,
+          script,
           error: {
             message: e.message,
             stack: e.stack,
