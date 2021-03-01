@@ -59,7 +59,7 @@ async function Run(integrationMap, users, scriptOptions) {
 
   //ES6
   const data = {
-    from: "rodriguezartav@jungledynamics.com",
+    from: "rodriguezartav@jungledynamics.com <Jungle Dynamics>",
     to: scriptOptions.email,
     subject: "Your Google Ads Report",
     text: `http://reports.jungledynamics.com/csv/${random}.csv`,
