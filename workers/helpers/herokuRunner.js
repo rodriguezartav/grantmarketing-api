@@ -21,7 +21,10 @@ module.exports = function Run(
   job
 ) {
   let promise = new Promise(async (resolve, reject) => {
+  
+
     try {
+      let logRequest
       const dynoRes = await heroku.post("/apps/grantmarketing/dynos", {
         body: {
           command: `node ./scripts/helpers/runner.js`,
@@ -61,6 +64,27 @@ module.exports = function Run(
         })}`
       );
 
+      const timeoutInterval = setInterval(() => {
+        clearInterval(timeoutInterval);
+        
+         await heroku.post(`/apps/${grantmarketing}/dynos/${dynoRes.name}/actions/stop`, {
+          body: {},
+        });  
+
+        if(logRequest) logRequest.destroy();
+ 
+        console.log(
+          `API_EVENT:::HEROKU_RUNNER:::TIME_OUT:::${JSON.stringify({
+            job_id: job.id,
+            script,
+            time: moment().unix(),
+          })}`
+        );
+
+        reject(new Error("Script Timeout"));
+      }, 1000 * 60 * 10);
+
+
       const logRes = await heroku.post("/apps/grantmarketing/log-sessions", {
         body: {
           dyno: dynoRes.name,
@@ -69,12 +93,14 @@ module.exports = function Run(
       });
 
       let lines = [];
-      const logRequest = https
+       logRequest = https
         .get(logRes.logplex_url, (res) => {
           res.on("data", async (d) => {
             const line = d.toString();
             lines.push(line);
             if (line.indexOf("SCRIPTRUNNER:::END") > -1) {
+              clearInterval(timeoutInterval);
+
               logRequest.destroy();
               const url = await saveToS3(lines, script);
 
