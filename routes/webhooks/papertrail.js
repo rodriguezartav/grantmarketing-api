@@ -70,7 +70,7 @@ router.post("/", async function (req, res) {
             events: {
               list: [
                 ...flowsById[jobId].events.list,
-                ...eventsByJobId[jobId].list,
+                ...eventsByJobId[jobId].events.list,
               ],
             },
           })
