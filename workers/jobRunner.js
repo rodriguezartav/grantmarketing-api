@@ -46,11 +46,6 @@ async function JobRunner(knex) {
           })}`
         );
 
-        await knex
-          .table("jobs")
-          .update({ status: "working" })
-          .where("id", job.id);
-
         const integrations = await knex
           .table("integrations")
           .select("integrations.*", "providers.name as provider")
@@ -116,6 +111,11 @@ async function JobRunner(knex) {
             time_to_live: 60 * 10,
           },
         });
+
+        await knex
+          .table("jobs")
+          .update({ status: "working" })
+          .where("id", job.id);
 
         console.log(
           `API_EVENT:::JOB_RUNNER:::END:::${JSON.stringify({
