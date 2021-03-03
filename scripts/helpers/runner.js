@@ -3,9 +3,9 @@
 //
 
 require("dotenv").config();
-const util = require("util");
 const sms = require("../../helpers/sms");
 const moment = require("moment");
+const request = require("superagent");
 
 (function () {
   if (console.log) {

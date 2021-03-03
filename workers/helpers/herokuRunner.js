@@ -62,29 +62,6 @@ module.exports = function Run(
         })}`
       );
 
-      const timeoutInterval = setInterval(async () => {
-        clearInterval(timeoutInterval);
-
-        await heroku.post(
-          `/apps/${"grantmarketing"}/dynos/${dynoRes.name}/actions/stop`,
-          {
-            body: {},
-          }
-        );
-
-        if (logRequest) logRequest.destroy();
-
-        console.log(
-          `API_EVENT:::HEROKU_RUNNER:::TIMEOUT_ERROR:::${JSON.stringify({
-            job_id: job.id,
-            script,
-            time: moment().valueOf(),
-          })}`
-        );
-
-        reject(new Error("Script Timeout"));
-      }, 1000 * 60 * 9);
-
       const logRes = await heroku.post("/apps/grantmarketing/log-sessions", {
         body: {
           dyno: dynoRes.name,
