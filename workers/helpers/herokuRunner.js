@@ -25,7 +25,7 @@ module.exports = function Run(
       let logRequest;
       const dynoRes = await heroku.post("/apps/grantmarketing/dynos", {
         body: {
-          command: `node ./scripts/helpers/runner.js`,
+          command: `node ./scripts/helpers/runner.js job_id=${job.id}`,
           env: {
             COLUMNS: "80",
             LINES: "24",
