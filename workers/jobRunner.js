@@ -84,7 +84,7 @@ async function JobRunner(knex) {
             job_id: job.id,
             time: moment().valueOf(),
             integrationMap: Object.keys(integrationMap),
-            script: script,
+            script: job.script_location,
             scriptOptions: scriptOptions,
           })}`
         );
