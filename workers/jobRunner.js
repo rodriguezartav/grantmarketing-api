@@ -4,10 +4,10 @@
 
 require("dotenv").config();
 const moment = require("moment");
-const sms = require("../helpers/sms");
-const HerokuRunner = require("./helpers/herokuRunner");
 const AWS = require("aws-sdk");
 var s3 = new AWS.S3();
+const Heroku = require("heroku-client");
+const heroku = new Heroku({ token: process.env.HEROKU_API_TOKEN });
 
 async function JobRunner(knex) {
   try {
@@ -79,28 +79,44 @@ async function JobRunner(knex) {
           integrationMap[item.provider] = item;
         });
 
-        let { url, log } = await HerokuRunner(
-          integrationMap,
-          job.script_location,
-          users,
-          job.script_options,
-          job
+        console.log(
+          `API_EVENT:::HEROKU_RUNNER:::START:::${JSON.stringify({
+            job_id: job.id,
+            time: moment().valueOf(),
+            herokuScript_name: dynoRes.name,
+            integrationMap: Object.keys(integrationMap),
+            script: script,
+            scriptOptions: scriptOptions,
+          })}`
         );
 
-        await knex.table("script_logs").insert({
-          script_id: job.script_id,
-          job_id: job.id,
-          log: {
-            link: url,
+        await heroku.post("/apps/grantmarketing/dynos", {
+          body: {
+            command: `node ./scripts/helpers/runner.js job_id=${job.id}`,
+            env: {
+              COLUMNS: "80",
+              LINES: "24",
+              INTEGRATION_MAP: JSON.stringify(integrationMap),
+              SCRIPT_OPTIONS: JSON.stringify(job.script_options),
+              JOB_ID: job.id,
+              SCRIPT: job.script_location,
+              USERS: JSON.stringify(
+                users.map((item) => {
+                  return {
+                    name: item.name,
+                    id: item.id,
+                    phone: item.phone,
+                    email: item.email,
+                  };
+                })
+              ),
+            },
+            force_no_tty: null,
+            size: "Hobby.",
+            type: "run",
+            time_to_live: 60 * 10,
           },
         });
-
-        await knex.table("jobs").delete().where("id", job.id);
-
-        await knex
-          .table("schedules")
-          .update({ last_run: moment() })
-          .where("id", job.schedule_id);
 
         console.log(
           `API_EVENT:::JOB_RUNNER:::END:::${JSON.stringify({
@@ -110,8 +126,6 @@ async function JobRunner(knex) {
           })}`
         );
       } catch (e) {
-        await knex.table("jobs").delete().where("id", job.id);
-
         console.log(
           `API_EVENT:::JOB_RUNNER:::ERROR:::${JSON.stringify({
             job_id: job.id,

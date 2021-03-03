@@ -82,14 +82,6 @@ async function Run() {
     process.exit(0);
   } catch (e) {
     console.log(
-      `API_EVENT:::SCRIPTRUNNER:::END:::${JSON.stringify({
-        job_id: job_id,
-        scriptPath: process.env.SCRIPT,
-        time: moment().valueOf(),
-      })}`
-    );
-
-    console.log(
       `API_EVENT:::SCRIPTRUNNER:::ERROR:::${JSON.stringify({
         job_id: job_id,
         scriptPath: process.env.SCRIPT,
@@ -97,8 +89,6 @@ async function Run() {
         time: moment().valueOf(),
       })}`
     );
-
-    console.error(e);
 
     process.exit(1);
   }
