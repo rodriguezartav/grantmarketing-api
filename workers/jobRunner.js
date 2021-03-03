@@ -83,7 +83,6 @@ async function JobRunner(knex) {
           `API_EVENT:::HEROKU_RUNNER:::START:::${JSON.stringify({
             job_id: job.id,
             time: moment().valueOf(),
-            herokuScript_name: dynoRes.name,
             integrationMap: Object.keys(integrationMap),
             script: script,
             scriptOptions: scriptOptions,
