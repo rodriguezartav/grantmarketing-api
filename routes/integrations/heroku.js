@@ -15,6 +15,7 @@ router.post("/webhook", async function (req, res, next) {
   const jobId = command.split("job_id=")[1];
   console.log(action, exit_status, jobId, name);
 
+  if (!jobId) return res.json({});
   const job = await knex
     .table("jobs")
     .select("jobs.*", "scripts.location as script_location")
