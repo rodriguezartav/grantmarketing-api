@@ -77,8 +77,6 @@ module.exports = function Run(
             lines.push(line);
             if (line.indexOf("SCRIPTRUNNER:::END") > -1) {
               try {
-                clearInterval(timeoutInterval);
-
                 logRequest.destroy();
                 const url = await saveToS3(lines, script);
 
