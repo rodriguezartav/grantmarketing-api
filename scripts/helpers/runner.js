@@ -11,7 +11,11 @@ const request = require("superagent");
   if (console.log) {
     var old = console.log;
     console.log = function () {
-      if (arguments[0].indexOf("API_EVENT") != 0) {
+      if (
+        arguments[0] &&
+        typeof arguments[0] == "string" &&
+        arguments[0].indexOf("API_EVENT") != 0
+      ) {
         let initiator = "unknown place";
         try {
           throw new Error();
