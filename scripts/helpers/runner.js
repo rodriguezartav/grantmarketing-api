@@ -8,48 +8,46 @@ const moment = require("moment");
 const request = require("superagent");
 
 (function () {
-  if (console.log) {
-    var old = console.log;
-    console.log = function () {
-      if (
-        arguments[0] &&
-        typeof arguments[0] == "string" &&
-        arguments[0].indexOf("API_EVENT") != 0
-      ) {
-        let initiator = "unknown place";
-        try {
-          throw new Error();
-        } catch (e) {
-          if (typeof e.stack === "string") {
-            let isFirst = true;
-            for (const line of e.stack.split("\n")) {
-              const matches = line.match(/^\s+at\s+(.*)/);
-              if (matches) {
-                if (!isFirst) {
-                  // first line - current function
-                  // second line - caller (what we are looking for)
-                  initiator = matches[1];
-                  break;
-                }
-                isFirst = false;
+  var old = console.log;
+  console.log = function () {
+    if (
+      arguments[0] &&
+      typeof arguments[0] == "string" &&
+      arguments[0].indexOf("API_EVENT") != 0
+    ) {
+      let initiator = "unknown place";
+      try {
+        throw new Error();
+      } catch (e) {
+        if (typeof e.stack === "string") {
+          let isFirst = true;
+          for (const line of e.stack.split("\n")) {
+            const matches = line.match(/^\s+at\s+(.*)/);
+            if (matches) {
+              if (!isFirst) {
+                // first line - current function
+                // second line - caller (what we are looking for)
+                initiator = matches[1];
+                break;
               }
+              isFirst = false;
             }
           }
         }
+      }
 
-        old.apply(this, [
-          "API_EVENT:::SCRIPT:::LOGS:::" +
-            JSON.stringify({
-              job_id: process.env.JOB_ID,
-              scriptPath: process.env.SCRIPT,
-              line: initiator,
-              message: arguments,
-              time: moment().valueOf(),
-            }),
-        ]);
-      } else old.apply(this, arguments);
-    };
-  }
+      old.apply(this, [
+        "API_EVENT:::SCRIPT:::LOGS:::" +
+          JSON.stringify({
+            job_id: process.env.JOB_ID,
+            scriptPath: process.env.SCRIPT,
+            line: initiator,
+            message: arguments,
+            time: moment().valueOf(),
+          }),
+      ]);
+    } else old.apply(this, arguments);
+  };
 })();
 
 async function Run() {
