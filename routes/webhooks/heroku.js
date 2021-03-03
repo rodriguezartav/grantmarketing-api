@@ -12,7 +12,7 @@ const knex = Knex();
 router.post("/", async function (req, res, next) {
   const { exit_status, command, name } = req.body.data;
   const action = req.body.data.action;
-  const jobId = command.split("job_id=")[1];
+  const jobId = parseInt(command.split("job_id=")[1]);
   console.log(action, exit_status, jobId, name);
 
   if (!jobId) return res.json({});
