@@ -45,6 +45,7 @@ app.use("/integrations/xero", cors(), XeroIntegration);
 app.use("/integrations/salesforce", cors(), SalesforceIntegration);
 app.use("/integrations/google", cors(), GoogleIntegration);
 app.use("/integrations/slack", cors(), SlackIntegration);
+app.use("/integrations/heroku", cors(), require("./integrations/heroku"));
 
 app.use(
   "/webhooks/papertrail",
