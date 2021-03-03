@@ -9,7 +9,7 @@ const sms = require("../../helpers/sms");
 
 const knex = Knex();
 
-router.post("/webhook", async function (req, res, next) {
+router.post("/", async function (req, res, next) {
   const { exit_status, command, name } = req.body.data;
   const action = req.body.data.action;
   const jobId = command.split("job_id=")[1];
@@ -19,7 +19,7 @@ router.post("/webhook", async function (req, res, next) {
   const job = await knex
     .table("jobs")
     .select("jobs.*", "scripts.location as script_location")
-    .join("scripts", "script.id", "jobs.script_id")
+    .join("scripts", "scripts.id", "jobs.script_id")
     .where("jobs.id", jobId)
     .first();
 

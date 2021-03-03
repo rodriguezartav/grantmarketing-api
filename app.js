@@ -45,17 +45,9 @@ app.use("/integrations/xero", cors(), XeroIntegration);
 app.use("/integrations/salesforce", cors(), SalesforceIntegration);
 app.use("/integrations/google", cors(), GoogleIntegration);
 app.use("/integrations/slack", cors(), SlackIntegration);
-app.use(
-  "/integrations/heroku",
-  cors(),
-  require("./routes/integrations/heroku")
-);
 
-app.use(
-  "/webhooks/papertrail",
-  cors(),
-  require("./routes/webhooks/papertrail")
-);
+app.use("/webhooks/heroku", require("./routes/webhooks/heroku"));
+app.use("/webhooks/papertrail", require("./routes/webhooks/papertrail"));
 
 app.use("/api/login", cors(), Login);
 app.use("/api/userLogin", cors(), UserLogin);
