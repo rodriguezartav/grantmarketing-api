@@ -10,12 +10,13 @@ const sms = require("../../helpers/sms");
 const knex = Knex();
 
 router.post("/", async function (req, res, next) {
+  console.log(req.body.data);
   const { exit_status, command, name } = req.body.data;
   const action = req.body.data.action;
   const jobId = parseInt(command.split("job_id=")[1]);
   console.log(action, exit_status, jobId, name);
 
-  if (!jobId) return res.json({});
+  if (!jobId || !exit_status) return res.json({});
   const job = await knex
     .table("jobs")
     .select("jobs.*", "scripts.location as script_location")
@@ -32,7 +33,6 @@ router.post("/", async function (req, res, next) {
       herokuScript_name: name,
     })}`
   );
-
   await knex.table("jobs").delete().where("id", jobId);
 
   if (exit_status == 1) {
@@ -41,7 +41,7 @@ router.post("/", async function (req, res, next) {
       .update({ last_run: moment() })
       .where("id", job.schedule_id);
   } else if (exit_status != 0) {
-    const admin = await knex.table("jobs").select().where("id", 1);
+    const admin = await knex.table("admins").select().where("id", 1);
     await sms(
       `Error in Job id ${job.id} for script ${script_location}`,
       `+${admin.country_code}${admin.phone}`
