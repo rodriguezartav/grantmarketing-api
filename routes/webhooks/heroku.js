@@ -26,6 +26,15 @@ router.post("/", async function (req, res, next) {
 
   console.log(job);
 
+  if (!job) {
+    const admin = await knex.table("admins").select().where("id", 1);
+    await sms(
+      `Error in Job id ${jobId} not found`,
+      `+${admin.country_code}${admin.phone}`
+    );
+    return res.json({});
+  }
+
   console.log(
     `API_EVENT:::HEROKU_RUNNER:::END:::${JSON.stringify({
       job_id: job.id,
