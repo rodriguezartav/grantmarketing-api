@@ -44,7 +44,7 @@ router.post("/", async function (req, res, next) {
   );
   await knex.table("jobs").delete().where("id", jobId);
 
-  if (exit_status == 1) {
+  if (exit_status == 0) {
     await knex
       .table("schedules")
       .update({ last_run: moment() })
