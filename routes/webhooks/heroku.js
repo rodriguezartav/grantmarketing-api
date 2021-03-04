@@ -16,7 +16,7 @@ router.post("/", async function (req, res, next) {
   const jobId = parseInt(command.split("job_id=")[1]);
   console.log(action, exit_status, jobId, name);
 
-  if (!jobId || !exit_status) return res.json({});
+  if (!jobId || exit_status == null) return res.json({});
   const job = await knex
     .table("jobs")
     .select("jobs.*", "scripts.location as script_location")
