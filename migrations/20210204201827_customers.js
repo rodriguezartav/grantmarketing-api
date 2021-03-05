@@ -10,7 +10,7 @@ exports.up = function (knex, Promise) {
     table.string("address");
     table.string("state");
     table.string("zipcode");
-    table.string("tags");
+    table.string("tags").defaultTo("");
   });
 };
 

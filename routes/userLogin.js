@@ -65,7 +65,7 @@ router.post("/autenticate", async function (req, res, next) {
 
 module.exports = router;
 
-async function getCode({ phone }) {
+async function getCode({ phone, countryCode }) {
   var user = await getKnex()
     .table("users")
     .where({ phone: phone, country_code: countryCode })

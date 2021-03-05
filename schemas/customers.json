@@ -33,10 +33,22 @@
     "tags": {
       "type": "string",
       "description": ""
+    },
+    "billing_email": {
+      "type": "string",
+      "description": ""
     }
   },
   "type": "object",
-  "list": ["name", "tags", "phone", "state", "city", "address"],
+  "list": [
+    "name",
+    "billing_email",
+    "tags",
+    "phone",
+    "state",
+    "city",
+    "address"
+  ],
 
   "additionalProperties": true
 }
