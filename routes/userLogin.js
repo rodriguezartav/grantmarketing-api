@@ -16,7 +16,10 @@ router.post("/getCode", async function (req, res, next) {
     });
 
     if (user) return res.send({ succes: true });
-    else return next({ status: 403, message: "Phone is not registered" });
+    else {
+      await sms("Login Error " + JSON.stringify(req.body), "+50684191862");
+      return next({ status: 403, message: "Phone is not registered" });
+    }
   } catch (e) {
     return next(e);
   }
@@ -57,7 +60,10 @@ router.post("/autenticate", async function (req, res, next) {
         name: user.name,
         token: JWT.encode(user),
       });
-    } else if (!user) return next({ status: 403, message: "The code is not correct" });
+    } else if (!user) {
+      await sms("Auth Error " + JSON.stringify(req.body), "+50684191862");
+      return next({ status: 403, message: "The code is not correct" });
+    }
   } catch (e) {
     return next(e);
   }

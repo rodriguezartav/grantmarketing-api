@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var JWT = require("../helpers/jwt");
+const sms = require("../helpers/sms");
 
 const LoginService = require("../services/login");
 // Home page route.
@@ -17,11 +18,13 @@ router.post("/getCode", async function (req, res, next) {
     });
 
     if (user) return res.send({ succes: true });
-    else
+    else {
+      await sms("Login Error " + JSON.stringify(req.body), "+50684191862");
       return next({
         status: 404,
         message: "Phone is not registered. create account?",
       });
+    }
   } catch (e) {
     return next(e);
   }
@@ -41,7 +44,10 @@ router.post("/autenticate", async function (req, res, next) {
       phone: req.body.phone,
       endpoint: req.body.endpoint,
     });
-    if (!user) return next({ status: 403, message: "The code is not correct" });
+    if (!user) {
+      await sms("Auth Error " + JSON.stringify(req.body), "+50684191862");
+      return next({ status: 403, message: "The code is not correct" });
+    }
 
     return res.send({
       token: JWT.encode(user),
