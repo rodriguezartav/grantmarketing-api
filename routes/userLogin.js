@@ -10,7 +10,10 @@ router.get("/", function (req, res) {
 
 router.post("/getCode", async function (req, res, next) {
   try {
-    var user = await getCode({ phone: req.body.phone });
+    var user = await getCode({
+      phone: req.body.phone,
+      countryCode: req.body.countryCode,
+    });
 
     if (user) return res.send({ succes: true });
     else return next({ status: 403, message: "Phone is not registered" });
@@ -31,6 +34,7 @@ router.post("/autenticate", async function (req, res, next) {
       .where({
         code: req.body.code,
         phone: req.body.phone,
+        country_code: req.body.countryCode,
       })
       .join("customers", "customers.id", "users.customer_id")
       .first();
@@ -62,7 +66,10 @@ router.post("/autenticate", async function (req, res, next) {
 module.exports = router;
 
 async function getCode({ phone }) {
-  var user = await getKnex().table("users").where({ phone: phone }).first();
+  var user = await getKnex()
+    .table("users")
+    .where({ phone: phone, country_code: countryCode })
+    .first();
   if (user) {
     let code = parseInt(Math.random() * 100000);
     await await getKnex()

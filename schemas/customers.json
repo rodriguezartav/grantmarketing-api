@@ -29,10 +29,14 @@
     "phone": {
       "type": "string",
       "description": ""
+    },
+    "tags": {
+      "type": "string",
+      "description": ""
     }
   },
   "type": "object",
-  "list": ["name", "phone", "state", "city", "address"],
+  "list": ["name", "tags", "phone", "state", "city", "address"],
 
   "additionalProperties": true
 }

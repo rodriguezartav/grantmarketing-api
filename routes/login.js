@@ -11,10 +11,17 @@ router.get("/", function (req, res) {
 router.post("/getCode", async function (req, res, next) {
   try {
     var login = new LoginService();
-    var user = await login.getCode({ phone: req.body.phone });
+    var user = await login.getCode({
+      phone: req.body.phone,
+      countryCode: req.body.countryCode,
+    });
 
     if (user) return res.send({ succes: true });
-    else return next({ status: 403, message: "Phone is not registered" });
+    else
+      return next({
+        status: 404,
+        message: "Phone is not registered. create account?",
+      });
   } catch (e) {
     return next(e);
   }
@@ -30,6 +37,7 @@ router.post("/autenticate", async function (req, res, next) {
     const { user } = await login.authenticate({
       applicationSid: req.body.applicationSid,
       code: req.body.code,
+      countryCode: req.body.countryCode,
       phone: req.body.phone,
       endpoint: req.body.endpoint,
     });

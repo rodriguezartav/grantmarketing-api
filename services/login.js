@@ -11,11 +11,18 @@ module.exports = class LoginService {
     this.Worker = getModel("worker");
   }
 
-  async getCode({ phone }) {
-    var user = await this.getOne("admins", { phone: phone });
+  async getCode({ phone, countryCode }) {
+    var user = await this.getOne("admins", {
+      phone: phone,
+      country_code: countryCode,
+    });
     if (user) {
       let code = parseInt(Math.random() * 100000);
-      await this.update("admins", { code: code }, { phone: phone });
+      await this.update(
+        "admins",
+        { code: code },
+        { phone: phone, country_code: countryCode }
+      );
 
       //Sends email if it's not testing/developing
 
@@ -34,11 +41,18 @@ module.exports = class LoginService {
     return user;
   }
 
-  async sendCode({ phone }) {
-    var user = await this.getOne("admins", { phone: phone });
+  async sendCode({ phone, countryCode }) {
+    var user = await this.getOne("admins", {
+      phone: phone,
+      country_code: countryCode,
+    });
     if (user) {
       let code = parseInt(Math.random() * 100000);
-      await this.update("admins", { code: code }, { phone: phone });
+      await this.update(
+        "admins",
+        { code: code },
+        { phone: phone, country_code: countryCode }
+      );
 
       //Sends email if it's not testing/developing
 
@@ -57,8 +71,11 @@ module.exports = class LoginService {
     return user;
   }
 
-  async authenticate({ code, phone, endpoint, applicationSid }) {
-    var user = await this.getOne("admins", { phone });
+  async authenticate({ code, phone, countryCode, endpoint, applicationSid }) {
+    var user = await this.getOne("admins", {
+      phone,
+      country_code: countryCode,
+    });
     if (process.env.NODE_ENV != "development" && user.code != code) return null;
 
     if (user) {

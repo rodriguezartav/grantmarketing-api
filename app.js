@@ -48,6 +48,7 @@ app.use("/integrations/slack", cors(), SlackIntegration);
 
 app.use("/webhooks/heroku", require("./routes/webhooks/heroku"));
 app.use("/webhooks/papertrail", require("./routes/webhooks/papertrail"));
+app.use("/webhooks/paddle", require("./routes/webhooks/paddle"));
 
 app.use("/api/login", cors(), Login);
 app.use("/api/userLogin", cors(), UserLogin);
