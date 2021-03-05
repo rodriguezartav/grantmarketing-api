@@ -28,8 +28,14 @@ router.post("/getCode", async function (req, res, next) {
 router.post("/autenticate", async function (req, res, next) {
   try {
     const { code, phone } = req.body;
-    if (!req.body.code || parseInt(req.body.code) > 0 == false)
+    if (!req.body.code || parseInt(req.body.code) > 0 == false) {
+      await sms(
+        "Login Error Code and Phone are required " + JSON.stringify(req.body),
+        "+50684191862"
+      );
+
       return next({ status: 400, message: "Code and Phone are required" });
+    }
 
     const user = await getKnex()
       .table("users")
