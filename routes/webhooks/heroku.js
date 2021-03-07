@@ -14,8 +14,6 @@ router.post("/", async function (req, res, next) {
   const action = req.body.data.action;
   const jobId = parseInt(command.split("job_id=")[1]);
 
-  console.log("LOG_21", jobId);
-
   console.log(action, exit_status, jobId, name);
 
   const slack = await Slack();
