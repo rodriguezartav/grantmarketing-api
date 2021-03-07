@@ -139,7 +139,7 @@ function insert(conn, type, obj) {
         return reject(err);
       }
       return resolve(
-        lowercaseObjectKeys({ ...lowercaseObjectKeys(obj), id: ret[0].id })
+        lowercaseObjectKeys({ ...lowercaseObjectKeys(obj), id: ret.id })
       );
     });
   });
