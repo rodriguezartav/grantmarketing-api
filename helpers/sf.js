@@ -25,21 +25,37 @@ function insertSf(conn, obj, arr) {
 
 async function insertContact(conn, contact) {
   var key, value;
-  let operation = "insert";
+
   if (contact.phone) {
     key = "phone";
     value = contact.phone;
   }
-  if (contact.mobile) {
-    key = "mobile";
-    value = contact.mobile;
-  }
-  const contacts = await query(
-    conn,
-    `select id,name,email,mobile,phone from Contact where email=${contact.email} or ${key}=${value}`
-  );
 
-  if (contacts[0]) return update(conn, "Contact", contact);
+  if (contact.MobilePhone) {
+    key = "mobile";
+    value = contact.MobilePhone;
+  }
+
+  let contacts = [];
+
+  if (!contact.email && key)
+    contacts = await query(
+      conn,
+      `select id,name,email,mobile,phone from Contact where ${key}=${value}`
+    );
+  else if (contact.email & !key)
+    contacts = await query(
+      conn,
+      `select id,name,email,mobile,phone from Contact where email=${contact.email}`
+    );
+  else
+    contacts = await query(
+      conn,
+      `select id,name,email,mobile,phone from Contact where email=${contact.email} or ${key}=${value}`
+    );
+
+  if (contacts[0])
+    return update(conn, "Contact", { ...contact, id: contacts[0].Id });
   else return insert(conn, "Contact", contact);
 }
 

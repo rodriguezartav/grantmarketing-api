@@ -52,13 +52,13 @@ router.post("/", async function ({ body }, res, next) {
   const city = shipping_address ? shipping_address.city : "";
 
   const contact = await insertContact(conn, {
-    MobilePhone: mobile,
-    Phone: phone,
-    FirstName: orderCustomer.first_name,
-    LastName: orderCustomer.last_name,
-    LeadSource: "shopify",
-    Department: billing_address.company,
-    Email: email,
+    mobilePhone: mobile,
+    phone: phone,
+    firstName: orderCustomer.first_name,
+    lastName: orderCustomer.last_name,
+    leadSource: "shopify",
+    department: billing_address.company,
+    email: email,
   });
 
   await cio.track(contact.id, { name: "ORDER" });
