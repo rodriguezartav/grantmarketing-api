@@ -12,7 +12,7 @@ async function sfConn(integration) {
   });
 }
 
-async function insertContact(conn, contact) {
+async function insertContact(conn, contact, insertCompany) {
   var key, value;
   contact = lowercaseObjectKeys(contact);
 
@@ -35,6 +35,12 @@ async function insertContact(conn, contact) {
       `select id from Account where name LIKE '%${contact.department}%'`
     );
     if (accounts[0]) contact.accountId = accounts[0].id;
+    else {
+      const account = await insert(conn, "Account", {
+        name: contact.department,
+      });
+      contact.accountId = account.id;
+    }
   }
   if (!contact.email && key)
     contacts = await query(
