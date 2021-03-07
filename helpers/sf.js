@@ -153,7 +153,6 @@ function update(conn, type, obj) {
 
 module.exports = {
   bulk,
-  insertSf,
   insertContact,
   insert,
   update,
