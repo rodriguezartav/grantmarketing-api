@@ -3,11 +3,13 @@ var router = express.Router();
 const JWT = require("../../../helpers/jwt");
 const Knex = require("../../../helpers/knex");
 const moment = require("moment");
-const superagent = require("superagent");
+
 const jwt_decode = require("jwt-decode");
 const IntegrationMap = require("../../../helpers/integrationMap");
 const CustomerIO = require("../../../helpers/customerio");
 const { sfConn, bulk, query, insertContact } = require("../../../helpers/sf");
+
+const request = require("superagent");
 
 router.post("/", async function ({ body }, res, next) {
   const knex = Knex();
