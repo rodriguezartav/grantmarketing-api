@@ -23,14 +23,14 @@ module.exports = async function Run(integrationMap) {
       productMap[item.codigo__c] = item;
     });
 
-    const locationUrl = "/admin/api/2020-04/locations.json?limit=250";
+    const locationUrl = "admin/api/2020-04/locations.json?limit=250";
     const locationRes = await request
       .get(`https://${Shopify.application_id}/${locationUrl}`)
       .set("X-Shopify-Access-Token", Shopify.client_secret);
 
     const location = locationRes.body.locations[0];
 
-    const url = "/admin/api/2020-04/products.json?presentment_currencies=USD";
+    const url = "admin/api/2020-04/products.json?presentment_currencies=USD";
 
     let shopifyProducts = [];
     let lastRes = {
@@ -98,7 +98,7 @@ module.exports = async function Run(integrationMap) {
     for (let index = 0; index < update.length; index++) {
       const element = update[index];
 
-      const url = `/admin/api/2020-04/products/${element.id}.json`;
+      const url = `admin/api/2020-04/products/${element.id}.json`;
 
       const productResponse = await request
         .put(`https://${Shopify.application_id}/${url}`)
