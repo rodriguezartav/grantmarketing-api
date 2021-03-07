@@ -23,8 +23,45 @@ function insertSf(conn, obj, arr) {
   });
 }
 
-function bulk(conn, obj, op, extId, arr) {
-  conn.bulk.pollTimeout = 25000; // Bulk timeout can be specified globally on the connection object
+async function insertContact(conn, contact) {
+  var key, value;
+  let operation = "insert";
+  if (contact.phone) {
+    key = "phone";
+    value = contact.phone;
+  }
+  if (contact.mobile) {
+    key = "mobile";
+    value = contact.mobile;
+  }
+  const contacts = await query(
+    conn,
+    `select id,name,email,mobile,phone from Contact where email=${contact.email} or ${key}=${value}`
+  );
+
+  if (contacts[0]) return update(conn, "Contact", contact);
+  else return insert(conn, "Contact", contact);
+}
+
+async function bulk(conn, obj, op, extId, arr) {
+  conn.bulk.pollTimeout = 40000; // Bulk timeout can be specified globally on the connection object
+
+  var arrays = [];
+  var size = 6000;
+
+  let resultMap = {};
+  while (arr.length > 0) {
+    arrays.push(arr.splice(0, size));
+  }
+
+  for (let index = 0; index < arrays.length; index++) {
+    const element = arrays[index];
+    const map = await _bulk(conn, obj, op, extId, element);
+    resultMap = { ...resultMap, map };
+  }
+}
+
+function _bulk(conn, obj, op, extId, arr) {
   return new Promise((resolve, reject) => {
     conn.bulk.load(obj, op, { extIdField: extId }, arr, function (err, rets) {
       if (err) {
@@ -32,13 +69,10 @@ function bulk(conn, obj, op, extId, arr) {
       }
 
       const map = {};
-
+      console.log("Job Complete for " + rets.length);
       for (var i = 0; i < rets.length; i++) {
         if (rets[i].success) {
           map[arr[i].external_id__c] = rets[i].id;
-          console.log(
-            "#" + (i + 1) + " loaded successfully, id = " + rets[i].id
-          );
         } else {
           console.log(
             "#" +
@@ -76,9 +110,34 @@ function query(conn, queryString) {
   });
 }
 
+function insert(conn, type, obj) {
+  return new Promise((resolve, reject) => {
+    conn.sobject(type).create(obj, function (err, ret) {
+      if (err || !ret.success) {
+        return reject(err, ret[0]);
+      }
+      return resolve({ ...obj, id: ret[0].id });
+    });
+  });
+}
+
+function update(conn, type, obj) {
+  return new Promise((resolve, reject) => {
+    conn.sobject(type).create(obj, function (err, ret) {
+      if (err || !ret.success) {
+        return reject(err, ret[0]);
+      }
+      return resolve(obj);
+    });
+  });
+}
+
 module.exports = {
   bulk,
   insertSf,
+  insertContact,
+  insert,
+  update,
   query,
   sfConn,
 };

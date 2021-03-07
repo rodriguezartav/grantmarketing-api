@@ -55,7 +55,7 @@ async function Run() {
 
   try {
     let scriptOptions = process.env.SCRIPT_OPTIONS || "{}";
-    let users = JSON.parse(process.env.USERS);
+    let users = JSON.parse(process.env.USERS || "[]");
     let scriptPath = process.env.SCRIPT;
     const integrationMap = JSON.parse(process.env.INTEGRATION_MAP);
     scriptOptions = JSON.parse(scriptOptions);

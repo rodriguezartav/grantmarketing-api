@@ -2,7 +2,7 @@ require("dotenv").config();
 const util = require("util");
 const moment = require("moment");
 const sms = require("../helpers/sms");
-const IntegrationMap = require("../scripts/helpers/integrationMap");
+const IntegrationMap = require("../helpers/integrationMap");
 
 const Knex = require("../helpers/knex");
 const Runner = require("../scripts/helpers/runner");

@@ -3,7 +3,7 @@ const { xeroApi, redis } = require("../../helpers/xero");
 const { sfConn, bulk, query } = require("../../helpers/sf");
 
 module.exports = async function Run(integrationMap) {
-  const xeroPayments = await xeroApi(
+  let xeroPayments = await xeroApi(
     integrationMap["xero"],
     "getPayments",
     moment().add(-4, "d")

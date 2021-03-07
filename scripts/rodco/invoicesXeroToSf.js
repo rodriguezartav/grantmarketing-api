@@ -17,6 +17,7 @@ module.exports = async function Run(integrationMap) {
   let index = 1;
   while (index < DAYS) {
     let response = await xeroApi(
+      integrationMap["xero"],
       "getCreditNotes",
       moment().add(-DAYS, "d"),
       "",
@@ -41,6 +42,7 @@ module.exports = async function Run(integrationMap) {
   index = 1;
   while (index < DAYS) {
     let response = await xeroApi(
+      integrationMap["xero"],
       "getInvoices",
       moment().add(-DAYS, "d"),
       "",
