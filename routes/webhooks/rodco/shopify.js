@@ -15,7 +15,8 @@ router.post("/", async function ({ body }, res, next) {
   const conn = await sfConn(integrationMap["salesforce"]);
   const cio = CustomerIO(integrationMap["customerio"]);
 
-  let identification, mobile;
+  let identification = null;
+  let mobile = null;
   let customerName = "";
   let {
     email,
@@ -61,60 +62,19 @@ router.post("/", async function ({ body }, res, next) {
     email: email,
   });
 
-  await cio.track(contact.id, { name: "ORDER" });
-
-  if (discount_codes.length > 0)
-    await cio.track(contact.id, { name: discount_codes[0].code });
-
   try {
+    await cio.track(contact.id, { name: "ORDER" });
+
+    if (discount_codes.length > 0)
+      await cio.track(contact.id, { name: discount_codes[0].code });
+
     await request
       .post(
         "https://hooks.slack.com/services/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"
       )
       .send({
         username: "Shopify",
-        text: "Nueva Venta en línea por " + total_price,
-        blocks: [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `${customerName} hizo un pedido para ${city}:\n*<${order_status_url}|Link al Pedido>*`,
-            },
-          },
-          {
-            type: "section",
-            fields: [
-              {
-                type: "mrkdwn",
-                text: `*Total:*\n${total_price}`,
-              },
-              {
-                type: "mrkdwn",
-                text: `*Forma de Pago:*\n${payment_gateway_names.join(",")}`,
-              },
-              {
-                type: "mrkdwn",
-                text: `*Descuentos:*\n${discount_codes
-                  .map((item) => item.code)
-                  .join(",")}`,
-              },
-
-              {
-                type: "mrkdwn",
-                text: `*Direccion:*\n${address}`,
-              },
-              {
-                type: "mrkdwn",
-                text: `*Cedula:*\n${identification || ""}`,
-              },
-              {
-                type: "mrkdwn",
-                text: `*CLV:*\n${orderCustomer.total_spent}`,
-              },
-            ],
-          },
-        ],
+        text: `Nueva Venta en línea ${customerName} por ${total_price} ${order_status_url}`,
       });
   } catch (e) {
     console.log(e);

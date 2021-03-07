@@ -2,6 +2,8 @@ var jsforce = require("jsforce");
 var conn = new jsforce.Connection();
 const Knex = require("../helpers/knex");
 
+var lowercaseObjectKeys = require("lowercase-object-keys");
+
 async function sfConn(integration) {
   console.log("creating salesforce connection");
   return new jsforce.Connection({
@@ -10,21 +12,9 @@ async function sfConn(integration) {
   });
 }
 
-function insertSf(conn, obj, arr) {
-  if (!Array.isArray(arr)) arr = [arr];
-
-  return new Promise((resolve, reject) => {
-    conn.sobject(obj).create(arr, function (err, ret) {
-      console.log(err, ret);
-      if (err || !ret.success) reject(err);
-      else if (arr.length == 1) resolve(ret.id);
-      else resolve(ret);
-    });
-  });
-}
-
 async function insertContact(conn, contact) {
   var key, value;
+  contact = lowercaseObjectKeys(contact);
 
   if (contact.phone) {
     key = "phone";
@@ -120,7 +110,7 @@ function query(conn, queryString) {
     var query = conn
       .query(queryString)
       .on("record", function (record) {
-        records.push(record);
+        records.push(lowercaseObjectKeys(record));
       })
       .on("end", function () {
         console.log("total in database : " + query.totalSize);
@@ -142,7 +132,9 @@ function insert(conn, type, obj) {
         console.log(err);
         return reject(err);
       }
-      return resolve({ ...obj, id: ret[0].id });
+      return resolve(
+        lowercaseObjectKeys({ ...lowercaseObjectKeys(obj), id: ret[0].id })
+      );
     });
   });
 }
@@ -154,7 +146,7 @@ function update(conn, type, obj) {
         console.log(err);
         return reject(err);
       }
-      return resolve(obj);
+      return resolve(lowercaseObjectKeys(obj));
     });
   });
 }
