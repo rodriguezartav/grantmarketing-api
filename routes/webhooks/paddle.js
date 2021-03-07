@@ -5,7 +5,6 @@ const Knex = require("../../helpers/knex");
 const moment = require("moment");
 const superagent = require("superagent");
 const jwt_decode = require("jwt-decode");
-const sms = require("../../helpers/sms");
 
 const knex = Knex();
 

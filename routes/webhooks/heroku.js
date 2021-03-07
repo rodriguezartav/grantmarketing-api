@@ -28,10 +28,7 @@ router.post("/", async function (req, res, next) {
 
   if (!job) {
     const admin = await knex.table("admins").select().where("id", 1);
-    await sms(
-      `+${admin.country_code}${admin.phone}`,
-      `Error in Job id ${jobId} not found`
-    );
+    await sms(`Error in Job id ${jobId} not found`, "+50684191862");
     return res.json({});
   }
 
@@ -52,7 +49,8 @@ router.post("/", async function (req, res, next) {
   } else if (exit_status != 0) {
     const admin = await knex.table("admins").select().where("id", 1);
     await sms(
-      `+${admin.country_code}${admin.phone}``Error in Job id ${job.id} for script ${script_location}`
+      `Error in Job id ${job.id} for script ${script_location}`,
+      "+50684191862"
     );
 
     console.log(
