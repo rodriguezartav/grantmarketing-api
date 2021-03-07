@@ -76,7 +76,7 @@ router.post("/", async function ({ body }, res, next) {
       )
       .send({
         username: "Shopify",
-        text: `Nueva Venta en línea ${customerName} por ${total_price} ${order_status_url}`,
+        text: `Venta Shopify de ${customerName} por ${total_price} ${order_status_url}`,
       });
   } catch (e) {
     console.log(e);
