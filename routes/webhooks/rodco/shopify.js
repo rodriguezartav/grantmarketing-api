@@ -7,13 +7,13 @@ const superagent = require("superagent");
 const jwt_decode = require("jwt-decode");
 const IntegrationMap = require("../../../helpers/integrationMap");
 const CustomerIO = require("../../../helpers/customerio");
-const { sfConn, bulk, query,insertContact } = require("../../../helpers/sf");
+const { sfConn, bulk, query, insertContact } = require("../../../helpers/sf");
 
 router.post("/", async function ({ body }, res, next) {
   const knex = Knex();
   const integrationMap = await IntegrationMap(knex, 1);
   const conn = await sfConn(integrationMap["salesforce"]);
-  const cio = CustomerIO(integrationMap["customerio"])
+  const cio = CustomerIO(integrationMap["customerio"]);
 
   let identification, mobile;
   let customerName = "";
@@ -48,21 +48,18 @@ router.post("/", async function ({ body }, res, next) {
     customerName = shipping_address.company;
   else customerName = orderCustomer.first_name + " " + orderCustomer.last_name;
 
-  const address = shipping_address ? shipping_address.address1 : "",
-  const city =  shipping_address ? shipping_address.city : "",
- 
- 
+  const address = shipping_address ? shipping_address.address1 : "";
+  const city = shipping_address ? shipping_address.city : "";
 
-  
   const contact = await insertContact({
     MobilePhone: mobile,
     Phone: phone,
     FirstName: orderCustomer.first_name,
     LastName: orderCustomer.last_name,
     LeadSource: "shopify",
-    Department:billing_address.company,
+    Department: billing_address.company,
     Email: email,
-   });
+  });
 
   await cio.track(contact.id, { name: "ORDER" });
 
