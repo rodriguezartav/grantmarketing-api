@@ -51,7 +51,7 @@ router.post("/", async function ({ body }, res, next) {
   const address = shipping_address ? shipping_address.address1 : "";
   const city = shipping_address ? shipping_address.city : "";
 
-  const contact = await insertContact({
+  const contact = await insertContact(conn, {
     MobilePhone: mobile,
     Phone: phone,
     FirstName: orderCustomer.first_name,
