@@ -59,7 +59,6 @@ async function insertContact(conn, contact, insertCompany) {
     );
 
   if (contacts[0]) {
-    console.log("ggg", { ...contact, Id: contacts[0].id });
     return update(conn, "Contact", { ...contact, Id: contacts[0].id });
   } else return insert(conn, "Contact", contact);
 }
