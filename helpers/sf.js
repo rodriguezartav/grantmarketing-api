@@ -138,7 +138,8 @@ function insert(conn, type, obj) {
   return new Promise((resolve, reject) => {
     conn.sobject(type).create(obj, function (err, ret) {
       if (err || !ret.success) {
-        return reject(err, ret[0]);
+        console.log(err);
+        return reject(err);
       }
       return resolve({ ...obj, id: ret[0].id });
     });
@@ -149,7 +150,8 @@ function update(conn, type, obj) {
   return new Promise((resolve, reject) => {
     conn.sobject(type).create(obj, function (err, ret) {
       if (err || !ret.success) {
-        return reject(err, ret[0]);
+        console.log(err);
+        return reject(err);
       }
       return resolve(obj);
     });
