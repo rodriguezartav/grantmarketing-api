@@ -17,6 +17,7 @@ router.post("/", async function (req, res, next) {
   console.log("LOG_21", jobId);
 
   console.log(action, exit_status, jobId, name);
+
   const slack = await Slack();
 
   if (!jobId || exit_status == null) return res.json({});
@@ -31,7 +32,7 @@ router.post("/", async function (req, res, next) {
 
   console.log(
     `API_EVENT:::HEROKU_RUNNER:::END:::${JSON.stringify({
-      job_id: job.id,
+      job_id: jobId,
       time: moment().valueOf(),
       herokuScript_name: name,
     })}`
