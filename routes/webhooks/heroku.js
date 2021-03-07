@@ -29,14 +29,6 @@ router.post("/", async function (req, res, next) {
 
   console.log(job);
 
-  if (!job) {
-    await slack.chat.postMessage({
-      text: `Error in Job id ${jobId} not found`,
-      channel: slack.generalChannelId,
-    });
-    return res.json({});
-  }
-
   console.log(
     `API_EVENT:::HEROKU_RUNNER:::END:::${JSON.stringify({
       job_id: job.id,
@@ -44,14 +36,29 @@ router.post("/", async function (req, res, next) {
       herokuScript_name: name,
     })}`
   );
-  await knex.table("jobs").delete().where("id", jobId);
 
   if (exit_status == 0) {
+    if (!job) {
+      await slack.chat.postMessage({
+        text: `Error in Job id ${jobId} not found`,
+        channel: slack.generalChannelId,
+      });
+      return res.json({});
+    }
+    await knex.table("jobs").delete().where("id", jobId);
     await knex
       .table("schedules")
       .update({ last_run: moment() })
       .where("id", job.schedule_id);
   } else if (exit_status != 0) {
+    if (!job) {
+      await slack.chat.postMessage({
+        text: `Error in Job id ${jobId} not found`,
+        channel: slack.generalChannelId,
+      });
+      return res.json({});
+    }
+    await knex.table("jobs").delete().where("id", jobId);
     await slack.chat.postMessage({
       text: `Error in Job id ${job.id} for script ${script_location}`,
       channel: slack.generalChannelId,
