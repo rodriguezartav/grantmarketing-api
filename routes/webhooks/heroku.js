@@ -59,7 +59,7 @@ router.post("/", async function (req, res, next) {
     }
     await knex.table("jobs").delete().where("id", jobId);
     await slack.chat.postMessage({
-      text: `Error in Job id ${job.id} for script ${script_location}`,
+      text: `Error in Job id ${jobId} for script ${script_location}`,
       channel: slack.generalChannelId,
     });
 
