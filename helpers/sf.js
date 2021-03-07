@@ -62,9 +62,10 @@ async function insertContact(conn, contact) {
       `select id,name,email,MobilePhone,phone from Contact where email='${contact.email}' or ${key}='${value}'`
     );
 
-  if (contacts[0])
-    return update(conn, "Contact", { ...contact, id: contacts[0].Id });
-  else return insert(conn, "Contact", contact);
+  if (contacts[0]) {
+    console.log(contacts);
+    return update(conn, "Contact", { ...contact, id: contacts[0].id });
+  } else return insert(conn, "Contact", contact);
 }
 
 async function bulk(conn, obj, op, extId, arr) {
