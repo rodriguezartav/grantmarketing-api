@@ -10,10 +10,12 @@ const Slack = require("../../helpers/slack");
 const knex = Knex();
 
 router.post("/", async function (req, res, next) {
-  console.log(req.body.data);
   const { exit_status, command, name } = req.body.data;
   const action = req.body.data.action;
   const jobId = parseInt(command.split("job_id=")[1]);
+
+  console.log("LOG_21", jobId);
+
   console.log(action, exit_status, jobId, name);
   const slack = await Slack();
 
