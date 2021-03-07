@@ -37,7 +37,15 @@ async function insertContact(conn, contact) {
   }
 
   let contacts = [];
+  let accounts = [];
 
+  if (contact.department) {
+    accounts = await query(
+      conn,
+      `select id from Account where name LIKE '%${contact.department}%'`
+    );
+    if (accounts[0]) contact.accountId = accounts[0].id;
+  }
   if (!contact.email && key)
     contacts = await query(
       conn,
