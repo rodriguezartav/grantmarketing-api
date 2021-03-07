@@ -63,8 +63,7 @@ async function insertContact(conn, contact) {
     );
 
   if (contacts[0]) {
-    console.log(contacts);
-    return update(conn, "Contact", { ...contact, id: contacts[0].id });
+    return update(conn, "Contact", { ...contact, id: contacts[0].Id });
   } else return insert(conn, "Contact", contact);
 }
 
@@ -149,7 +148,7 @@ function insert(conn, type, obj) {
 
 function update(conn, type, obj) {
   return new Promise((resolve, reject) => {
-    conn.sobject(type).create(obj, function (err, ret) {
+    conn.sobject(type).update(obj, function (err, ret) {
       if (err || !ret.success) {
         console.log(err);
         return reject(err);
