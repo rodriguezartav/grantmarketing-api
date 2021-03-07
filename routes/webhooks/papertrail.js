@@ -45,7 +45,7 @@ router.post("/", async function (req, res) {
         if (data.customer_id)
           eventsByJobId[data.job_id].customer_id = data.customer_id;
         if (data.script_id)
-          eventsByJobId[data.job_id].customer_id = data.script_id;
+          eventsByJobId[data.job_id].script_id = data.script_id;
         if (data.schedule_id)
           eventsByJobId[data.job_id].schedule_id = data.schedule_id;
       });
