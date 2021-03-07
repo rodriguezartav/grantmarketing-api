@@ -49,17 +49,17 @@ async function insertContact(conn, contact) {
   if (!contact.email && key)
     contacts = await query(
       conn,
-      `select id,name,email,mobile,phone from Contact where ${key}=${value}`
+      `select id,name,email,mobile,phone from Contact where ${key}='${value}'`
     );
-  else if (contact.email & !key)
+  else if (contact.email && !key)
     contacts = await query(
       conn,
-      `select id,name,email,mobile,phone from Contact where email=${contact.email}`
+      `select id,name,email,mobile,phone from Contact where email='${contact.email}'`
     );
   else
     contacts = await query(
       conn,
-      `select id,name,email,mobile,phone from Contact where email=${contact.email} or ${key}=${value}`
+      `select id,name,email,mobile,phone from Contact where email='${contact.email}' or ${key}='${value}'`
     );
 
   if (contacts[0])
