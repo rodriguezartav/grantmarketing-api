@@ -15,7 +15,7 @@ router.post("/", async function (req, res, next) {
   const action = req.body.data.action;
   const jobId = parseInt(command.split("job_id=")[1]);
   console.log(action, exit_status, jobId, name);
-  const slack = Slack();
+  const slack = await Slack();
 
   if (!jobId || exit_status == null) return res.json({});
   const job = await knex
