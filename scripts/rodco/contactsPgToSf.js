@@ -29,7 +29,7 @@ module.exports = async function Run(integrationMap) {
     );
     const clientesMap = {};
     clientes.forEach((item) => {
-      clientesMap[item.external_id__c] = item.Id;
+      clientesMap[item.external_id__c] = item.id;
     });
 
     const accounts = contacts

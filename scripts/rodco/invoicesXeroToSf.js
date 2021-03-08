@@ -108,7 +108,7 @@ module.exports = async function Run(integrationMap) {
 
   const items = xeroInvoices.map((item) => {
     let account = clientesMap[item.contact.contactID];
-    if (account) clientesMap[item.contact.contactID].Saldo__c = 0;
+    if (account) clientesMap[item.contact.contactID].saldo__c = 0;
 
     const multiplier = item.invoiceNumber ? 1 : -1;
 
@@ -123,7 +123,7 @@ module.exports = async function Run(integrationMap) {
     }
 
     if (account && saldo != null) {
-      clientesMap[item.contact.contactID].Saldo__c += saldo;
+      clientesMap[item.contact.contactID].saldo__c += saldo;
     }
 
     var invoiceSql = {
@@ -168,8 +168,8 @@ module.exports = async function Run(integrationMap) {
           );
           lineItems.push({
             external_id__c: lineItem.lineItemID,
-            producto__c: producto.Id,
-            cuenta__c: account ? account.Id : null,
+            producto__c: producto.id,
+            cuenta__c: account ? account.id : null,
             costo__c: cost,
             factura__c: facturaId,
             cantidad__c: lineItem.quantity,
