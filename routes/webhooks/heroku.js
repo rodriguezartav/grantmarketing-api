@@ -34,26 +34,28 @@ router.post("/", async function (req, res, next) {
     })}`
   );
 
-  if (exit_status == 0 && job) {
+  if (job) {
     await knex.table("jobs").delete().where("id", jobId);
     await knex
       .table("schedules")
       .update({ last_run: moment() })
       .where("id", job.schedule_id);
-  } else if (exit_status != 0 && job) {
-    await knex.table("jobs").delete().where("id", jobId);
-    if (job)
-      await slack.chat.postMessage({
-        text: `Error in Job id ${jobId} for script ${job.script_location}`,
-        channel: slack.generalChannelId,
-      });
 
-    console.log(
-      `API_EVENT:::HEROKU_RUNNER:::ERROR:::${JSON.stringify({
-        job_id: jobId,
-        time: moment().valueOf(),
-      })}`
-    );
+    if (exit_status != 0) {
+      await knex.table("jobs").delete().where("id", jobId);
+      if (job)
+        await slack.chat.postMessage({
+          text: `Error in Job id ${jobId} for script ${job.script_location}`,
+          channel: slack.generalChannelId,
+        });
+
+      console.log(
+        `API_EVENT:::HEROKU_RUNNER:::ERROR:::${JSON.stringify({
+          job_id: jobId,
+          time: moment().valueOf(),
+        })}`
+      );
+    }
   }
 
   return res.json({});
