@@ -191,6 +191,6 @@ module.exports = async function Run(integrationMap) {
     "Account",
     "upsert",
     "external_id__c",
-    Object.values(clientesMap.filter((item) => item.external_id__c))
+    Object.values(clientesMap).filter((item) => item.external_id__c)
   );
 };

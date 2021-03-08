@@ -26,8 +26,6 @@ router.post("/", async function (req, res, next) {
     .where("jobs.id", jobId)
     .first();
 
-  console.log(job);
-
   console.log(
     `API_EVENT:::HEROKU_RUNNER:::END:::${JSON.stringify({
       job_id: jobId,
