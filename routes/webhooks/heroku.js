@@ -36,13 +36,13 @@ router.post("/", async function (req, res, next) {
     })}`
   );
 
-  if (exit_status == 0) {
+  if (exit_status == 0 && job) {
     await knex.table("jobs").delete().where("id", jobId);
     await knex
       .table("schedules")
       .update({ last_run: moment() })
       .where("id", job.schedule_id);
-  } else if (exit_status != 0) {
+  } else if (exit_status != 0 && job) {
     await knex.table("jobs").delete().where("id", jobId);
     if (job)
       await slack.chat.postMessage({
