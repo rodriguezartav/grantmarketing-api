@@ -10,11 +10,11 @@ module.exports = async function Run(integrationMap) {
 
   const productos = await query(
     conn,
-    "select id,codigo__c,precio__c from producto__c "
+    "select id,codigo__c,precio__c,precio_mayoreo__c from producto__c "
   );
   const productosMap = {};
   productos.forEach((item) => {
-    productosMap[item.codigo__c] = item.Id;
+    productosMap[item.codigo__c] = item;
   });
 
   const items = itemsGetResponse.items;
@@ -24,7 +24,7 @@ module.exports = async function Run(integrationMap) {
     if (item.name == "xxxxxx") return;
 
     const product = productosMap[item.code];
-    if (![item.code]) console.log("not found", item.name, item.code);
+    if (!item.code) console.log("not found", item.name, item.code);
     else if (!product) {
       console.log("producto not found ", item.code);
     } else {
@@ -50,6 +50,7 @@ module.exports = async function Run(integrationMap) {
   for (let index = 0; index < arrays.length; index++) {
     const element = arrays[index];
     const response = await xeroApi(
+      integrationMap["xero"],
       "updateOrCreateItems",
       {
         items: element,
