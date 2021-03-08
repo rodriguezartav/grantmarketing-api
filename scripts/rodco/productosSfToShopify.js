@@ -11,7 +11,7 @@ module.exports = async function Run(integrationMap) {
 
     const products = await query(
       conn,
-      "select id,codigo__c,precio__c,inventario__c,presentacion__c,external_id__c from producto__c "
+      "select id,codigo__c,precio__c,inventario__c,presentacion__c,external_id__c from producto__c where precio__c != null"
     );
 
     const productMap = {};

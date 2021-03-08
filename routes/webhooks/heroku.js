@@ -52,7 +52,7 @@ router.post("/", async function (req, res, next) {
 
     console.log(
       `API_EVENT:::HEROKU_RUNNER:::ERROR:::${JSON.stringify({
-        job_id: job_id,
+        job_id: jobId,
         time: moment().valueOf(),
       })}`
     );
