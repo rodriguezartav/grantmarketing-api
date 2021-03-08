@@ -16,9 +16,9 @@ module.exports = async function Run(integrationMap) {
 
     const productMap = {};
     products.forEach((item) => {
-      item.precio__c = item.Precio__c * item.Presentacion__c;
-      item.inventario__c = item.inventario__c / item.Presentacion__c;
-      item.presentacion__c = item.Presentacion__c;
+      item.precio__c = item.precio__c * item.presentacion__c;
+      item.inventario__c = item.inventario__c / item.presentacion__c;
+      item.presentacion__c = item.presentacion__c;
 
       productMap[item.codigo__c] = item;
     });
