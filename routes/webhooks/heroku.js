@@ -36,6 +36,11 @@ router.post("/", async function (req, res, next) {
 
   if (job) {
     await knex.table("jobs").delete().where("id", jobId);
+
+    await knex
+      .table("executions")
+      .insert({ schedule_id: job.schedule_id, result: exit_status });
+
     await knex
       .table("schedules")
       .update({ last_run: moment() })
