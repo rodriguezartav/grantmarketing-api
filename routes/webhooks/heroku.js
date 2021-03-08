@@ -44,10 +44,11 @@ router.post("/", async function (req, res, next) {
       .where("id", job.schedule_id);
   } else if (exit_status != 0) {
     await knex.table("jobs").delete().where("id", jobId);
-    await slack.chat.postMessage({
-      text: `Error in Job id ${jobId} for script ${script_location}`,
-      channel: slack.generalChannelId,
-    });
+    if (job)
+      await slack.chat.postMessage({
+        text: `Error in Job id ${jobId} for script ${job.script_location}`,
+        channel: slack.generalChannelId,
+      });
 
     console.log(
       `API_EVENT:::HEROKU_RUNNER:::ERROR:::${JSON.stringify({
