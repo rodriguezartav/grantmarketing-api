@@ -29,18 +29,19 @@ async function insertContact(conn, contact, insertCompany) {
   let contacts = [];
   let accounts = [];
 
-  if (contact.department) {
+  if (contact._companyName) {
     accounts = await query(
       conn,
-      `select id from Account where name LIKE '%${contact.department}%'`
+      `select id from Account where name LIKE '%${contact._companyName}%'`
     );
     if (accounts[0]) contact.accountId = accounts[0].id;
     else {
       const account = await insert(conn, "Account", {
-        name: contact.department,
+        name: contact._companyName,
       });
       contact.accountId = account.id;
     }
+    delete contact._companyName;
   }
   if (!contact.email && key)
     contacts = await query(
@@ -79,6 +80,7 @@ async function bulk(conn, obj, op, extId, arr) {
     const map = await _bulk(conn, obj, op, extId, element);
     resultMap = { ...resultMap, map };
   }
+  return resultMap;
 }
 
 function _bulk(conn, obj, op, extId, arr) {
@@ -115,6 +117,11 @@ function query(conn, queryString) {
     var query = conn
       .query(queryString)
       .on("record", function (record) {
+        Object.keys(record).forEach((key) => {
+          if (key.indexOf("__r") > -1) {
+            record[key] = lowercaseObjectKeys(record[key]);
+          }
+        });
         records.push(lowercaseObjectKeys(record));
       })
       .on("end", function () {
