@@ -90,7 +90,7 @@ module.exports = async function Run(integrationMap) {
 
   const clientes = await query(
     conn,
-    "select id,external_id__c,saldo__c from account"
+    "select id,external_id__c,saldo__c from account "
   );
   const clientesMap = {};
   clientes.forEach((item) => {
@@ -191,6 +191,6 @@ module.exports = async function Run(integrationMap) {
     "Account",
     "upsert",
     "external_id__c",
-    Object.values(clientesMap)
+    Object.values(clientesMap.filter((item) => item.external_id__c))
   );
 };
