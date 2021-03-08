@@ -37,26 +37,12 @@ router.post("/", async function (req, res, next) {
   );
 
   if (exit_status == 0) {
-    if (!job) {
-      await slack.chat.postMessage({
-        text: `Error in Job id ${jobId} not found`,
-        channel: slack.generalChannelId,
-      });
-      return res.json({});
-    }
     await knex.table("jobs").delete().where("id", jobId);
     await knex
       .table("schedules")
       .update({ last_run: moment() })
       .where("id", job.schedule_id);
   } else if (exit_status != 0) {
-    if (!job) {
-      await slack.chat.postMessage({
-        text: `Error in Job id ${jobId} not found`,
-        channel: slack.generalChannelId,
-      });
-      return res.json({});
-    }
     await knex.table("jobs").delete().where("id", jobId);
     await slack.chat.postMessage({
       text: `Error in Job id ${jobId} for script ${script_location}`,
