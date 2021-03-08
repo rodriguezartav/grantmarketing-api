@@ -13,6 +13,7 @@ module.exports = async function Slack(integration) {
     web.channels =
       channelsByToken[process.env.SLACK_TOKEN || integration.auth_token];
   else {
+    console.log("Loading Slack Channels");
     const result = await web.conversations.list({
       types: "public_channel",
     });
