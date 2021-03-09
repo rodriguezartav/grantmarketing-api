@@ -5,8 +5,8 @@ const request = require("superagent");
 async function Run(integration) {
   try {
     const url = `${integration.application_id.replace(
-      "rest",
-      "identity"
+      "/rest",
+      "/identity"
     )}/oauth/token?grant_type=client_credentials&client_id=${
       integration.client_id
     }&client_secret=${integration.client_secret}`;
