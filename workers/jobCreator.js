@@ -84,7 +84,9 @@ setInterval(async () => {
         text: `Some jobs seem to be stuck. (${jobs
           .map(
             (item) =>
-              `${item.script_name} ${item.customer_name} ${item.created_at}`
+              `${item.script_name} ${item.customer_name} ${moment(
+                item.created_at
+              ).fromNow()}`
           )
           .join("\n")} `,
         channel: slack.generalChannelId,
