@@ -62,7 +62,7 @@ module.exports = async function Run(integrationMap) {
         if (sku.length == 9) sku = "0" + sku;
         let product = productMap[sku];
         if (product) {
-          console.log(variant.name, variant.sku, product.precio__c);
+          // console.log(variant.name, variant.sku, product.precio__c);
 
           sfItems.push({
             external_id__c: product.external_id__c,
@@ -105,10 +105,10 @@ module.exports = async function Run(integrationMap) {
         .set("X-Shopify-Access-Token", Shopify.client_secret)
         .send({ product: element });
 
-      console.log(
-        productResponse.headers["x-shopify-shop-api-call-limit"],
-        productResponse.status
-      );
+      // console.log(
+      //  productResponse.headers["x-shopify-shop-api-call-limit"],
+      // productResponse.status
+      //);
 
       const itemUrl = `admin/api/2020-04/inventory_levels/set.json`;
 
@@ -135,10 +135,10 @@ module.exports = async function Run(integrationMap) {
       });
 
       const pr = await Promise.all(promises);
-      pr.map((r) => {
-        if (r && r.headers)
-          console.log(r.headers["x-shopify-shop-api-call-limit"], r.status);
-      });
+      //pr.map((r) => {
+      //if (r && r.headers)
+      //  console.log(r.headers["x-shopify-shop-api-call-limit"], r.status);
+      //});
       await sleep(2000);
     }
   } catch (e) {
