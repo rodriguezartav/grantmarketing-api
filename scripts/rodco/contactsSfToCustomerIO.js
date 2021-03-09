@@ -12,7 +12,7 @@ module.exports = async function Run(integrationMap) {
 
     var contacts = await query(
       conn,
-      "select id,name,email,mobilePhone,phone, department, account.name, account.Id,account.saldo__c,createdAt,department,description,title from contact "
+      "select id,name,email,mobilePhone,phone, department, account.name, account.Id,account.saldo__c,CreatedDate,department,description,title from contact "
     );
 
     for (let index = 0; index < contacts.length; index++) {
@@ -20,14 +20,14 @@ module.exports = async function Run(integrationMap) {
 
       const res = await cio.identify(contact.id, {
         email: contact.email,
-        created_at: moment(contact.createdAt).unix(),
+        created_at: moment(contact.createdDate).unix(),
         name: contact.name,
         mobile: mobilePhone,
         brands: contact.description,
         balance: contact.account__r ? contact.account__r.saldo__c : 0,
         role: contact.title,
         segment: contact.department,
-        customer_since: contact.createdAt,
+        customer_since: contact.createdDate,
         companyName: contact.account__r ? contact.account__r.name : null,
         companyId: contact.account__r ? contact.account__r.id : null,
       });
