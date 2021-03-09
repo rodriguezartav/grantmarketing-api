@@ -3,7 +3,7 @@ var router = express.Router();
 const JWT = require("../../../helpers/jwt");
 const Knex = require("../../../helpers/knex");
 const moment = require("moment");
-
+const numeral = require("numeral");
 const jwt_decode = require("jwt-decode");
 const IntegrationMap = require("../../../helpers/integrationMap");
 const CustomerIO = require("../../../helpers/customerio");
@@ -76,7 +76,9 @@ router.post("/", async function ({ body }, res, next) {
       )
       .send({
         username: "Shopify",
-        text: `Venta Shopify de ${customerName} por ${total_price} ${order_status_url}`,
+        text: `Venta Shopify de ${customerName} por ${numeral(
+          total_price
+        ).format("0,0")} ${order_status_url}`,
       });
   } catch (e) {
     console.log(e);
