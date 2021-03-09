@@ -72,7 +72,7 @@ setInterval(async () => {
       .whereIn("status", ["working"]);
 
     const lateJobs = jobs.filter((item) => {
-      if (moment(item.created_at).add(12, "minutes").unix() > moment().unix())
+      if (moment(item.created_at).add(30, "minutes").unix() > moment().unix())
         return true;
       return false;
     });
