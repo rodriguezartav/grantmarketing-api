@@ -4,7 +4,12 @@ const request = require("superagent");
 
 async function Run(integration) {
   try {
-    const url = `${integration.application_id}/oauth/token?grant_type=client_credentials&client_id=${integration.client_id}&client_secret=${integration.client_secret}`;
+    const url = `${integration.application_id.replace(
+      "rest",
+      "identity"
+    )}/oauth/token?grant_type=client_credentials&client_id=${
+      integration.client_id
+    }&client_secret=${integration.client_secret}`;
 
     let response = await request.get(url);
 
@@ -12,7 +17,7 @@ async function Run(integration) {
       .table("integrations")
       .update({
         auth_token: response.body.access_token,
-        refresh_token: "Manual Refresh",
+        refresh_token: response.body.access_token,
         external_user_id: response.body.scope,
         expiry_date: moment().add(3600, "seconds"),
       })
