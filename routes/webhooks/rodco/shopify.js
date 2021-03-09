@@ -60,7 +60,7 @@ router.post("/", async function ({ body }, res, next) {
     firstName: orderCustomer.first_name,
     lastName: orderCustomer.last_name,
     leadSource: "shopify",
-    _companyName: billing_address.company,
+    // _companyName: billing_address.company,
     email: email,
   });
 
