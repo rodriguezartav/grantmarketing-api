@@ -4,7 +4,6 @@ const JWT = require("../../helpers/jwt");
 const Knex = require("../../helpers/knex");
 const moment = require("moment");
 const superagent = require("superagent");
-const jwt_decode = require("jwt-decode");
 
 router.get("/:customer_id", async function (req, res, next) {
   try {
@@ -13,7 +12,7 @@ router.get("/:customer_id", async function (req, res, next) {
       .select("integrations.*", "providers.name as provider")
       .join("providers", "providers.id", "integrations.provider_id")
       .where("providers.name", "marketo")
-      .where("customer_id", parseInt(req.query.state))
+      .where("customer_id", req.params.customer_id)
       .first();
 
     if (!integration) return res.send(404);
