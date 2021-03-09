@@ -18,7 +18,12 @@ router.get("/:customer_id", async function (req, res, next) {
     if (!integration) return res.send(404);
 
     const oauthRes = await superagent.get(
-      `${integration.application_id}/oauth/token?grant_type=client_credentials&client_id=${integration.client_id}&client_secret=${integration.client_secret}`
+      `${integration.application_id.replace(
+        "rest",
+        "identity"
+      )}/oauth/token?grant_type=client_credentials&client_id=${
+        integration.client_id
+      }&client_secret=${integration.client_secret}`
     );
 
     console.log(oauthRes.body);
