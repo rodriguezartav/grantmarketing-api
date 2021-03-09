@@ -4,24 +4,17 @@ const request = require("superagent");
 
 async function Run(integration) {
   try {
-    const url = `${integration.application_id}/oauth/token?grant_type=client_credentials&client_id=<Client Id>&client_secret=<Client Secret></Client>`;
+    const url = `${integration.application_id}/oauth/token?grant_type=client_credentials&client_id=${integration.client_id}&client_secret=${integration.client_secret}`;
 
-    let response = await request
-      .post("https://login.salesforce.com//services/oauth2/token")
-      .send({
-        grant_type: "refresh_token",
-        refresh_token: integration.refresh_token,
-        client_id: integration.client_id,
-        client_secret: integration.client_secret,
-      })
-      .type("form");
+    let response = await request.get(url);
 
     await Knex()
       .table("integrations")
       .update({
         auth_token: response.body.access_token,
-        refresh_token: response.body.refresh_token,
-        expiry_date: moment().add(1500, "seconds"),
+        refresh_token: "Manual Refresh",
+        external_user_id: response.body.scope,
+        expiry_date: moment().add(3600, "seconds"),
       })
       .where("id", integration.id);
   } catch (e) {

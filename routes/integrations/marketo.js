@@ -27,6 +27,7 @@ router.get("/:customer_id", async function (req, res, next) {
       .update({
         auth_token: oauthRes.body.access_token,
         refresh_token: oauthRes.body.access_token,
+        external_user_id: response.body.scope,
         expiry_date: moment().add(oauthRes.body.expires_in, "seconds"),
       })
       .where("id", integration.id);
