@@ -21,6 +21,8 @@ router.get("/:customer_id", async function (req, res, next) {
       `${integration.application_id}/oauth/token?grant_type=client_credentials&client_id=${integration.client_id}&client_secret=${integration.client_secret}`
     );
 
+    console.log(oauthRes.body);
+
     await Knex()
       .table("integrations")
       .update({
