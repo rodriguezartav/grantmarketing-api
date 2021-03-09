@@ -29,19 +29,19 @@ async function insertContact(conn, contact, insertCompany) {
   let contacts = [];
   let accounts = [];
 
-  if (contact._companyName) {
+  if (contact._companyname) {
     accounts = await query(
       conn,
-      `select id from Account where name LIKE '%${contact._companyName}%'`
+      `select id from Account where name LIKE '%${contact._companyname}%'`
     );
     if (accounts[0]) contact.accountId = accounts[0].id;
     else {
       const account = await insert(conn, "Account", {
-        name: contact._companyName,
+        name: contact._companyname,
       });
       contact.accountId = account.id;
     }
-    delete contact._companyName;
+    delete contact._companyname;
   }
   if (!contact.email && key)
     contacts = await query(
