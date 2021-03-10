@@ -12,7 +12,7 @@ module.exports = async function Run(integrationMap) {
 
     var contacts = await query(
       conn,
-      "select id,name,email,mobilePhone,phone, department, account.name, account.Id,account.saldo__c,CreatedDate,department,description,title from contact "
+      "select id,name,email,mobilePhone,phone, account.name, account.Id,account.saldo__c,CreatedDate,department,description,title from contact "
     );
 
     for (let index = 0; index < contacts.length; index++) {
