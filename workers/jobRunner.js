@@ -108,7 +108,7 @@ async function JobRunner(knex) {
             force_no_tty: null,
             size: "Hobby.",
             type: "run",
-            time_to_live: 60 * 10,
+            time_to_live: 60 * 90,
           },
         });
 

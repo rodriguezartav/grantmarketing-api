@@ -20,7 +20,7 @@ module.exports = async function Run(integrationMap) {
 
       const res = await cio.identify(contact.id, {
         email: contact.email,
-        created_at: moment(contact.createdDate).unix(),
+        created_at: moment(contact.createddate).unix(),
         name: contact.name,
         mobile: contact.mobilephone,
         brands: contact.description,

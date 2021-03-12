@@ -83,6 +83,11 @@ function Poll(type, integration, exportId) {
           )
           .auth(integration.auth_token, { type: "bearer" });
 
+        if (!response.body.success) {
+          clearInterval(interval);
+          reject(response.body.errors[0]);
+        }
+
         if (
           response.body.success &&
           response.body.result[0].status == "Completed"
