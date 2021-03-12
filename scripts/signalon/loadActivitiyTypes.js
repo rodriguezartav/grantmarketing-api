@@ -15,18 +15,22 @@ module.exports = async function Run(integrationMap) {
 
     for (let index = 0; index < activityTypes.length; index++) {
       const activityType = activityTypes[index];
-      await knex.table("activity_types").insert({
-        id: activityType.id,
-        name: activityType.name,
-        description: activityType.description,
-        primary_attribute_name: activityType.primaryAttribute
-          ? activityType.primaryAttribute.name
-          : "",
-        primary_attribute_type: activityType.primaryAttribute
-          ? activityType.primaryAttribute.dataType
-          : "",
-        attributes: { list: activityType.attributes },
-      });
+      await knex
+        .table("activity_types")
+        .insert({
+          id: activityType.id,
+          name: activityType.name,
+          description: activityType.description,
+          primary_attribute_name: activityType.primaryAttribute
+            ? activityType.primaryAttribute.name
+            : "",
+          primary_attribute_type: activityType.primaryAttribute
+            ? activityType.primaryAttribute.dataType
+            : "",
+          attributes: { list: activityType.attributes },
+        })
+        .onConflict("id")
+        .merge();
     }
 
     await knex.destroy();
