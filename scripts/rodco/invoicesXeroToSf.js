@@ -6,6 +6,7 @@ const DAYS = 2;
 
 module.exports = async function Run(integrationMap) {
   let productCosts = {};
+  const conn = await sfConn(integrationMap["salesforce"]);
 
   const itemsGetResponse = await xeroApi(integrationMap["xero"], "getItems");
 
@@ -86,8 +87,6 @@ module.exports = async function Run(integrationMap) {
 
   xeroInvoices = xeroInvoices.concat(xeroNcs);
 
-  const conn = await sfConn(integrationMap["salesforce"]);
-
   const clientes = await query(
     conn,
     "select id,external_id__c,saldo__c from account "
@@ -140,13 +139,21 @@ module.exports = async function Run(integrationMap) {
     return invoiceSql;
   });
 
-  const facturasMap = await bulk(
+  const { items: facturaItems, success, errors } = await bulk(
     conn,
     "Factura__c",
     "upsert",
     "external_id__c",
     items
   );
+
+  if (!success)
+    throw new Error(
+      "Not all Facturas where save in Salesforce " + errors.join(",")
+    );
+
+  const facturasMap = {};
+  facturaItems.forEach((item) => (facturasMap[item.external_id__c] = item.id));
 
   const lineItems = [];
 

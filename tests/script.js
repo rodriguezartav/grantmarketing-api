@@ -21,7 +21,7 @@ async function Test() {
     integrations.forEach((item) => (integrationMap[item.provider] = item));
 
     process.env.INTEGRATION_MAP = JSON.stringify(integrationMap);
-    process.env.SCRIPT = "signalon/marketoTest";
+    process.env.SCRIPT = "rodco/invoicesXeroToSf";
 
     await Runner();
   } catch (e) {

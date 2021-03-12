@@ -1,8 +1,8 @@
 var jsforce = require("jsforce");
-var conn = new jsforce.Connection();
-const Knex = require("../helpers/knex");
-
+const { parse } = require("json2csv");
+const request = require("superagent");
 var lowercaseObjectKeys = require("lowercase-object-keys");
+const CSV = require("csvtojson");
 
 async function sfConn(integration) {
   console.log("creating salesforce connection");
@@ -64,51 +64,96 @@ async function insertContact(conn, contact, insertCompany) {
   } else return insert(conn, "Contact", contact);
 }
 
-async function bulk(conn, obj, op, extId, arr) {
-  conn.bulk.pollTimeout = 40000; // Bulk timeout can be specified globally on the connection object
+async function bulk(conn, objectName, operation, externalIdFieldName, arr) {
+  if (arr.length == 0)
+    return {
+      successResults: [],
+      failedResults: [],
+    };
+  const csv = parse(arr, { fields: Object.keys(arr[0]) });
 
-  var arrays = [];
-  var size = 6000;
+  const job = await request
+    .post(`${conn.instanceUrl}/services/data/v51.0/jobs/ingest/`)
+    .send({
+      object: objectName,
+      contentType: "CSV",
+      externalIdFieldName: externalIdFieldName,
+      operation: operation,
+    })
+    .auth(conn.accessToken, { type: "bearer" });
 
-  let resultMap = {};
-  while (arr.length > 0) {
-    arrays.push(arr.splice(0, size));
+  await request
+    .put(`${conn.instanceUrl}/${job.body.contentUrl}`)
+    .accept("application/json")
+    .type("text/csv")
+    .send(csv)
+    .auth(conn.accessToken, { type: "bearer" });
+
+  await request
+    .patch(
+      `${conn.instanceUrl}/services/data/v51.0/jobs/ingest/${job.body.id}/`
+    )
+    .send({
+      state: "UploadComplete",
+    })
+    .auth(conn.accessToken, { type: "bearer" });
+
+  let jobResult;
+  while (
+    !jobResult ||
+    (jobResult.body.state != "JobComplete" && jobResult.body.state != "Failed")
+  ) {
+    jobResult = await request
+      .get(
+        `${conn.instanceUrl}/services/data/v51.0/jobs/ingest/${job.body.id}/`
+      )
+
+      .auth(conn.accessToken, { type: "bearer" });
+    if (
+      jobResult.body.state != "JobComplete" &&
+      jobResult.body.state != "Failed"
+    )
+      await sleep(1000 * 60 * 3);
   }
+  const successResults = await request
+    .get(
+      `${conn.instanceUrl}/services/data/v51.0/jobs/ingest/${job.body.id}/successfulResults`
+    )
 
-  for (let index = 0; index < arrays.length; index++) {
-    const element = arrays[index];
-    const map = await _bulk(conn, obj, op, extId, element);
-    resultMap = { ...resultMap, map };
-  }
-  return resultMap;
-}
+    .auth(conn.accessToken, { type: "bearer" });
 
-function _bulk(conn, obj, op, extId, arr) {
-  return new Promise((resolve, reject) => {
-    conn.bulk.load(obj, op, { extIdField: extId }, arr, function (err, rets) {
-      if (err) {
-        return reject(err);
-      }
+  const failedResults = await request
+    .get(
+      `${conn.instanceUrl}/services/data/v51.0/jobs/ingest/${job.body.id}/failedResults`
+    )
 
-      const map = {};
-      console.log("Job Complete for " + rets.length);
-      for (var i = 0; i < rets.length; i++) {
-        if (rets[i].success) {
-          map[arr[i].external_id__c] = rets[i].id;
-        } else {
-          console.log(
-            "#" +
-              (i + 1) +
-              obj +
-              " error occurred, message = " +
-              rets[i].errors.join(", ")
-          );
-          console.log(arr[i]);
-        }
-      }
-      resolve(map);
-    });
+    .auth(conn.accessToken, { type: "bearer" });
+
+  let results = await CSV().fromString(successResults.text);
+  const errors = await CSV().fromString(failedResults.text);
+
+  let allOk = true;
+  const errorResults = errors.map((item) => {
+    allOk = false;
+    return {
+      id: item.sf__Id,
+      error: item.sf__Error,
+      [externalIdFieldName]: item[externalIdFieldName],
+    };
   });
+
+  results = results.map((item) => {
+    const result = { id: item.sf__Id };
+    if (externalIdFieldName)
+      results[externalIdFieldName] = item[externalIdFieldName];
+    return result;
+  });
+
+  return {
+    success: allOk,
+    items: results,
+    errors: errorResults,
+  };
 }
 
 function query(conn, queryString) {
@@ -171,3 +216,9 @@ module.exports = {
   query,
   sfConn,
 };
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
