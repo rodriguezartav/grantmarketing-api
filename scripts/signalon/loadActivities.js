@@ -19,8 +19,8 @@ module.exports = async function Run(integrationMap) {
 
     const filter = {
       createdAt: {
-        startAt: "2020-03-01T00:00:00Z",
-        endAt: "2020-03-13T00:00:00Z",
+        startAt: "2021-03-01T00:00:00Z",
+        endAt: "2021-03-13T00:00:00Z",
         activityTypeIds: [3, 6, 7, 8, 9, 10, 11, 27, 41, 40, 39, 48, 111, 112],
       },
     };
