@@ -21,6 +21,7 @@ Marketo.get = async function (integration, url) {
 Marketo.batch = async function (type, fields, filter, integration) {
   const { exportId } = await Create(type, fields, filter, integration);
   const file = await Poll(type, integration, exportId);
+  console.log(file);
   return parse(file, { columns: true });
 };
 
