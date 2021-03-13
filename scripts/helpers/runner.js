@@ -44,6 +44,7 @@ const request = require("superagent");
             line: initiator,
             message: arguments,
             time: moment().valueOf(),
+            cr: moment().utcOffset("-0600").format("YYYY-MM-DD HH:mm"),
           }),
       ]);
     } else old.apply(this, arguments);
