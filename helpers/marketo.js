@@ -101,12 +101,12 @@ function Poll(type, integration, exportId) {
                 ""
               )}/bulk/v1/${type}/export/${exportId}/file.json`
             )
+            .maxResponseSize(2000000000)
             .auth(integration.auth_token, { type: "bearer" });
 
-          fs.writeFileSync("./activities.csv", file.text);
           resolve(file.text);
         }
-      }, 60 * 1000);
+      }, 60 * 3 * 1000);
     } catch (e) {
       reject(e);
     }
