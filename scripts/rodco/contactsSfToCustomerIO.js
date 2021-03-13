@@ -17,7 +17,7 @@ module.exports = async function Run(integrationMap) {
 
     for (let index = 0; index < contacts.length; index++) {
       const contact = contacts[index];
-
+      console.log(contact.id);
       const res = await cio.identify(contact.id, {
         email: contact.email,
         created_at: moment(contact.createddate).unix(),
