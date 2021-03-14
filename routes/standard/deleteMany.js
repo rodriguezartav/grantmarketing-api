@@ -4,7 +4,7 @@ module.exports = async (req, res, next) => {
   try {
     const deleteMany = getModel("deleteMany");
     await deleteMany(
-      req.baseUrl.replace("/api/", ""),
+      req.baseUrl.replace("/api/", "").replace("/vpi/", ""),
       req.body || req.query,
       req.knexPg
     );

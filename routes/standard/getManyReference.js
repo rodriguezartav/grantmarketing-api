@@ -16,7 +16,7 @@ module.exports = async (req, res, next) => {
 
     const getManyReference = getModel("getManyReference");
     const { results, count } = await getManyReference(
-      req.baseUrl.replace("/api/", ""),
+      req.baseUrl.replace("/api/", "").replace("/vpi/", ""),
       req.body,
       req.knexPg
     );

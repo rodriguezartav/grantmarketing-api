@@ -3,7 +3,7 @@ const moment = require("moment");
 
 module.exports = async (req, res, next) => {
   try {
-    const resource = req.baseUrl.replace("/api/", "");
+    const resource = req.baseUrl.replace("/api/", "").replace("/vpi/", "");
     let update = getModel("update");
     let getOne = getModel("getOne");
     let data = req.body;

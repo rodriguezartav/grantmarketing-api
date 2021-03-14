@@ -13,7 +13,7 @@ module.exports = async (req, res, next) => {
     }
     const getMany = getModel("getMany");
     var results = await getMany(
-      req.baseUrl.replace("/api/", ""),
+      req.baseUrl.replace("/api/", "").replace("/vpi/", ""),
       {
         "id,IN": req.body.ids,
       },

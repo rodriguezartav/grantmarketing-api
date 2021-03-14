@@ -59,7 +59,9 @@ app.use("/webhooks/rodco/shopify", require("./routes/webhooks/rodco/shopify"));
 
 app.use("/api/login", cors(), Login);
 app.use("/api/userLogin", cors(), UserLogin);
-app.use("/vpi/schemas", cors(), require("./routes/schemas"));
+app.use("/vpi/schemas", cors(), Vpi, require("./routes/schemas"));
+app.use("/vpi/private_schemas", cors(), Jwt, Vpi, require("./routes/schemas"));
+
 app.use("/vpi/scripts", cors(), require("./routes/scripts"));
 app.use("/vpi/api_keys", cors(), Jwt, require("./routes/vpi/apiKeys"));
 app.use("/vpi/:resource", cors(), Jwt, Vpi, makeRouter());

@@ -2,7 +2,7 @@ const { getModel } = require("../../models");
 
 module.exports = async (req, res, next) => {
   try {
-    const table = req.baseUrl.replace("/api/", "");
+    const table = req.baseUrl.replace("/api/", "").replace("/vpi/", "");
     let data = req.body.data;
 
     const schema = require("../../schemas/" + table + ".json");

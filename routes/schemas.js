@@ -3,12 +3,26 @@ var router = express.Router();
 const fs = require("fs");
 const Knex = require("../helpers/knex");
 
+router.get("/", async function (req, res) {
+  const knex = req.knexPg || Knex();
+
+  const tables = await knex("pg_catalog.pg_tables")
+    .select("tablename")
+    .where({ schemaname: "public" });
+
+  return res.send(
+    tables
+      .map((item) => item.tablename)
+      .filter((item) => item.indexOf("knex") == -1)
+  );
+});
+
 // Home page route.
 router.get("/:name", function (req, res) {
   fs.exists("./schemas/" + req.params.name + ".json", async (exists) => {
     if (exists) res.send(require("../schemas/" + req.params.name + ".json"));
     else {
-      const knex = Knex();
+      const knex = req.knexPg || Knex();
       const columns = await knex.table(req.params.name).columnInfo();
       const standardColumns = transformColumns(columns);
       const response = {

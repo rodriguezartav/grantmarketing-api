@@ -5,7 +5,7 @@ module.exports = async (req, res, next) => {
   try {
     const getOne = getModel("getOne");
     var result = await getOne(
-      req.baseUrl.replace("/api/", ""),
+      req.baseUrl.replace("/api/", "").replace("/vpi/", ""),
       {
         id: req.params.id,
         ...queryString.parse(req.query || ""),

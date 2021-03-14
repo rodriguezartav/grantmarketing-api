@@ -13,7 +13,7 @@ module.exports = async (req, res, next) => {
     }
     const getList = getModel("getList");
     const { results, count } = await getList(
-      req.baseUrl.replace("/api/", ""),
+      req.baseUrl.replace("/api/", "").replace("/vpi/", ""),
       req.body,
       req.knexPg
     );

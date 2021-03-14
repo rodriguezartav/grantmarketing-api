@@ -7,7 +7,7 @@ async function loadXero() {
   //TODO REMOVE
 }
 
-async function xeroApi(integration, method, ...rest,count=0) {
+async function xeroApi(integration, method, ...rest) {
   console.log("creating xero connection");
   let xero = new XeroClient({});
   try {
@@ -17,9 +17,9 @@ async function xeroApi(integration, method, ...rest,count=0) {
       ...rest,
     ]);
 
-    if(response.status>=500 && count<10){
+    if (response.status >= 500) {
       await sleep(60000);
-      response = await xeroApi(integration, method, ...rest,count+1)
+      response = await xeroApi(integration, method, ...rest);
     }
 
     return response.body;
