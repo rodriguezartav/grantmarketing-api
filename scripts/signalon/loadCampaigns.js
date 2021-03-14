@@ -6,19 +6,10 @@ const Knex = require("../../helpers/knex_pg");
 let knex;
 module.exports = async function Run(integrationMap) {
   try {
-    let campaigns = [];
-    let lastResult;
-
-    let offset = 0;
-    while (!lastResult || lastResult.length == 200) {
-      const loopCampaings = await Marketo.get(
-        integrationMap["marketo"],
-        `/rest/asset/v1/smartCampaigns.json?earliestUpdatedAt=2020-09-01T23:15:00-00:00&latestUpdatedAt=2021-03-12T23:17:00-00:00&maxReturn=200&offset=${offset}`
-      );
-      campaigns = campaigns.concat(loopCampaings);
-      lastResult = loopCampaings;
-      offset++;
-    }
+    const campaigns = await Marketo.getBulk(
+      integrationMap["marketo"],
+      `/rest/asset/v1/smartCampaigns.json?earliestUpdatedAt=2020-09-01T23:15:00-00:00&latestUpdatedAt=2021-03-12T23:17:00-00:00`
+    );
 
     const knex = Knex(integrationMap["postgres"]);
 

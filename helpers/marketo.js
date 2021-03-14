@@ -18,6 +18,25 @@ Marketo.get = async function (integration, url) {
   return response.body.result;
 };
 
+Marketo.getBulk = async function (integration, url) {
+  let list = [];
+  let lastResult;
+  let offset = 0;
+  while (!lastResult || lastResult.length == 200) {
+    const loopList = await Marketo.get(
+      integration,
+      `${url}${url.indexOf("?") > -1 ? `&` : "?"}maxReturn=200&offset=${
+        list.length
+      }`
+    );
+    list = list.concat(loopList);
+    lastResult = loopList;
+    offset++;
+  }
+
+  return list;
+};
+
 Marketo.batch = async function (type, fields, filter, integration) {
   const { exportId } = await Create(type, fields, filter, integration);
   const file = await Poll(type, integration, exportId);

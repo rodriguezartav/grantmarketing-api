@@ -6,15 +6,21 @@ const Knex = require("../../helpers/knex_pg");
 let knex;
 module.exports = async function Run(integrationMap) {
   try {
-    const emails = await Marketo.get(
+    const emails = await Marketo.getBulk(
       integrationMap["marketo"],
-      "/rest/asset/v1/emails.json?maxReturn=200"
+      "/rest/asset/v1/emails.json"
     );
 
     const knex = Knex(integrationMap["postgres"]);
 
     for (let index = 0; index < emails.length; index++) {
       const email = emails[index];
+
+      const emailContents = await Marketo.getBulk(
+        integrationMap["marketo"],
+        `/rest/asset/v1/email/${email.id}/content.json`
+      );
+
       await knex
         .table("emails")
         .insert({
@@ -29,6 +35,7 @@ module.exports = async function Run(integrationMap) {
           operational: email.operational,
           template: email.template,
           subject: email.subject.value,
+          contents: { list: emailContents },
         })
         .onConflict("id")
         .merge();

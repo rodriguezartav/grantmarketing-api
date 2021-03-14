@@ -15,13 +15,13 @@ async function Test() {
       .table("integrations")
       .select("integrations.*", "providers.name as provider")
       .join("providers", "providers.id", "integrations.provider_id")
-      .where({ customer_id: 1 });
+      .where({ customer_id: 2 });
 
     let integrationMap = {};
     integrations.forEach((item) => (integrationMap[item.provider] = item));
 
     process.env.INTEGRATION_MAP = JSON.stringify(integrationMap);
-    process.env.SCRIPT = "signalon/loadActivities";
+    process.env.SCRIPT = "signalon/loadEmails";
 
     await Runner();
   } catch (e) {

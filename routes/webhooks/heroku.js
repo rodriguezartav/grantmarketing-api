@@ -46,11 +46,22 @@ router.post("/", async function (req, res, next) {
       .update({ last_run: moment() })
       .where("id", job.schedule_id);
 
+    if (exit_status == 1) {
+      console.log(
+        `API_EVENT:::HEROKU_RUNNER:::END:::${JSON.stringify({
+          job_id: jobId,
+          time: moment().valueOf(),
+          herokuScript_name: name,
+        })}`
+      );
+    }
+
     if (exit_status != 0) {
       await knex.table("jobs").delete().where("id", jobId);
       if (job)
         await slack.chat.postMessage({
-          text: `Error in Job id ${jobId} for script ${job.script_location}`,
+          text: `Error in Job id ${jobId} for script ${job.script_location} https://my.papertrailapp.com/groups/23740542/events?q=${name}`,
+          link: `https://my.papertrailapp.com/groups/23740542/events?q=${name}`,
           channel: slack.generalChannelId,
         });
 
