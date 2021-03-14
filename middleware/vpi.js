@@ -6,7 +6,7 @@ const KnexPg = require("../helpers/knex_pg");
 const Knex = require("../helpers/knex");
 
 var VPIMiddleware = async function (req, res, next) {
-  if (req.user && req.user.customer_id) return next();
+  if (!req.user && !req.user.customer_id) return next();
   const knex = Knex();
   const integrationMap = await IntegrationMap(knex, req.user.customer_id);
   if (integrationMap["postgres"] && integrationMap["postgres"].client_secret) {
