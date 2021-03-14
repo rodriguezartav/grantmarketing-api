@@ -11,7 +11,7 @@ module.exports = async (req, res, next) => {
       req.baseUrl.replace("/api/", ""),
       req.body.data,
       req.body.ids,
-      req.knex
+      req.knexPg
     );
 
     res.send(updatedRecords);

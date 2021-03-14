@@ -12,9 +12,13 @@ module.exports = async (req, res, next) => {
       delete req.body.filter.q;
     }
     const getMany = getModel("getMany");
-    var results = await getMany(req.baseUrl.replace("/api/", ""), {
-      "id,IN": req.body.ids,
-    });
+    var results = await getMany(
+      req.baseUrl.replace("/api/", ""),
+      {
+        "id,IN": req.body.ids,
+      },
+      req.knexPg
+    );
 
     results.forEach((result) => {
       if (result.items_json) result.items_json = result.items_json.items;

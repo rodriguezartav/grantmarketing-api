@@ -21,7 +21,6 @@ Marketo.get = async function (integration, url) {
 Marketo.batch = async function (type, fields, filter, integration) {
   const { exportId } = await Create(type, fields, filter, integration);
   const file = await Poll(type, integration, exportId);
-  console.log(file);
   return parse(file, { columns: true });
 };
 
@@ -54,21 +53,6 @@ async function Create(type, fields, filter, integration) {
     .auth(integration.auth_token, { type: "bearer" });
 
   return response.body.result[0];
-  /*
-{
-   "requestId": "e42b#14272d07d78",
-   "success": true,
-   "result": [
-      {
-         "exportId": "ce45a7a1-f19d-4ce2-882c-a3c795940a7d",
-         "status": "Created",
-         "createdAt": "2017-01-21T11:47:30-08:00",
-         "queuedAt": "2017-01-21T11:48:30-08:00",
-         "format": "CSV",
-      }
-   ]
-}
-    */
 }
 
 function Poll(type, integration, exportId) {

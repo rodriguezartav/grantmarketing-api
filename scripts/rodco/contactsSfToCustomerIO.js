@@ -22,25 +22,26 @@ module.exports = async function Run(integrationMap) {
 
     for (let index = 0; index < contacts.length; index++) {
       const contact = contacts[index];
+      try {
+        const res = await request
+          .put(`https://track.customer.io/api/v1/customers/${contact.id}`)
+          .set("Authorization", `Basic ${cioAuth}`)
+          .send({
+            email: contact.email,
+            created_at: moment(contact.createddate).unix(),
+            name: contact.name,
+            mobile: contact.mobilephone,
+            brands: contact.description,
+            balance: contact.account__r ? contact.account__r.saldo__c : 0,
+            role: contact.title,
+            segment: contact.department,
+            customer_since: contact.createddate,
+            companyName: contact.account__r ? contact.account__r.name : null,
+            companyId: contact.account__r ? contact.account__r.id : null,
+          });
 
-      const res = await request
-        .put(`https://track.customer.io/api/v1/customers/${contact.id}`)
-        .set("Authorization", `Basic ${cioAuth}`)
-        .send({
-          email: contact.email,
-          created_at: moment(contact.createddate).unix(),
-          name: contact.name,
-          mobile: contact.mobilephone,
-          brands: contact.description,
-          balance: contact.account__r ? contact.account__r.saldo__c : 0,
-          role: contact.title,
-          segment: contact.department,
-          customer_since: contact.createddate,
-          companyName: contact.account__r ? contact.account__r.name : null,
-          companyId: contact.account__r ? contact.account__r.id : null,
-        });
-
-      await sleep(10);
+        await sleep(10);
+      } catch (e) {}
     }
   } catch (e) {
     console.log(e);

@@ -14,7 +14,8 @@ module.exports = async (req, res, next) => {
     const getList = getModel("getList");
     const { results, count } = await getList(
       req.baseUrl.replace("/api/", ""),
-      req.body
+      req.body,
+      req.knexPg
     );
     return res.send({ results, count });
   } catch (e) {

@@ -6,7 +6,7 @@ module.exports = async (req, res, next) => {
     await deleteMany(
       req.baseUrl.replace("/api/", ""),
       req.body || req.query,
-      req.knex
+      req.knexPg
     );
 
     res.send({});

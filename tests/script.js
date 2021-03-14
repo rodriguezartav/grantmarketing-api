@@ -15,7 +15,7 @@ async function Test() {
       .table("integrations")
       .select("integrations.*", "providers.name as provider")
       .join("providers", "providers.id", "integrations.provider_id")
-      .where({ customer_id: 2 });
+      .where({ customer_id: 1 });
 
     let integrationMap = {};
     integrations.forEach((item) => (integrationMap[item.provider] = item));

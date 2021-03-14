@@ -9,14 +9,19 @@ module.exports = async (req, res, next) => {
     let data = req.body;
     delete data.id;
 
-    const original = await getOne(resource, { id: req.params.id });
+    const original = await getOne(resource, { id: req.params.id }, req.knexPg);
 
     if (original.achived || (original.status && original.status == "archived"))
       return next({
         status: 409,
         message: `${resource} #${req.params.id} ya esta archivado`,
       });
-    const updatedItem = await update(resource, data, { id: req.params.id });
+    const updatedItem = await update(
+      resource,
+      data,
+      { id: req.params.id },
+      req.knexPg
+    );
 
     res.send(updatedItem);
   } catch (e) {

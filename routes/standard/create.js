@@ -10,7 +10,7 @@ module.exports = async (req, res, next) => {
       data.created_by_user_id = req.user.id;
 
     const create = getModel("create");
-    var createResult = await create(table, data, req.knex);
+    var createResult = await create(table, data, req.knexPg);
 
     return res.send(createResult);
   } catch (e) {

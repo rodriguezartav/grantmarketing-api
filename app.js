@@ -17,6 +17,7 @@ const GoogleIntegration = require("./routes/integrations/google");
 const Login = require("./routes/login");
 const UserLogin = require("./routes/userLogin");
 const Jwt = require("./middleware/jwt");
+const Vpi = require("./middleware/vpi");
 
 if (process.env.NODE_ENV == "production") require("./workers/jobCreator");
 if (process.env.NODE_ENV == "production") require("./workers/refreshWorker");
@@ -60,7 +61,14 @@ app.use("/api/login", cors(), Login);
 app.use("/api/userLogin", cors(), UserLogin);
 app.use("/vpi/schemas", cors(), require("./routes/schemas"));
 app.use("/vpi/scripts", cors(), require("./routes/scripts"));
+app.use("/vpi/api_keys", cors(), Jwt, require("./routes/vpi/apiKeys"));
+app.use("/vpi/:resource", cors(), Jwt, Vpi, makeRouter());
 app.use("/api/:resource", cors(), Jwt, makeRouter());
+
+app.use(async (req, res, next) => {
+  if (req.knexPg) await req.knexPg.destroy();
+  next();
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
