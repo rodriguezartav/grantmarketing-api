@@ -136,15 +136,17 @@ async function bulk(conn, objectName, operation, externalIdFieldName, arr) {
   const errors = await CSV().fromString(failedResults.text);
 
   let allOk = true;
-  const errorResults = errors.map((item) => {
-    console.log(item);
-    allOk = false;
-    return {
-      id: item.sf__Id,
-      error: item.sf__Error,
-      [externalIdFieldName]: item[externalIdFieldName],
-    };
-  });
+  const errorResults = errors
+    .filter((item) => item)
+    .map((item) => {
+      console.log(item);
+      allOk = false;
+      return {
+        id: item.sf__Id,
+        error: item.sf__Error,
+        [externalIdFieldName]: item[externalIdFieldName],
+      };
+    });
 
   results = results.map((item) => {
     const result = { id: item.sf__Id };
