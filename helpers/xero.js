@@ -18,6 +18,8 @@ async function xeroApi(integration, method, ...rest) {
     ]);
 
     if (response.status >= 500) {
+      console.log(response);
+
       await sleep(60000);
       response = await xeroApi(integration, method, ...rest);
     }
