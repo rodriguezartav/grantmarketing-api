@@ -131,7 +131,7 @@ async function bulk(conn, objectName, operation, externalIdFieldName, arr) {
 
   let results = await CSV().fromString(successResults.text);
 
-  console.log(failedResults.text);
+  console.log(failedResults);
 
   const errors = await CSV().fromString(failedResults.text);
 
