@@ -148,9 +148,7 @@ module.exports = async function Run(integrationMap) {
   );
 
   if (!success)
-    throw new Error(
-      "Not all Facturas where save in Salesforce " + errors.join(",")
-    );
+    throw new Error("Not all Facturas where save in Salesforce " + errors);
 
   const facturasMap = {};
   facturaItems.forEach((item) => (facturasMap[item.external_id__c] = item.id));
