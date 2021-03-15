@@ -139,7 +139,7 @@ module.exports = async function Run(integrationMap) {
     return invoiceSql;
   });
 
-  const { items: facturaItems, success, errors } = await bulk(
+  const { facturaItems: items, success, errors } = await bulk(
     conn,
     "Factura__c",
     "upsert",
@@ -149,7 +149,7 @@ module.exports = async function Run(integrationMap) {
 
   console.log(facturaItems);
 
-  if (!success)
+  if (success == false)
     throw new Error("Not all Facturas where save in Salesforce " + errors);
 
   const facturasMap = {};
