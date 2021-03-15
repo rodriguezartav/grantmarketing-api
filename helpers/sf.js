@@ -130,10 +130,14 @@ async function bulk(conn, objectName, operation, externalIdFieldName, arr) {
     .auth(conn.accessToken, { type: "bearer" });
 
   let results = await CSV().fromString(successResults.text);
+
+  console.log(failedResults.text);
+
   const errors = await CSV().fromString(failedResults.text);
 
   let allOk = true;
   const errorResults = errors.map((item) => {
+    console.log(item);
     allOk = false;
     return {
       id: item.sf__Id,
