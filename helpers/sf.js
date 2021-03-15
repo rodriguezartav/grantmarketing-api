@@ -67,9 +67,11 @@ async function insertContact(conn, contact, insertCompany) {
 async function bulk(conn, objectName, operation, externalIdFieldName, arr) {
   if (arr.length == 0)
     return {
-      successResults: [],
-      failedResults: [],
+      success: true,
+      items: [],
+      errors: [],
     };
+
   const csv = parse(arr, { fields: Object.keys(arr[0]) });
 
   const job = await request

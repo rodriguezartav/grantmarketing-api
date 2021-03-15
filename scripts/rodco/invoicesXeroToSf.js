@@ -147,8 +147,6 @@ module.exports = async function Run(integrationMap) {
     items
   );
 
-  console.log(facturaItems);
-
   if (success == false)
     throw new Error("Not all Facturas where save in Salesforce " + errors);
 
