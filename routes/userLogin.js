@@ -37,14 +37,21 @@ router.post("/autenticate", async function (req, res, next) {
       return next({ status: 400, message: "Code and Phone are required" });
     }
 
-    const user = await getKnex()
-      .table("users")
-      .select("users.*", "customers.name as customer_name")
-      .where({
+    let filter = {
+      code: req.body.code,
+    };
+    if (req.body.phone.indexOf("@") > --1) filter.email = req.body.phone;
+    else
+      filter = {
         code: req.body.code,
         phone: req.body.phone,
         country_code: req.body.countryCode,
-      })
+      };
+
+    const user = await getKnex()
+      .table("users")
+      .select("users.*", "customers.name as customer_name")
+      .where(filter)
       .join("customers", "customers.id", "users.customer_id")
       .first();
 
@@ -78,10 +85,12 @@ router.post("/autenticate", async function (req, res, next) {
 module.exports = router;
 
 async function getCode({ phone, countryCode }) {
-  var user = await getKnex()
-    .table("users")
-    .where({ phone: phone, country_code: countryCode })
-    .first();
+  const filter = {};
+
+  if (phone.indexOf("*") > -1) filter = { email: phone };
+  else filter = { phone: phone, country_code: countryCode };
+
+  var user = await getKnex().table("users").where(filter).first();
   if (user) {
     let code = parseInt(Math.random() * 100000);
     await await getKnex()
