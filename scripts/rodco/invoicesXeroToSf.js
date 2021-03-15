@@ -139,7 +139,7 @@ module.exports = async function Run(integrationMap) {
     return invoiceSql;
   });
 
-  const { facturaItems: items, success, errors } = await bulk(
+  const { items: facturaItems, success, errors } = await bulk(
     conn,
     "Factura__c",
     "upsert",
