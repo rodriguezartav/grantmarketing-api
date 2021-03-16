@@ -31,10 +31,7 @@ async function Run(integrationMap, users, scriptOptions) {
       item.current_price = parseFloat(item.current_price);
       item.avg_entry_price = parseFloat(item.avg_entry_price);
       item.unrealized_plpc = parseFloat(item.unrealized_plpc);
-
-    
       positionsMap[item.symbol] = item;
-    
     });
 
   for (let index = 0; index < stocks.length; index++) {
@@ -45,7 +42,7 @@ async function Run(integrationMap, users, scriptOptions) {
       .table("bars")
       .max("high as max")
       .where("symbol", stock.symbol)
-      .where("time", ">", moment().startOf("day").unix() / 1000);
+      .where("time", ">", moment().startOf("day").unix());
 
     const current = await knex
       .table("bars")
@@ -60,7 +57,7 @@ async function Run(integrationMap, users, scriptOptions) {
       position,
       maxs[0].max,
       current,
-      moment(current.time * 1000).toISOString()
+      moment(current.time).toISOString()
     );
   }
 
