@@ -21,7 +21,7 @@ function prepareKnex(integration) {
     client: "pg",
     pool: { min: 1, max: 1 },
     connection: {
-      ...parsePgConnStr(integration.client_secret),
+      ...parsePgConnStr(integration.api_key || integration.client_secret),
       dialectOptions: {
         ssl: {
           require: true,
