@@ -87,7 +87,7 @@ module.exports = router;
 async function getCode({ phone, countryCode }) {
   let filter = {};
 
-  if (phone.indexOf("*") > -1) filter = { email: phone };
+  if (phone.indexOf("@") > -1) filter = { email: phone };
   else filter = { phone: phone, country_code: countryCode };
 
   var user = await getKnex().table("users").where(filter).first();
