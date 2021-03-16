@@ -9,63 +9,6 @@ async function Run(integrationMap, users, scriptOptions) {
   const alpacaKeys = integrationMap["alpaca"];
   const knex = Knex(pgString);
 
-  const symbols = await knex.table("stocks").select();
-  const symbolsWithBars = await Alpaca.getBars(
-    alpacaKeys,
-    symbols.map((item) => item.symbol)
-  );
-
-  for (let index1 = 0; index1 < symbolsWithBars.length; index1++) {
-    const symbolWithBars = symbolsWithBars[index1];
-    for (let index = 0; index < symbolWithBars.bars.length; index++) {
-      const bar = symbolWithBars.bars[index];
-      await knex
-        .table("bars")
-        .insert({
-          time_symbol: bar.t + "_" + symbolWithBars.symbol,
-          symbol: symbolWithBars.symbol,
-          time: bar.t,
-          open: bar.o,
-          close: bar.c,
-          high: bar.h,
-          low: bar.l,
-          volume: bar.v,
-        })
-        .onConflict("time_symbol")
-        .merge();
-    }
-  }
-
-  const symbolsWithDays = await Alpaca.getBars(
-    alpacaKeys,
-    symbols.map((item) => item.symbol),
-    "day",
-    -45
-  );
-
-  for (let index1 = 0; index1 < symbolsWithDays.length; index1++) {
-    const symbolWithBars = symbolsWithDays[index1];
-    for (let index = 0; index < symbolWithBars.bars.length; index++) {
-      const bar = symbolWithBars.bars[index];
-      await knex
-        .table("days")
-        .insert({
-          time_symbol: bar.t + "_" + symbolWithBars.symbol,
-          symbol: symbolWithBars.symbol,
-          date: moment(bar.t * 1000)
-            .utc()
-            .format("YYYY-MM-DD"),
-          open: bar.o,
-          close: bar.c,
-          high: bar.h,
-          low: bar.l,
-          volume: bar.v,
-        })
-        .onConflict("time_symbol")
-        .merge();
-    }
-  }
-
   return true;
 }
 

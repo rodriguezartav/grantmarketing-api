@@ -104,13 +104,11 @@ async function getCode({ phone, countryCode }) {
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const client = require("twilio")(accountSid, authToken);
 
-    await client.messages
-      .create({
-        body: `Hi ${user.name},\n Your JD login code is: ${code}`,
-        from: process.env.TWILIO_NUMBER,
-        to: user.country_code + phone,
-      })
-      .then((message) => console.log(message.sid));
+    await client.messages.create({
+      body: `Hi ${user.name},\n Your JD login code is: ${code}`,
+      from: process.env.TWILIO_NUMBER,
+      to: user.country_code + phone,
+    });
   }
   return user;
 }
