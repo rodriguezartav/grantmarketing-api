@@ -85,7 +85,7 @@ router.post("/autenticate", async function (req, res, next) {
 module.exports = router;
 
 async function getCode({ phone, countryCode }) {
-  const filter = {};
+  let filter = {};
 
   if (phone.indexOf("*") > -1) filter = { email: phone };
   else filter = { phone: phone, country_code: countryCode };
