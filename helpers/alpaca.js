@@ -18,7 +18,7 @@ Alpaca.getBars = async function (integration, symbols) {
 Alpaca._getBars = async function (integration, symbol) {
   try {
     const response = await request
-      .get(`https://data.alpaca.markets/v1/bars/5Min`)
+      .get(`https://data.alpaca.markets/v1/bars/1Min`)
       .query({
         symbols: symbol,
         after: moment().add(-2, "days").format("YYYY-MM-DDT00:00:00Z"),
