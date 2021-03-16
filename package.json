@@ -10,6 +10,7 @@
     "node": "12.13"
   },
   "dependencies": {
+    "@alpacahq/alpaca-trade-api": "^1.4.2",
     "@sendgrid/mail": "^7.4.2",
     "@slack/web-api": "^6.0.0",
     "@tailwindcss/forms": "^0.2.1",
