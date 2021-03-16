@@ -28,11 +28,11 @@ async function Run(integrationMap, users, scriptOptions) {
 
   let positionsMap = {};
   positions.forEach((item) => {
-      item.current_price = parseFloat(item.current_price);
-      item.avg_entry_price = parseFloat(item.avg_entry_price);
-      item.unrealized_plpc = parseFloat(item.unrealized_plpc);
-      positionsMap[item.symbol] = item;
-    });
+    item.current_price = parseFloat(item.current_price);
+    item.avg_entry_price = parseFloat(item.avg_entry_price);
+    item.unrealized_plpc = parseFloat(item.unrealized_plpc);
+    positionsMap[item.symbol] = item;
+  });
 
   for (let index = 0; index < stocks.length; index++) {
     const stock = stocks[index];
@@ -50,8 +50,6 @@ async function Run(integrationMap, users, scriptOptions) {
       .where("symbol", stock.symbol)
       .orderBy("time", "DESC")
       .limit(10);
-
-    if( position.avg_entry_price - )
 
     console.log(
       position,
