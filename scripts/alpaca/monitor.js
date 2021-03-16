@@ -41,21 +41,24 @@ async function Run(integrationMap, users, scriptOptions) {
       .where("symbol", stock.symbol)
       .where("time", ">", moment().add(-1, "days").startOf("day").unix());
 
-    if (position.unrealized_plpc < -0.01)
-      await sms(`${stock.symbol} is dropping to -1%`, "+50684191862");
-    else if (position.unrealized_plpc < -0.015)
+    //if (position.unrealized_plpc < -0.01)
+    // await sms(`${stock.symbol} is dropping to -1%`, "+50684191862");
+    if (position.unrealized_plpc < -0.015)
       await sms(`${stock.symbol} dropped to -1.5%`, "+50684191862");
+    // close position
     else if (position.unrealized_plpc > 0.05)
       await sms(
         `${stock.symbol} is reaching to ${formatPl(position.unrealized_plpc)}`,
         "+50684191862"
       );
-    else if (position.unrealized_plpc < plMax[0].max)
+    // close position
+    else if (position.unrealized_plpc < plMax[0].max - 0.015)
       await sms(
         `${stock.symbol} is dropping from Max of ${formatPl(plMax[0].max)}`,
         "+50684191862"
       );
-    else if (position.unrealized_plpc > plMax[0].max)
+    // close position
+    else if (position.unrealized_plpc > plMax[0].max + 0.01)
       await sms(
         `${stock.symbol} is climbing from Max of ${formatPl(plMax[0].max)}`,
         "+50684191862"
