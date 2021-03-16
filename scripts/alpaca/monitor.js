@@ -5,6 +5,7 @@ const Alpaca = require("../../helpers/alpaca");
 const finnhub = require("../../helpers/finnhub");
 const moment = require("moment");
 const position = require("@alpacahq/alpaca-trade-api/lib/resources/position");
+const sms = require("../../helpers/sms");
 
 async function Run(integrationMap, users, scriptOptions) {
   const pgString = integrationMap["postgres"];
@@ -13,16 +14,6 @@ async function Run(integrationMap, users, scriptOptions) {
   const alpaca = Alpaca(alpacaKeys, true); //PAPER!
 
   const stocks = await knex.table("stocks").select();
-
-  const indicators = await finnhub.indicators(
-    integrationMap["finnhub"],
-    stocks.map((item) => item.symbol)
-  );
-
-  const rsi = await finnhub.rsi(
-    integrationMap["finnhub"],
-    stocks.map((item) => item.symbol)
-  );
 
   const positions = await alpaca.getPositions();
 
@@ -38,25 +29,11 @@ async function Run(integrationMap, users, scriptOptions) {
     const stock = stocks[index];
     const position = positionsMap[stock.symbol];
 
-    const maxs = await knex
-      .table("bars")
-      .max("high as max")
+    const pclps = await knex
+      .table("unrealized_profits")
       .where("symbol", stock.symbol)
-      .where("time", ">", moment().startOf("day").unix());
-
-    const current = await knex
-      .table("bars")
-      .select()
-      .where("symbol", stock.symbol)
-      .orderBy("time", "DESC")
-      .limit(10);
-
-    console.log(
-      position,
-      maxs[0].max,
-      current,
-      moment(current.time).toISOString()
-    );
+      .where("time", ">", moment().add(-1, "days").startOf("day").unix())
+      .orderBy("time", "DESC");
   }
 
   return true;
