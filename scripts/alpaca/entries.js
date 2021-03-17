@@ -16,6 +16,11 @@ async function Run(integrationMap, users, scriptOptions) {
 
   const marketStatus = await Alpaca.marketStatus(alpacaKeys);
   if (!marketStatus.isOpen) return true;
+  const orders = await alpaca.getOrders();
+  let orderMap = {};
+  orders.forEach((item) => {
+    orderMap[item.symbol] = item;
+  });
 
   const positions = await alpaca.getPositions();
 
@@ -29,11 +34,12 @@ async function Run(integrationMap, users, scriptOptions) {
 
   for (let index = 0; index < stocks.length; index++) {
     const stock = stocks[index];
-
-    await Alpaca.order(alpacaKeys, "buy", "market", {
-      qty: 5,
-      symbol: stock.symbol,
-    });
+    if (!orderMap[stock.symbol]) {
+      await Alpaca.order(alpacaKeys, "buy", "market", {
+        qty: 5,
+        symbol: stock.symbol,
+      });
+    }
   }
   return true;
 }
