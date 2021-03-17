@@ -61,7 +61,6 @@ async function Create(type, fields, filter, integration) {
       filter: filter,
     });
 
-  console.log(response.body);
   const { exportId } = response.body.result[0];
   await request
     .post(

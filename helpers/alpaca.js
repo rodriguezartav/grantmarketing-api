@@ -87,6 +87,8 @@ Alpaca.marketStatus = async function (integration) {
   const isAfter = open.isBefore();
   const isBefore = now.isBefore(close);
 
+  if (clock.is_open) return { isOpen: true, afterHours: false };
+
   if (isAfter && now.isBefore(close.add(-30, "minutes")))
     return { isOpen: true, isClosing: true, afterHours: true };
   else if (isAfter && clock.isOpen) {
