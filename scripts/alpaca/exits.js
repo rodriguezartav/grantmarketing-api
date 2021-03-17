@@ -61,7 +61,10 @@ async function Run(integrationMap, users, scriptOptions) {
 
     // close position
     if (position.unrealized_plpc <= minMaxPl) {
-      await sms(`Selling ${position.symbol} p/l: ${position.unrealized_plpc}`);
+      await sms(
+        `Selling ${position.symbol} p/l: ${position.unrealized_plpc}`,
+        "+50684191862"
+      );
       await Alpaca.order(alpacaKeys, "sell", "market", position);
       // close position
     } else if (
