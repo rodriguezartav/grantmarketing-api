@@ -21,8 +21,6 @@ async function Run(integrationMap, users, scriptOptions) {
 
   if (positions.length == 0) return true;
 
-  const stocks = await knex.table("stocks").select();
-
   let positionsMap = {};
   positions.forEach((item) => {
     item.current_price = parseFloat(item.current_price);
@@ -36,22 +34,23 @@ async function Run(integrationMap, users, scriptOptions) {
     orderMap[item.symbol] = item;
   });
 
-  for (let index = 0; index < stocks.length; index++) {
-    const stock = stocks[index];
-    const position = positionsMap[stock.symbol];
-    const order = orderMap[stock.symbol];
+  for (let index = 0; index < positions.length; index++) {
+    const position = positions[index];
+
+    const order = orderMap[position.symbol];
 
     if (!position || order) return;
+
     const bars = await knex
       .table("bars")
-      .where("symbol", stock.symbol)
+      .where("symbol", position.symbol)
       .where("time", ">", moment().startOf("day").unix())
       .orderBy("time", "DESC");
 
     const plMax = await knex
       .table("unrealized_profits")
       .max("plpc")
-      .where("symbol", stock.symbol)
+      .where("symbol", position.symbol)
       .where("time", ">", moment().add(-1, "days").startOf("day").unix());
 
     let maxPl = 0;
@@ -61,6 +60,11 @@ async function Run(integrationMap, users, scriptOptions) {
 
     // close position
     if (position.unrealized_plpc <= minMaxPl) {
+      await knex
+        .table("positions")
+        .update({ exit_time: moment().unix(), exit_reason: "dropped 1.5%" })
+        .where("symbol", position.symbol);
+
       await sms(
         `Selling ${position.symbol} p/l: ${position.unrealized_plpc}`,
         "+50684191862"

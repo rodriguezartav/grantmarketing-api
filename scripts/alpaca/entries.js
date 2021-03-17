@@ -35,11 +35,27 @@ async function Run(integrationMap, users, scriptOptions) {
   for (let index = 0; index < stocks.length; index++) {
     const stock = stocks[index];
     if (!orderMap[stock.symbol]) {
+      const time = moment().unix();
+      const client_order_id = `${stock.symbol}-${time}`;
+      await knex
+        .table("positions")
+        .insert({
+          entry_time: time,
+          entry_reason: "no reason",
+          client_order_id: client_order_id,
+          symbol: stock.symbol,
+        });
       await sms(`Buying ${stock.symbol}`, "+50684191862");
-      await Alpaca.order(alpacaKeys, "buy", "market", {
-        qty: 5,
-        symbol: stock.symbol,
-      });
+      await Alpaca.order(
+        alpacaKeys,
+        "buy",
+        "market",
+        {
+          qty: 5,
+          symbol: stock.symbol,
+        },
+        { client_order_id: client_order_id }
+      );
     }
   }
   return true;
