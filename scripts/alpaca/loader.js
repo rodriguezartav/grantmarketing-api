@@ -10,6 +10,9 @@ async function Run(integrationMap, users, scriptOptions) {
   const knex = Knex(pgString);
   const alpaca = Alpaca(alpacaKeys, true); //PAPER!
 
+  const marketStatus = await Alpaca.marketStatus(alpacaKeys);
+  if (!marketStatus.isOpen && !marketStatus.afterHours) return true;
+
   const symbols = await knex.table("stocks").select();
   const symbolsWithBars = await Alpaca.getBars(
     alpacaKeys,

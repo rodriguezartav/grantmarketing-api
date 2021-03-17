@@ -13,6 +13,9 @@ async function Run(integrationMap, users, scriptOptions) {
   const knex = Knex(pgString);
   const alpaca = Alpaca(alpacaKeys, true); //PAPER!
 
+  const marketStatus = await Alpaca.marketStatus(alpacaKeys);
+  if (!marketStatus.isOpen && !marketStatus.afterHours) return true;
+
   const stocks = await knex.table("stocks").select();
 
   const positions = await alpaca.getPositions();
@@ -43,8 +46,10 @@ async function Run(integrationMap, users, scriptOptions) {
 
     //if (position.unrealized_plpc < -0.01)
     // await sms(`${stock.symbol} is dropping to -1%`, "+50684191862");
-    if (position.unrealized_plpc < -0.015)
+    if (position.unrealized_plpc < -0.015) {
+      await Alpaca.order(alpacaKeys, "sell", "market", position);
       await sms(`${stock.symbol} dropped to -1.5%`, "+50684191862");
+    }
     // close position
     else if (position.unrealized_plpc > 0.05)
       await sms(
