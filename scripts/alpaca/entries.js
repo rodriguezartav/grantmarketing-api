@@ -15,7 +15,7 @@ async function Run(integrationMap, users, scriptOptions) {
   const alpaca = Alpaca(alpacaKeys, true); //PAPER!
 
   const marketStatus = await Alpaca.marketStatus(alpacaKeys);
-  //  if (!marketStatus.isOpen) return true;
+  if (!marketStatus.isOpen) return true;
 
   const positions = await alpaca.getPositions();
 
@@ -30,32 +30,11 @@ async function Run(integrationMap, users, scriptOptions) {
   for (let index = 0; index < stocks.length; index++) {
     const stock = stocks[index];
 
-    const indicators = await finnhub.indicators(integrationMap["finnhub"], [
-      stock.symbol,
-    ]);
-    const pattern = await finnhub.pattern(
-      integrationMap["finnhub"],
-      stock.symbol
-    );
-
-    const techIndicators = await finnhub.techIndicators(
-      integrationMap["finnhub"],
-      stock.symbol
-    );
-
-    const bars = await knex
-      .table("bars")
-      .where("symbol", stock.symbol)
-      .where("time", ">", moment().tz("America/New_York").startOf("day").unix())
-      .orderBy("time", "DESC");
-
-    const days = await knex
-      .table("days")
-      .where("symbol", stock.symbol)
-      .where("date", ">=", moment().add(-1, "days").format("YYYY-MM-DD"))
-      .orderBy("date", "DESC");
+    await Alpaca.order(alpacaKeys, "buy", "market", {
+      qty: 5,
+      symbol: stock.symbol,
+    });
   }
-
   return true;
 }
 

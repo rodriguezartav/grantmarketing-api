@@ -15,7 +15,7 @@ async function Run(integrationMap, users, scriptOptions) {
   const alpaca = Alpaca(alpacaKeys, true); //PAPER!
 
   const marketStatus = await Alpaca.marketStatus(alpacaKeys);
-  // if (!marketStatus.isOpen && !marketStatus.afterHours) return true;
+  if (!marketStatus.isOpen && !marketStatus.afterHours) return true;
   const positions = await alpaca.getPositions();
   const orders = await alpaca.getOrders();
 
