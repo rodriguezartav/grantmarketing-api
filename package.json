@@ -43,6 +43,7 @@
     "lowercase-object-keys": "^1.0.5",
     "mailgun-js": "^0.22.0",
     "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
     "morgan": "~1.9.1",
     "mysql2": "^2.2.5",
     "numeral": "^2.0.6",

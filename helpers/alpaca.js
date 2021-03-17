@@ -1,6 +1,7 @@
 const URL = "https://paper-api.alpaca.markets";
 const request = require("superagent");
-const moment = require("moment");
+const moment = require("moment-timezone");
+moment.tz.setDefault("America/New_York");
 
 const alpaca = require("@alpacahq/alpaca-trade-api");
 
@@ -75,23 +76,25 @@ Alpaca._getBars = async function (integration, symbol, groupBy, daysAgo) {
 Alpaca.marketStatus = async function (integration) {
   const response = await request
     .get(`${URL}/v2/clock`)
-
     .set("APCA-API-KEY-ID", integration.client_id)
     .set("APCA-API-SECRET-KEY", integration.client_secret);
 
   const clock = response.body;
 
-  if (clock.isOpen) {
+  let close = moment(clock.next_close).utc();
+  let open = moment(clock.next_open).utc();
+  let now = moment().utc();
+  const isAfter = open.isBefore();
+  const isBefore = now.isBefore(close);
+
+  if (isAfter && now.isBefore(close.add(-30, "minutes")))
+    return { isOpen: true, isClosing: true, afterHours: true };
+  else if (isAfter && clock.isOpen) {
     return { isOpen: true, afterHours: false };
   }
-  const close = moment(clock.next_close).add(2, "hours").utc();
-  const now = moment().utc();
 
-  if (close.isBefore(now.add(30, "minutes")))
+  if (isAfter && now.isBefore(close.add(2, "hours")))
     return { isOpen: false, afterHours: true };
-  else if (close.isBefore())
-    return { isOpen: false, closing: true, afterHours: true };
-  else if (close.isBefore()) return { isOpen: false, afterHours: true };
   else return { isOpen: false, afterHours: false };
 };
 
@@ -137,6 +140,17 @@ Alpaca.order = async function (integration, side, type, position, params) {
     console.log(e);
     throw e;
   }
+};
+
+Alpaca.getOrders = async function (integration) {
+  const response = await request
+    .get(`${URL}/v2/orders`)
+    .send(order)
+
+    .set("APCA-API-KEY-ID", integration.client_id)
+    .set("APCA-API-SECRET-KEY", integration.client_secret);
+
+  return response.body;
 };
 
 module.exports = Alpaca;

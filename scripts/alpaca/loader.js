@@ -2,7 +2,8 @@ if (!process.env.NODE_ENV) require("dotenv").config();
 
 const Knex = require("../../helpers/knex_pg");
 const Alpaca = require("../../helpers/alpaca");
-const moment = require("moment");
+const moment = require("moment-timezone");
+moment.tz.setDefault("America/New_York");
 
 async function Run(integrationMap, users, scriptOptions) {
   const pgString = integrationMap["postgres"];
@@ -68,7 +69,7 @@ async function Run(integrationMap, users, scriptOptions) {
           time_symbol: bar.t * 1000 + "_" + symbolWithBars.symbol,
           symbol: symbolWithBars.symbol,
           date: moment(bar.t * 1000)
-            .utc()
+            .tz("America/New_York")
             .format("YYYY-MM-DD"),
           open: bar.o,
           close: bar.c,

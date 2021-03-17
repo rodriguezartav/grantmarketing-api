@@ -3,9 +3,10 @@ if (!process.env.NODE_ENV) require("dotenv").config();
 const Knex = require("../../helpers/knex_pg");
 const Alpaca = require("../../helpers/alpaca");
 const finnhub = require("../../helpers/finnhub");
-const moment = require("moment");
-const position = require("@alpacahq/alpaca-trade-api/lib/resources/position");
+const moment = require("moment-timezone");
+
 const sms = require("../../helpers/sms");
+moment.tz.setDefault("America/New_York");
 
 async function Run(integrationMap, users, scriptOptions) {
   const pgString = integrationMap["postgres"];
@@ -14,11 +15,13 @@ async function Run(integrationMap, users, scriptOptions) {
   const alpaca = Alpaca(alpacaKeys, true); //PAPER!
 
   const marketStatus = await Alpaca.marketStatus(alpacaKeys);
-  if (!marketStatus.isOpen && !marketStatus.afterHours) return true;
+  // if (!marketStatus.isOpen && !marketStatus.afterHours) return true;
+  const positions = await alpaca.getPositions();
+  const orders = await alpaca.getOrders();
+
+  if (positions.length == 0) return true;
 
   const stocks = await knex.table("stocks").select();
-
-  const positions = await alpaca.getPositions();
 
   let positionsMap = {};
   positions.forEach((item) => {
@@ -28,14 +31,21 @@ async function Run(integrationMap, users, scriptOptions) {
     positionsMap[item.symbol] = item;
   });
 
+  let orderMap = {};
+  orders.forEach((item) => {
+    orderMap[item.symbol] = item;
+  });
+
   for (let index = 0; index < stocks.length; index++) {
     const stock = stocks[index];
     const position = positionsMap[stock.symbol];
+    const order = orderMap[stock.symbol];
 
-    const pclps = await knex
-      .table("unrealized_profits")
+    if (!position || order) return;
+    const bars = await knex
+      .table("bars")
       .where("symbol", stock.symbol)
-      .where("time", ">", moment().add(-1, "days").startOf("day").unix())
+      .where("time", ">", moment().startOf("day").unix())
       .orderBy("time", "DESC");
 
     const plMax = await knex
@@ -44,30 +54,19 @@ async function Run(integrationMap, users, scriptOptions) {
       .where("symbol", stock.symbol)
       .where("time", ">", moment().add(-1, "days").startOf("day").unix());
 
-    //if (position.unrealized_plpc < -0.01)
-    // await sms(`${stock.symbol} is dropping to -1%`, "+50684191862");
-    if (position.unrealized_plpc < -0.015) {
+    let maxPl = 0;
+    maxPl = plMax[0] && plMax[0].max;
+    const minMaxPl = maxPl - 0.015;
+
+    // close position
+    if (position.unrealized_plpc <= minMaxPl)
       await Alpaca.order(alpacaKeys, "sell", "market", position);
-      await sms(`${stock.symbol} dropped to -1.5%`, "+50684191862");
-    }
     // close position
-    else if (position.unrealized_plpc > 0.05)
-      await sms(
-        `${stock.symbol} is reaching to ${formatPl(position.unrealized_plpc)}`,
-        "+50684191862"
-      );
-    // close position
-    else if (position.unrealized_plpc < plMax[0].max - 0.015)
-      await sms(
-        `${stock.symbol} is dropping from Max of ${formatPl(plMax[0].max)}`,
-        "+50684191862"
-      );
-    // close position
-    else if (position.unrealized_plpc > plMax[0].max + 0.01)
-      await sms(
-        `${stock.symbol} is climbing from Max of ${formatPl(plMax[0].max)}`,
-        "+50684191862"
-      );
+    else if (
+      position.unrealized_plpc > 0.03 &&
+      (bars[0].close < bars[0].open || bars[1].close < bars[1].open)
+    )
+      await Alpaca.order(alpacaKeys, "sell", "market", position);
   }
 
   return true;
