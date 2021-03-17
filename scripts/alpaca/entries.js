@@ -35,7 +35,7 @@ async function Run(integrationMap, users, scriptOptions) {
   for (let index = 0; index < stocks.length; index++) {
     const stock = stocks[index];
     if (!orderMap[stock.symbol]) {
-      await sms(`Buying ${position.symbol}`, "+50684191862");
+      await sms(`Buying ${stock.symbol}`, "+50684191862");
       await Alpaca.order(alpacaKeys, "buy", "market", {
         qty: 5,
         symbol: stock.symbol,
