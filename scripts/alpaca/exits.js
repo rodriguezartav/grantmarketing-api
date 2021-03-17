@@ -56,13 +56,15 @@ async function Run(integrationMap, users, scriptOptions) {
 
     let maxPl = 0;
     maxPl = plMax[0] && plMax[0].max;
+    if (maxPl < 0) maxPl = 0;
     const minMaxPl = maxPl - 0.015;
 
     // close position
-    if (position.unrealized_plpc <= minMaxPl)
+    if (position.unrealized_plpc <= minMaxPl) {
+      await sms(`Selling ${position.symbol} p/l: ${position.unrealized_plpc}`);
       await Alpaca.order(alpacaKeys, "sell", "market", position);
-    // close position
-    else if (
+      // close position
+    } else if (
       position.unrealized_plpc > 0.03 &&
       (bars[0].close < bars[0].open || bars[1].close < bars[1].open)
     )
