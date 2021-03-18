@@ -10,7 +10,7 @@ module.exports = async function Run(integrationMap) {
 
   const productos = await query(
     conn,
-    "select id,codigo__c,precio__c,precio_mayoreo__c from producto__c "
+    "select id,codigo__c,precio_mayoreo__c from producto__c "
   );
   const productosMap = {};
   productos.forEach((item) => {
