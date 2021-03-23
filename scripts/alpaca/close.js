@@ -13,8 +13,10 @@ async function Run(integrationMap, users, scriptOptions) {
   const knex = Knex(pgString);
   const alpaca = Alpaca(alpacaKeys, true); //PAPER!
 
-  const stocks = await knex.table("stocks").select();
+  const marketStatus = await Alpaca.marketStatus(alpacaKeys);
+  //if (!marketStatus.isOpen && !marketStatus.afterHours) return true;
 
+  await Alpaca.cancelAll(alpacaKeys);
   const positions = await alpaca.getPositions();
 
   let positionsMap = {};
@@ -25,11 +27,9 @@ async function Run(integrationMap, users, scriptOptions) {
     positionsMap[item.symbol] = item;
   });
 
-  for (let index = 0; index < stocks.length; index++) {
-    const stock = stocks[index];
-    const position = positionsMap[stock.symbol];
-
-    await Alpaca.order(alpacaKeys, "sell", "market", position);
+  for (let index = 0; index < positions.length; index++) {
+    const position = positions[index];
+    await Alpaca.sellOrDie(alpacaKeys, position);
   }
 
   return true;

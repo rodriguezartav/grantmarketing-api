@@ -13,20 +13,17 @@ module.exports = async function Run(integrationMap) {
 
     const knex = Knex(integrationMap["postgres"]);
 
-    for (let index = 0; index < emails.length; index++) {
-      const email = emails[index];
-
-      const emailContents = await Marketo.getBulk(
-        integrationMap["marketo"],
-        `/rest/asset/v1/email/${email.id}/content.json`
-      );
-
-      await knex
-        .table("emails")
-        .insert({
+    var i,
+      j,
+      temparray,
+      chunk = 500;
+    for (i = 0, j = emails.length; i < j; i += chunk) {
+      temparray = emails.slice(i, i + chunk).map((email) => {
+        return {
           id: email.id,
           name: email.name,
           from_name: email.fromName.value,
+          from_email: email.fromEmail.value,
           description: email.description,
           created_at: email.createdAt,
           updated_at: email.updatedAt,
@@ -35,10 +32,14 @@ module.exports = async function Run(integrationMap) {
           operational: email.operational,
           template: email.template,
           subject: email.subject.value,
-          contents: { list: emailContents },
-        })
-        .onConflict("id")
-        .merge();
+          folder_id: email.folder ? email.folder.value : null,
+          folder_name: email.folder ? email.folder.folderName : null,
+          folder_type: email.folder ? email.folder.type : null,
+
+          //contents: { list: emailContents },
+        };
+      });
+      await knex.table("emails").insert(temparray).onConflict("id").merge();
     }
 
     await knex.destroy();

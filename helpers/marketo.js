@@ -1,21 +1,102 @@
 const request = require("superagent");
 const fs = require("fs");
 var parse = require("csv-parse/lib/sync");
+const moment = require("moment");
 
 let Marketo = {};
 
+Marketo.request = async function (integration, originalRequest) {
+  const now = moment();
+  if (moment(integration.expiry_date).isBefore(now)) {
+    const url = `${integration.application_id.replace(
+      "/rest",
+      "/identity"
+    )}/oauth/token?grant_type=client_credentials&client_id=${
+      integration.client_id
+    }&client_secret=${integration.client_secret}`;
+
+    const response = await request.get(url);
+    integration = {
+      ...integration,
+      auth_token: response.body.access_token,
+      refresh_token: response.body.access_token,
+      external_user_id: response.body.scope,
+      expiry_date: moment().add(response.body.expires_in, "seconds"),
+    };
+  }
+
+  const res = await originalRequest
+    .auth(integration.auth_token, { type: "bearer" })
+    .retry(3);
+  if (
+    !res.body.success &&
+    (res.body.errors[0].code == "603" || res.body.errors[0].code == "602")
+  )
+    return Marketo.request(
+      { ...integration, expiry_date: moment().add(-1, "hour") },
+      originalRequest
+    );
+  return res;
+};
+
 Marketo.post = async function (integration, url) {
-  const response = await request
-    .get(`${integration.application_id.replace("/rest", "")}${url}`)
-    .auth(integration.auth_token, { type: "bearer" });
+  const response = await Marketo.request(
+    integration,
+    request.get(`${integration.application_id.replace("/rest", "")}${url}`)
+  );
+
   return response.body.result;
 };
 
 Marketo.get = async function (integration, url) {
-  const response = await request
-    .get(`${integration.application_id.replace("/rest", "")}${url}`)
-    .auth(integration.auth_token, { type: "bearer" });
-  return response.body.result;
+  const response = await await Marketo.request(
+    integration,
+    request.get(`${integration.application_id.replace("/rest", "")}${url}`)
+  );
+  return response.body.result ? response.body.result : response.body;
+};
+
+Marketo.getBulkActivities = async function (
+  integration,
+  startDate,
+  activityTypeIds
+) {
+  const url = `${integration.application_id.replace("/rest", "")}`;
+  let token = await Marketo.get(
+    integration,
+    `/rest/v1/activities/pagingtoken.json?sinceDatetime=${startDate}`
+  );
+
+  let list = [];
+  let lastResult;
+  let count = 0;
+
+  while (count < 8000 && (!lastResult || lastResult.body.moreResult)) {
+    token = (lastResult ? lastResult.body : token).nextPageToken;
+
+    try {
+      lastResult = await Marketo.request(
+        integration,
+        request.get(
+          `${url}/rest/v1/activities.json?activityTypeIds=${activityTypeIds}&nextPageToken=${token}`
+        )
+      );
+
+      if (!lastResult.body.success && count > 0) return list;
+      else if (!lastResult.body.success)
+        throw new Error(lastResult.body.errors[0]);
+
+      await sleep(500);
+
+      list = list.concat(lastResult.body.result);
+      count++;
+    } catch (e) {
+      if (count > 0) return list;
+      else throw e;
+    }
+  }
+
+  return list;
 };
 
 Marketo.getBulk = async function (integration, url) {
@@ -47,29 +128,40 @@ module.exports = Marketo;
 
 async function Create(type, fields, filter, integration) {
   console.log("creating slack connection");
-  const response = await request
-    .post(
-      `${integration.application_id.replace(
-        "/rest",
-        ""
-      )}/bulk/v1/${type}/export/create.json`
-    )
-    .auth(integration.auth_token, { type: "bearer" })
-    .send({
-      fields: fields,
-      format: "CSV",
-      filter: filter,
-    });
+  const response = await await Marketo.request(
+    integration,
+    request
+      .post(
+        `${integration.application_id.replace(
+          "/rest",
+          ""
+        )}/bulk/v1/${type}/export/create.json`
+      )
+
+      .send({
+        fields: fields,
+        format: "CSV",
+        filter: filter,
+      })
+  );
+
+  if (!response.body.success) {
+    console.log(
+      `LIMIT>MARKETO>BULK>CREATE:${JSON.stringify(response.body.errors[0])}`
+    );
+    throw new Error(response.body.errors[0]);
+  }
 
   const { exportId } = response.body.result[0];
-  await request
-    .post(
+  await Marketo.request(
+    integration,
+    request.post(
       `${integration.application_id.replace(
         "/rest",
         ""
       )}/bulk/v1/${type}/export/${exportId}/enqueue.json`
     )
-    .auth(integration.auth_token, { type: "bearer" });
+  );
 
   return response.body.result[0];
 }
@@ -78,17 +170,23 @@ function Poll(type, integration, exportId) {
   function promise(resolve, reject) {
     try {
       const interval = setInterval(async () => {
-        const response = await request
-          .get(
+        const response = await Marketo.request(
+          integration,
+          request.get(
             `${integration.application_id.replace(
               "/rest",
               ""
             )}/bulk/v1/${type}/export/${exportId}/status.json`
           )
-          .auth(integration.auth_token, { type: "bearer" });
+        );
 
         if (!response.body.success) {
           clearInterval(interval);
+
+          console.log(
+            `LIMIT>MARKETO>BULK>POLL${JSON.stringify(response.body)}`
+          );
+
           reject(response.body.errors[0]);
         }
 
@@ -98,16 +196,17 @@ function Poll(type, integration, exportId) {
         ) {
           clearInterval(interval);
 
-          const file = await request
-            .get(
-              `${integration.application_id.replace(
-                "/rest",
-                ""
-              )}/bulk/v1/${type}/export/${exportId}/file.json`
-            )
-            .maxResponseSize(2000000000)
-            .auth(integration.auth_token, { type: "bearer" });
-
+          const file = await Marketo.request(
+            integration,
+            request
+              .get(
+                `${integration.application_id.replace(
+                  "/rest",
+                  ""
+                )}/bulk/v1/${type}/export/${exportId}/file.json`
+              )
+              .maxResponseSize(2000000000)
+          );
           resolve(file.text);
         }
       }, 60 * 3 * 1000);
@@ -116,4 +215,9 @@ function Poll(type, integration, exportId) {
     }
   }
   return new Promise(promise);
+}
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }

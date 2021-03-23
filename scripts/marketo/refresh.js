@@ -19,7 +19,7 @@ async function Run(integration) {
         auth_token: response.body.access_token,
         refresh_token: response.body.access_token,
         external_user_id: response.body.scope,
-        expiry_date: moment().add(3600, "seconds"),
+        expiry_date: moment().add(response.body.expires_in, "seconds"),
       })
       .where("id", integration.id);
   } catch (e) {

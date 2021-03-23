@@ -13,11 +13,13 @@ module.exports = async function Run(integrationMap) {
 
     const knex = Knex(integrationMap["postgres"]);
 
-    for (let index = 0; index < programs.length; index++) {
-      const program = programs[index];
-      await knex
-        .table("programs")
-        .insert({
+    var i,
+      j,
+      temparray,
+      chunk = 500;
+    for (i = 0, j = programs.length; i < j; i += chunk) {
+      temparray = programs.slice(i, i + chunk).map((program) => {
+        return {
           id: program.id,
           name: program.name,
           description: program.description,
@@ -28,10 +30,10 @@ module.exports = async function Run(integrationMap) {
           channel: program.channel,
           url: program.url,
           folder_id: program.folder ? program.folder.value : null,
-          folder_name: program.folder ? program.folder.name : null,
-        })
-        .onConflict("id")
-        .merge();
+          folder_name: program.folder ? program.folder.folderName : null,
+        };
+      });
+      await knex.table("programs").insert(temparray).onConflict("id").merge();
     }
 
     await knex.destroy();

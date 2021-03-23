@@ -1,4 +1,5 @@
 if (!process.env.NODE_ENV) require("dotenv").config();
+const WebSocket = require("ws");
 
 const Knex = require("../../helpers/knex_pg");
 const Alpaca = require("../../helpers/alpaca");

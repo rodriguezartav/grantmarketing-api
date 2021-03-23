@@ -3,7 +3,7 @@ const util = require("util");
 const execFile = util.promisify(require("child_process").execFile);
 const moment = require("moment");
 const sms = require("../helpers/sms");
-
+process.env.TEST = true;
 const Knex = require("../helpers/knex");
 const Runner = require("../scripts/helpers/runner");
 
@@ -15,13 +15,13 @@ async function Test() {
       .table("integrations")
       .select("integrations.*", "providers.name as provider")
       .join("providers", "providers.id", "integrations.provider_id")
-      .where({ customer_id: 11 });
+      .where({ customer_id: 2 });
 
     let integrationMap = {};
     integrations.forEach((item) => (integrationMap[item.provider] = item));
 
     process.env.INTEGRATION_MAP = JSON.stringify(integrationMap);
-    process.env.SCRIPT = "alpaca/exits";
+    process.env.SCRIPT = "signalon/loadActivities";
 
     await Runner();
   } catch (e) {

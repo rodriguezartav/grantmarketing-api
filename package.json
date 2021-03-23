@@ -47,6 +47,7 @@
     "morgan": "~1.9.1",
     "mysql2": "^2.2.5",
     "numeral": "^2.0.6",
+    "percent-change": "^1.0.1",
     "pg": "^7.12.1",
     "postcss": "^8.2.6",
     "postcss-cli": "^8.3.1",
@@ -55,7 +56,10 @@
     "split": "^1.0.1",
     "superagent": "^6.1.0",
     "tailwindcss": "^2.0.3",
+    "technicalindicators": "^3.1.0",
     "twilio": "^3.55.1",
+    "websocket": "^1.0.33",
+    "ws": "^7.4.4",
     "xero-node": "^4.9.1"
   }
 }

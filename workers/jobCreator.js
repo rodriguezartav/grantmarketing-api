@@ -21,32 +21,35 @@ setInterval(async () => {
         .whereIn("status", ["pending", "working"])
         .where("schedule_id", schedule.id);
 
-      if (
-        existingJobs.length == 0 &&
-        moment(schedule.last_run || "1970-01-01")
-          .add(schedule.period_in_minutes, "minutes")
-          .unix() < moment().unix()
-      ) {
-        const ids = await knex
-          .table("jobs")
-          .insert({
-            status: "pending",
-            script_options: schedule.script_options,
-            schedule_id: schedule.id,
-            script_id: schedule.script_id,
-            customer_id: schedule.customer_id,
-          })
-          .returning("id");
+      if (schedule.start_at && !moment(schedule.start_at).isAfter()) {
+      } else {
+        if (
+          existingJobs.length == 0 &&
+          moment(schedule.last_run || "1970-01-01")
+            .add(schedule.period_in_minutes, "minutes")
+            .unix() < moment().unix()
+        ) {
+          const ids = await knex
+            .table("jobs")
+            .insert({
+              status: "pending",
+              script_options: schedule.script_options,
+              schedule_id: schedule.id,
+              script_id: schedule.script_id,
+              customer_id: schedule.customer_id,
+            })
+            .returning("id");
 
-        console.log(
-          `API_EVENT:::JOB_CREATOR:::INSERT_JOB:::${JSON.stringify({
-            job_id: ids[0],
-            schedule_id: schedule.id,
-            script_id: schedule.script_id,
-            customer_id: schedule.customer_id,
-            time: moment().valueOf(),
-          })}`
-        );
+          console.log(
+            `API_EVENT:::JOB_CREATOR:::INSERT_JOB:::${JSON.stringify({
+              job_id: ids[0],
+              schedule_id: schedule.id,
+              script_id: schedule.script_id,
+              customer_id: schedule.customer_id,
+              time: moment().valueOf(),
+            })}`
+          );
+        }
       }
     }
   } catch (e) {
@@ -72,7 +75,7 @@ setInterval(async () => {
       .whereIn("status", ["working"]);
 
     const lateJobs = jobs.filter((item) => {
-      if (Math.abs(moment(item.created_at).diff(moment(), "minutes")) > 20)
+      if (Math.abs(moment(item.created_at).diff(moment(), "minutes")) > 30)
         return true;
       else return false;
     });
@@ -81,7 +84,7 @@ setInterval(async () => {
       const slack = await Slack();
 
       await slack.chat.postMessage({
-        text: `Some jobs seem to be stuck. (${jobs
+        text: `Some jobs seem to be stuck. (${lateJobs
           .map(
             (item) =>
               `${item.script_name} ${item.customer_name} ${moment(

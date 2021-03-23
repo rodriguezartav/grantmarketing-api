@@ -25,6 +25,23 @@ Finnhub.techIndicators = async function (integration, symbol, groupBy = "5") {
   }
 };
 
+Finnhub.indicator = async function (
+  integration,
+  symbol,
+  groupBy = "5",
+  from,
+  to,
+  indicator,
+  query
+) {
+  const response = await request
+    .get(
+      `https://finnhub.io/api/v1/indicator?symbol=${symbol}&resolution=${groupBy}&from=${from}&to=${to}&indicator=${indicator}&token=${integration.api_key}`
+    )
+    .query(query);
+  return response.body;
+};
+
 Finnhub.indicators = async function (integration, symbols, groupBy = "5") {
   let symbolsWithBars = {};
 

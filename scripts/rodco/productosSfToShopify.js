@@ -63,8 +63,6 @@ module.exports = async function Run(integrationMap) {
         if (sku.length == 9) sku = "0" + sku;
         let product = productMap[sku];
         if (product) {
-          // console.log(variant.name, variant.sku, product.precio__c);
-
           sfItems.push({
             external_id__c: product.external_id__c,
             short_code__c: item.handle,

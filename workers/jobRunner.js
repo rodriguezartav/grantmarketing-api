@@ -17,7 +17,8 @@ async function JobRunner(knex) {
         "jobs.*",
         "scripts.name as script_name",
         "scripts.location as script_location",
-        "customers.name as customer_name"
+        "customers.name as customer_name",
+        "schedules.time_to_live"
       )
       .join("customers", "customers.id", "jobs.customer_id")
       .join("scripts", "scripts.id", "jobs.script_id")
@@ -92,6 +93,7 @@ async function JobRunner(knex) {
               LINES: "24",
               INTEGRATION_MAP: JSON.stringify(integrationMap),
               SCRIPT_OPTIONS: JSON.stringify(job.script_options),
+              TIME_TO_LIVE: job.time_to_live || null,
               JOB_ID: job.id,
               SCRIPT: job.script_location,
               USERS: JSON.stringify(
@@ -108,7 +110,7 @@ async function JobRunner(knex) {
             force_no_tty: null,
             size: "Hobby.",
             type: "run",
-            time_to_live: 60 * 90,
+            time_to_live: job.time_to_live || 60 * 90,
           },
         });
 

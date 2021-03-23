@@ -8,6 +8,7 @@ const moment = require("moment");
 const request = require("superagent");
 
 (function () {
+  if (process.env.TEST) return;
   var old = console.log;
   console.log = function () {
     if (
@@ -80,7 +81,7 @@ async function Run() {
       })}`
     );
 
-    process.exit(0);
+    if (!process.env.TIME_TO_LIVE) process.exit(0);
   } catch (e) {
     console.log(
       `API_EVENT:::SCRIPTRUNNER:::ERROR:::${JSON.stringify({
