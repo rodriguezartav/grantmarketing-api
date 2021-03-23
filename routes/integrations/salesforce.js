@@ -32,6 +32,7 @@ router.get("/callback", async function (req, res, next) {
     await Knex()
       .table("integrations")
       .update({
+        is_connected: true,
         external_user_id: oauthRes.body.id,
         auth_token: oauthRes.body.access_token,
         refresh_token: oauthRes.body.refresh_token,

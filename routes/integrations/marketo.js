@@ -26,11 +26,10 @@ router.get("/:customer_id", async function (req, res, next) {
       }&client_secret=${integration.client_secret}`
     );
 
-    console.log(oauthRes.body);
-
     await Knex()
       .table("integrations")
       .update({
+        is_connected: true,
         auth_token: oauthRes.body.access_token,
         refresh_token: oauthRes.body.access_token,
         external_user_id: oauthRes.body.scope,

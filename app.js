@@ -51,6 +51,7 @@ app.use(
   cors(),
   require("./routes/integrations/marketo")
 );
+app.use("/integrations", cors(), require("./routes/integrations/all"));
 
 app.use("/webhooks/heroku", require("./routes/webhooks/heroku"));
 app.use("/webhooks/papertrail", require("./routes/webhooks/papertrail"));
