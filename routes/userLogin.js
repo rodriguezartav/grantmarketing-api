@@ -3,6 +3,7 @@ var router = express.Router();
 var JWT = require("../helpers/jwt");
 var getKnex = require("../helpers/knex");
 var moment = require("moment");
+var sms = require("../helpers/sms");
 // Home page route.
 router.get("/", function (req, res) {
   res.send({ result: [] });
@@ -10,12 +11,12 @@ router.get("/", function (req, res) {
 
 router.post("/getCode", async function (req, res, next) {
   try {
-    var user = await getCode({
+    var users = await getCode({
       phone: req.body.phone,
       countryCode: req.body.countryCode,
     });
 
-    if (user) return res.send({ success: true });
+    if (users) return res.send(users);
     else {
       await sms("Login Error " + JSON.stringify(req.body), "+50684191862");
       return next({ status: 403, message: "Phone is not registered" });
@@ -27,7 +28,7 @@ router.post("/getCode", async function (req, res, next) {
 //
 router.post("/autenticate", async function (req, res, next) {
   try {
-    const { code, phone } = req.body;
+    const { code, phone, customer_id, countryCode } = req.body;
     if (!req.body.code || parseInt(req.body.code) > 0 == false) {
       await sms(
         "Login Error Code and Phone are required " + JSON.stringify(req.body),
@@ -38,34 +39,27 @@ router.post("/autenticate", async function (req, res, next) {
     }
 
     let filter = {
-      code: req.body.code,
+      code: code,
+      phone: phone,
+      country_code: countryCode,
+      customer_id: customer_id,
     };
-    if (req.body.phone.indexOf("@") > -1) filter.email = req.body.phone;
-    else
-      filter = {
-        code: req.body.code,
-        phone: req.body.phone,
-        country_code: req.body.countryCode,
-      };
 
     const user = await getKnex()
       .table("users")
       .select("users.*", "customers.name as customer_name")
-      .where(filter)
       .join("customers", "customers.id", "users.customer_id")
+      .where(filter)
       .first();
+
+    await getKnex().table("users").update({ code: null }).where({
+      code: code,
+      phone: phone,
+      country_code: countryCode,
+    });
 
     if (user) {
       user.timestamp = moment().valueOf();
-      try {
-        await getKnex()
-          .table("users")
-          .update({ code: null })
-          .where({ id: user.id });
-      } catch (e) {
-        return next({ status: 401, message: e.message });
-      }
-
       return res.send({
         id: user.id,
         customer_id: user.customer_id,
@@ -73,7 +67,7 @@ router.post("/autenticate", async function (req, res, next) {
         name: user.name,
         token: JWT.encode(user),
       });
-    } else if (!user) {
+    } else {
       await sms("Auth Error " + JSON.stringify(req.body), "+50684191862");
       return next({ status: 403, message: "The code is not correct" });
     }
@@ -85,18 +79,30 @@ router.post("/autenticate", async function (req, res, next) {
 module.exports = router;
 
 async function getCode({ phone, countryCode }) {
-  let filter = {};
+  let filter = { phone: phone, country_code: countryCode };
 
-  if (phone.indexOf("@") > -1) filter = { email: phone };
-  else filter = { phone: phone, country_code: countryCode };
+  var users = await getKnex()
+    .table("users")
+    .select(
+      "users.id",
+      "users.name",
+      "country_code",
+      "users.phone",
+      "users.customer_id",
+      "customers.name as customer_name"
+    )
+    .join("customers", "customers.id", "users.customer_id")
+    .where(filter);
 
-  var user = await getKnex().table("users").where(filter).first();
-  if (user) {
+  if (users.length > 0) {
     let code = parseInt(Math.random() * 100000);
     await await getKnex()
       .table("users")
       .update({ code: code })
-      .where({ id: user.id });
+      .whereIn(
+        "id",
+        users.map((user) => user.id)
+      );
 
     //Sends email if it's not testing/developing
 
@@ -104,11 +110,14 @@ async function getCode({ phone, countryCode }) {
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const client = require("twilio")(accountSid, authToken);
 
+    const user = users[0];
+
     await client.messages.create({
       body: `Hi ${user.name},\n Your JD login code is: ${code}`,
       from: process.env.TWILIO_NUMBER,
-      to: user.country_code + phone,
+      to: user.country_code + user.phone,
     });
+    return users;
   }
-  return user;
+  return false;
 }
