@@ -52,6 +52,7 @@ module.exports = async function Run(integrationMap) {
             lead_id: activity.leadId,
             activity_date: activity.activityDate,
             activity_type_id: activity.activityTypeId,
+            campaignRunId: activity.attributes["Campaign Run ID"],
             campaign_id:
               activity.campaignId == "null" ? null : activity.campaignId,
             primary_attribute_value_id: activity.primaryAttributeValueId,
