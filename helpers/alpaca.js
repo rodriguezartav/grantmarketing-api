@@ -135,12 +135,23 @@ Alpaca.marketStatus = async function (integration) {
       calendarResponse.body[0].close +
       ":00-04:00"
   );
+
+  let open = moment(
+    calendarResponse.body[0].date +
+      "T" +
+      calendarResponse.body[0].open +
+      ":00-04:00"
+  );
+
   let now = moment(clock.timestamp);
   let todayAfterClose = moment(close).add(2, "hours");
+  let todayBeforeOpen = moment(open).add(-30, "minutes");
 
   const isAfter = now.isBetween(close, todayAfterClose);
+  const isBefore = now.isBetween(todayBeforeOpen, open);
 
   if (clock.is_open) return { isOpen: true, afterHours: false };
+  else if (isBefore) return { isOpen: true, afterHours: true };
   else if (isAfter) {
     return { isOpen: true, afterHours: true };
   } else return { isOpen: false, afterHours: false };
@@ -183,7 +194,7 @@ Alpaca.order = async function (integration, side, type, position, params) {
 
     return response.body;
   } catch (e) {
-    console.log(e);
+    console.log(e.text);
     throw e;
   }
 };
@@ -206,9 +217,8 @@ Alpaca.getFilledOrder = async function (integration, order, count = -1) {
     .set("APCA-API-KEY-ID", integration.client_id)
     .set("APCA-API-SECRET-KEY", integration.client_secret);
 
-  console.log(order.id, response.body.status);
-
   if (count > 10) {
+    console.log("Cancelling Order", order.client_order_id);
     await Alpaca.cancelOrder(integration, order.id);
     return null;
   }
@@ -245,8 +255,10 @@ Alpaca.cancelOrder = async function (integration, orderId) {
 Alpaca.sellOrDie = async function (integration, position) {
   try {
     const marketStatus = await Alpaca.marketStatus(integration);
-    const client_order_id = `${position.symbol}-${moment().unix()}`;
-    const quote = await Alpaca.quote(integration, position.symbol);
+    const client_order_id = `${position.symbol}-${moment().unix()}-${parseInt(
+      Math.random() * 100
+    )}`;
+    //const quote = await Alpaca.quote(integration, position.symbol);
 
     let order = {};
 
@@ -256,7 +268,7 @@ Alpaca.sellOrDie = async function (integration, position) {
       "limit",
       {
         ...position,
-        price: quote.last.bp,
+
         order,
       },
       {
@@ -268,16 +280,19 @@ Alpaca.sellOrDie = async function (integration, position) {
 
     const filledOrder = await Alpaca.getFilledOrder(integration, order);
     if (!filledOrder) {
+      delete position.price;
       await Alpaca.order(
         integration,
         "sell",
         "market",
         {
           ...position,
-          price: quote.last.bp,
           order,
         },
         {
+          client_order_id: `${position.symbol}-${moment().unix()}-${parseInt(
+            Math.random() * 100
+          )}`,
           extended_hours: marketStatus.afterHours,
           time_in_force: marketStatus.afterHours ? "day" : "gtc",
         }
@@ -292,8 +307,10 @@ Alpaca.buyOrCry = async function (integration, position, onCry) {
   try {
     const marketStatus = await Alpaca.marketStatus(integration);
 
-    const client_order_id = `${position.symbol}-${moment().unix()}`;
-    const quote = await Alpaca.quote(integration, position.symbol);
+    const client_order_id = `${position.symbol}-${moment().unix()}-${parseInt(
+      Math.random() * 100
+    )}`;
+    //const quote = await Alpaca.quote(integration, position.symbol);
 
     let order = {};
 
@@ -303,7 +320,6 @@ Alpaca.buyOrCry = async function (integration, position, onCry) {
       "limit",
       {
         ...position,
-        price: quote.last.ap,
         order,
       },
       {

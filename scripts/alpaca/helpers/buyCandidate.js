@@ -17,7 +17,7 @@ class Counter {
     stocks.forEach((item) => {
       this.stocksMap[item.symbol] = {
         original_sell_at: item.sell_at || 0.989,
-        buy_amount: item.buy_amount || 100,
+        buy_amount: item.buy_amount || 1,
         sell_at: item.sell_at || 0.989,
         lower_base_at: item.lower_base_at || 0.991,
         raise_base_at: item.raise_base_at || 1.006,
@@ -364,6 +364,7 @@ class Counter {
 
         console.log(
           "Adjusting base from",
+          pricesPerSymbol.symbol,
           last,
           "to",
           pricesPerSymbol.basePrice.price

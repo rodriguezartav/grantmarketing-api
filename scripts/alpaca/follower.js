@@ -153,7 +153,7 @@ async function Run(integrationMap, users, scriptOptions) {
       } else {
         const newTrades = data.filter((item) => item.T == "t");
         if (newTrades.length > 0) counter.addTrades(newTrades);
-        else console.log(data);
+        //else console.log(data);
       }
     });
   });
