@@ -9,6 +9,8 @@ var VPIMiddleware = async function (req, res, next) {
   if (!req.user || !req.user.customer_id) return next();
   const knex = Knex();
   const integrationMap = await IntegrationMap(knex, req.user.customer_id);
+
+  console.log(req.user, integrationMap);
   if (integrationMap["postgres"] && integrationMap["postgres"].client_secret) {
     req.knexPg = KnexPg(integrationMap["postgres"]);
   }
