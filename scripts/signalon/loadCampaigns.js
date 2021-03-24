@@ -6,12 +6,25 @@ const Knex = require("../../helpers/knex_pg");
 let knex;
 module.exports = async function Run(integrationMap) {
   try {
+    const knex = Knex(integrationMap["postgres"]);
+
+    const first = await knex
+      .table("campaigns")
+      .select("updated_at")
+      .orderBy("updated_at", "DESC")
+      .first();
+
+    const startFilter =
+      first && first.updated_at
+        ? moment(first.updated_at)
+        : moment().add(-7, "months");
+
     const campaigns = await Marketo.getBulk(
       integrationMap["marketo"],
-      `/rest/asset/v1/smartCampaigns.json?earliestUpdatedAt=2020-09-01T23:15:00-00:00&latestUpdatedAt=2021-03-12T23:17:00-00:00`
+      `/rest/asset/v1/smartCampaigns.json?earliestUpdatedAt=${startFilter.toISOString()}&latestUpdatedAt=${startFilter
+        .add(7, "months")
+        .toISOString()}`
     );
-
-    const knex = Knex(integrationMap["postgres"]);
 
     var i,
       j,
@@ -31,7 +44,7 @@ module.exports = async function Run(integrationMap) {
 
           type: campaign.type,
           is_system: campaign.isSystem,
-
+          program_id: campaign.parentProgramId,
           is_active: campaign.isActive,
 
           is_requestable: campaign.isRequestable,
@@ -52,7 +65,7 @@ module.exports = async function Run(integrationMap) {
           attributes: { list: campaign.attributes },
         };
       });
-      await knex.table("programs").insert(temparray).onConflict("id").merge();
+      await knex.table("campaigns").insert(temparray).onConflict("id").merge();
     }
 
     await knex.destroy();

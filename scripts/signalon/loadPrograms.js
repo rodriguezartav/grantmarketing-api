@@ -6,12 +6,25 @@ const Knex = require("../../helpers/knex_pg");
 let knex;
 module.exports = async function Run(integrationMap) {
   try {
+    const knex = Knex(integrationMap["postgres"]);
+
+    const first = await knex
+      .table("programs")
+      .select("updated_at")
+      .orderBy("updated_at", "DESC")
+      .first();
+
+    const startFilter =
+      first && first.updated_at
+        ? moment(first.updated_at)
+        : moment().add(-7, "months");
+
     const programs = await Marketo.getBulk(
       integrationMap["marketo"],
-      "/rest/asset/v1/programs.json"
+      `/rest/asset/v1/programs.json?earliestUpdatedAt=${startFilter.toISOString()}&latestUpdatedAt=${startFilter
+        .add(7, "months")
+        .toISOString()}`
     );
-
-    const knex = Knex(integrationMap["postgres"]);
 
     var i,
       j,
