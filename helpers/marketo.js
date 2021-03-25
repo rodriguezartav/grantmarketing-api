@@ -72,10 +72,15 @@ Marketo.getBulkActivities = async function (
   let lastResult;
   let count = 0;
 
+  let count100 = 0;
+  let start = moment();
   while (count < 2000 && (!lastResult || lastResult.body.moreResult)) {
     token = (lastResult ? lastResult.body : token).nextPageToken;
 
+    if (count100 == 0) start = moment();
+
     try {
+      let _lastResult = lastResult;
       lastResult = await Marketo.request(
         integration,
         request.get(
@@ -83,13 +88,27 @@ Marketo.getBulkActivities = async function (
         )
       );
 
-      if (!lastResult.body.success) throw new Error(lastResult.body.errors[0]);
+      if (!lastResult.body.success) {
+        console.log(JSON.stringify(lastResult.body));
+        throw new Error(lastResult.body.errors[0]);
+      }
 
       await onLoad(lastResult.body.result);
+
+      if (count100 == 99) {
+        let runTime = Math.abs(start.diff(moment(), "milliseconds"));
+        console.lot(runTime);
+        if (runTime < 20000) {
+          //await sleep(20000);
+        }
+        count100 = 0;
+      } else count100++;
       count++;
+      _lastResult = null;
     } catch (e) {
-      console.log(e);
-      throw e;
+      console.log(JSON.stringify(e));
+      if (e.status != 606) throw e;
+      else await 20000;
     }
   }
 
