@@ -21,13 +21,11 @@ setInterval(async () => {
         .whereIn("status", ["pending", "working"])
         .where("schedule_id", schedule.id);
 
-      console.log(
-        schedule.script_id,
-        moment(schedule.start_at),
-        moment().unix() > moment(schedule.start_at).unix()
-      );
-
-      if (schedule.start_at && !moment(schedule.start_at).isAfter()) {
+      if (
+        schedule.start_at &&
+        moment().unix() < moment(schedule.start_at).unix()
+      ) {
+        //Ignore because of start at has not yet occured
       } else {
         if (
           existingJobs.length == 0 &&
