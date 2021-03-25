@@ -281,6 +281,7 @@ Alpaca.sellOrDie = async function (integration, position) {
     const filledOrder = await Alpaca.getFilledOrder(integration, order);
     if (!filledOrder) {
       delete position.price;
+      delete position.limit_price;
       await Alpaca.order(
         integration,
         "sell",
@@ -290,9 +291,6 @@ Alpaca.sellOrDie = async function (integration, position) {
           order,
         },
         {
-          client_order_id: `${position.symbol}-${moment().unix()}-${parseInt(
-            Math.random() * 100
-          )}`,
           extended_hours: marketStatus.afterHours,
           time_in_force: marketStatus.afterHours ? "day" : "gtc",
         }

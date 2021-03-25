@@ -60,6 +60,13 @@ async function Run(integrationMap, users, scriptOptions) {
       stock.lastPrice.price / position.price
     );
 
+    counter.updatePositions([
+      {
+        symbol: position.symbol,
+        pending: "sell",
+      },
+    ]);
+
     try {
       await Alpaca.sellOrDie(alpacaKeys, {
         symbol: stock.symbol,
@@ -70,13 +77,6 @@ async function Run(integrationMap, users, scriptOptions) {
     } catch (e) {
       console.log(e);
     }
-
-    counter.updatePositions([
-      {
-        symbol: position.symbol,
-        pending: "sell",
-      },
-    ]);
   }
 
   let counter = new BuyCandidate(onBuy, onSell);

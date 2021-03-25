@@ -54,43 +54,52 @@ module.exports = async function Run(integrationMap) {
       .set("X-Shopify-Api-Features", "include-presentment-prices");
 
     const sfItems = [];
+    const sfItemsIndex = {};
 
-    const update = shopifyProducts.map((item) => {
-      let allMapped = true;
-      let newVariants = item.variants.map((variant) => {
-        let sku = variant.sku;
+    const update = shopifyProducts
+      .filter((item) => {
+        const filter = sfItemsIndex[item.sku] == null;
+        sfItemsIndex[item.sku] = item;
+        if (!filter)
+          console.log("NOTIFY", "Duplicated SKU in Shopify", item.sku, item);
+        return filter;
+      })
+      .map((item) => {
+        let allMapped = true;
+        let newVariants = item.variants.map((variant) => {
+          let sku = variant.sku;
 
-        if (sku.length == 9) sku = "0" + sku;
-        let product = productMap[sku];
-        if (product) {
-          sfItems.push({
-            external_id__c: product.external_id__c,
-            short_code__c: item.handle,
-          });
+          if (sku.length == 9) sku = "0" + sku;
+          let product = productMap[sku];
+          if (product) {
+            sfItems.push({
+              external_id__c: product.external_id__c,
+              short_code__c: item.handle,
+            });
 
-          return {
-            id: variant.id,
-            sku: sku,
-            inventory_item_id: variant.inventory_item_id,
-            price: parseInt(product.precio_mayoreo__c * 100) / 100,
-          };
-        } else {
-          //console.log(
-          // item.title,
-          //item.handle,
-          //item.variants.map((variant) => variant.sku).join(",")
-          //);
-          allMapped = false;
-          return null;
-        }
+            return {
+              id: variant.id,
+              sku: sku,
+              inventory_item_id: variant.inventory_item_id,
+              price: parseInt(product.precio_mayoreo__c * 100) / 100,
+            };
+          } else {
+            //console.log(
+            // item.title,
+            //item.handle,
+            //item.variants.map((variant) => variant.sku).join(",")
+            //);
+            allMapped = false;
+            return null;
+          }
+        });
+
+        return {
+          id: item.id,
+          variants: allMapped ? newVariants : item.variants,
+          published: allMapped,
+        };
       });
-
-      return {
-        id: item.id,
-        variants: allMapped ? newVariants : item.variants,
-        published: allMapped,
-      };
-    });
 
     await bulk(conn, "producto__c", "upsert", "external_id__c", sfItems);
 
