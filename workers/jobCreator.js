@@ -21,7 +21,10 @@ setInterval(async () => {
         .whereIn("status", ["pending", "working"])
         .where("schedule_id", schedule.id);
 
-      console.log(moment(schedule.start_at).isAfter());
+      console.log(
+        moment(schedule.start_at),
+        moment(schedule.start_at).isAfter()
+      );
 
       if (schedule.start_at && !moment(schedule.start_at).isAfter()) {
       } else {
