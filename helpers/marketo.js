@@ -97,7 +97,7 @@ Marketo.getBulkActivities = async function (
       else {
         await onLoad(lastResult.body.result);
         let runTime = Math.abs(start.diff(moment(), "milliseconds"));
-        if (200 - runTime > 0) await sleep(200 - runtime);
+        if (200 - runTime > 0) await sleep(200 - runTime);
         count++;
         _lastResult = null;
       }
