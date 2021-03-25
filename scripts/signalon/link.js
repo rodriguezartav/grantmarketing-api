@@ -35,7 +35,9 @@ module.exports = async function Run(integrationMap) {
 
     const leadsData = deliveredByLead.map((item) => {
       return {
-        unique_id: `${item.lead_id}-${startDate}-${endDate}`,
+        unique_id: `${item.lead_id}-${moment(startDate).format(
+          "YYYY-MM-DD"
+        )}-${endDate.format("YYYY-MM-DD")}`,
         lead_id: item.lead_id,
         delivered: item.count || 0,
         opened: openMap[item.lead_id] || 0,
