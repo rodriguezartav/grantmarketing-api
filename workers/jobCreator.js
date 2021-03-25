@@ -22,8 +22,9 @@ setInterval(async () => {
         .where("schedule_id", schedule.id);
 
       console.log(
+        schedule.script_id,
         moment(schedule.start_at),
-        moment(schedule.start_at).isAfter()
+        moment().unix() > moment(schedule.start_at).unix()
       );
 
       if (schedule.start_at && !moment(schedule.start_at).isAfter()) {
