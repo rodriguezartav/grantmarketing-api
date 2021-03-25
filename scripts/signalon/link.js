@@ -8,8 +8,8 @@ module.exports = async function Run(integrationMap) {
   try {
     const knex = Knex(integrationMap["postgres"]);
 
-    const startDate = "2020-08-23T:00:00:00";
-    const endDate = "2020-09-01T:00:00:00";
+    const startDate = moment().toISOString();
+    const endDate = moment().startOf("week").toISOString();
 
     const { rows: deliveredByLead } = await knex.raw(
       `select count(inact.id), inact.lead_id from activities inact where  activity_date >= '${startDate}' and activity_date < '${endDate}' and activity_type_id=7  group by inact.lead_id;`
