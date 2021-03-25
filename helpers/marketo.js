@@ -83,12 +83,9 @@ Marketo.getBulkActivities = async function (
         )
       );
 
-      if (!lastResult.body.success && count > 0) return list;
-      else if (!lastResult.body.success)
-        throw new Error(lastResult.body.errors[0]);
+      if (!lastResult.body.success) throw new Error(lastResult.body.errors[0]);
 
       await onLoad(lastResult.body.result);
-
       count++;
     } catch (e) {
       console.log(e);
