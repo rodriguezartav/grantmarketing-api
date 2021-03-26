@@ -49,6 +49,17 @@ class Counter {
       } else if (item.pending == "sell") {
         existingPosition = {
           ...existingPosition,
+          pendingTimestamp: moment().unix(),
+          quantity: 0,
+        };
+      } else if (
+        existingPosition &&
+        existingPosition.pendingTimestamp &&
+        moment().unix() - existingPosition.pendingTimestamp < 60
+      ) {
+        existingPosition = {
+          ...existingPosition,
+          pendingTimestamp: moment().unix(),
           quantity: 0,
         };
       } else {
@@ -288,6 +299,7 @@ class Counter {
     return false;
   };
 
+  //MNot uses
   addTrade_Buy = function (pricesPerSymbol, item) {
     if (
       !this.positionMap[pricesPerSymbol.symbol] &&
@@ -348,12 +360,12 @@ class Counter {
       lowerBarResult =
         !sellResult && this.addTrade_LowerBar(pricesPerSymbol, item);
 
-      buyResult = this.addTrade_Buy(pricesPerSymbol, item);
+      //buyResult = this.addTrade_Buy(pricesPerSymbol, item);
 
       raiseBarResult =
         !buyResult && this.addTrade_RaiseBar(pricesPerSymbol, item);
 
-      if (sellResult || lowerBarResult || buyResult || raiseBarResult) {
+      if (sellResult || lowerBarResult || raiseBarResult) {
         const last = pricesPerSymbol.basePrice.price;
         pricesPerSymbol.basePrice = {
           time: item.t,

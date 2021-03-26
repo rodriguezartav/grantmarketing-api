@@ -72,7 +72,7 @@ Marketo.getBulkActivities = async function (
   let lastResult;
   let count = 0;
 
-  while (count < 2000 && (!lastResult || lastResult.body.moreResult)) {
+  while (count < 8000 && (!lastResult || lastResult.body.moreResult)) {
     token = (lastResult ? lastResult.body : token).nextPageToken;
     let start = moment();
 

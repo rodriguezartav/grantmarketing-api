@@ -21,8 +21,8 @@ module.exports = async function Run(integrationMap) {
 
     await Marketo.getBulkActivities(
       integrationMap["marketo"],
-      startFilter.format("YYYY-MM-DDTHH:mm:ss"),
-      [6, 7, 8, 9, 10, 11, 27],
+      startFilter.format("YYYY-MM-DDTHH:MM:SS"),
+      [1, 2],
       saveActivities,
       onEnd
     );

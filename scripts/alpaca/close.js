@@ -16,7 +16,8 @@ async function Run(integrationMap, users, scriptOptions) {
   const marketStatus = await Alpaca.marketStatus(alpacaKeys);
   //if (!marketStatus.isOpen && !marketStatus.afterHours) return true;
 
-  await Alpaca.cancelAll(alpacaKeys);
+  await alpaca.cancelAllOrders();
+
   const positions = await alpaca.getPositions();
 
   let positionsMap = {};
@@ -36,7 +37,3 @@ async function Run(integrationMap, users, scriptOptions) {
 }
 
 module.exports = Run;
-
-function formatPl(pl) {
-  return parseInt(pl * 1000) / 10 + "%";
-}

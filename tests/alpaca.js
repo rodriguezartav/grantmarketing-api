@@ -21,7 +21,7 @@ async function Test() {
     integrations.forEach((item) => (integrationMap[item.provider] = item));
 
     process.env.INTEGRATION_MAP = JSON.stringify(integrationMap);
-    process.env.SCRIPT = "alpaca/follower";
+    process.env.SCRIPT = "alpaca/open";
     process.env.TIME_TO_LIVE = 100000;
 
     await Runner();

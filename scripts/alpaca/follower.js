@@ -6,6 +6,7 @@ const Knex = require("../../helpers/knex_pg");
 const Alpaca = require("../../helpers/alpaca");
 const BuyCandidate = require("./helpers/buyCandidate");
 const Positions = require("./helpers/positions");
+const SMS = require("../../helpers/sms");
 
 const moment = require("moment-timezone");
 moment.tz.setDefault("America/New_York");
@@ -20,38 +21,7 @@ async function Run(integrationMap, users, scriptOptions) {
   const market = await Alpaca.marketStatus(alpacaKeys);
   console.log(market);
 
-  async function onBuy(stock, quantity) {
-    console.log("Buying Candidate", stock.symbol, stock.lastPrice.price);
-
-    try {
-      await Alpaca.buyOrCry(
-        alpacaKeys,
-        {
-          symbol: stock.symbol,
-          side: "buy",
-          price: stock.lastPrice.price,
-          qty: quantity,
-          timestamp: moment().format("YYYY-MM-DDTHH:mm:ss"),
-        },
-        function onCry() {
-          counter.updatePositions([
-            {
-              pending: "sell",
-              symbol: stock.symbol,
-            },
-          ]);
-        }
-      );
-      counter.updatePositions([
-        {
-          pending: "buy",
-          symbol: stock.symbol,
-        },
-      ]);
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  async function onBuy(stock, quantity) {}
 
   async function onSell(stock, position) {
     console.log(
@@ -68,6 +38,8 @@ async function Run(integrationMap, users, scriptOptions) {
     ]);
 
     try {
+      await Alpaca.cancelOrderBySymbol(alpacaKeys, stock.symbol);
+
       await Alpaca.sellOrDie(alpacaKeys, {
         symbol: stock.symbol,
         side: "sell",
@@ -97,7 +69,7 @@ async function Run(integrationMap, users, scriptOptions) {
 
     stocks = await knex.table("stocks").select();
     counter.updateStocks(stocks);
-  }, 1500);
+  }, 10500);
 
   setInterval(async () => {
     sipConnection.sendUTF(
