@@ -23,7 +23,15 @@ async function Run(integration) {
       })
       .where("id", integration.id);
   } catch (e) {
-    console.log(e);
+    console.log(
+      "NOTIFY",
+      "ERROR",
+      "In refresh",
+      JSON.stringify(integration),
+      e.message,
+      e.status,
+      e.response ? e.response.body : ""
+    );
     await Knex()
       .table("integrations")
       .update({
