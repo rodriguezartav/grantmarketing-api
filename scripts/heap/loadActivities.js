@@ -2,22 +2,28 @@ const moment = require("moment");
 const request = require("superagent");
 const Marketo = require("../../helpers/marketo");
 const Knex = require("../../helpers/knex_pg");
+const S3 = require("../../helpers/s3");
+
+const { Parser } = require("json2csv");
 
 let knex;
 module.exports = async function Run(integrationMap) {
   try {
     const knex = Knex(integrationMap["postgres"]);
 
-    const firstActivity = await knex
-      .table("activities")
-      .select("activity_date")
-      .orderBy("activity_date", "DESC")
-      .first();
+    const s3 = new S3();
 
-    const startFilter =
-      firstActivity && firstActivity.activity_date
-        ? moment(firstActivity.activity_date)
-        : moment().add(-7, "months");
+    let manifest = await s3.get(
+      "customers.jungledynamics.com",
+      `heap/activities/manifest.json`
+    );
+
+    if (manifest) manifest = JSON.parse(manifest);
+    else manifest = [];
+
+    const startFilter = manifest[manifest.length - 1]
+      ? moment(manifest[manifest.length - 1].end)
+      : moment().add(-7, "months");
 
     await Marketo.getBulkActivities(
       integrationMap["marketo"],
@@ -28,6 +34,11 @@ module.exports = async function Run(integrationMap) {
     );
 
     async function saveActivities(activities) {
+      let start = moment(activities[0].activityDate).toISOString();
+      let end = moment(
+        activities[activities.length - 1].activityDate
+      ).toISOString();
+      manifest.push({ start, end });
       const keys = [];
       activities = activities.filter((item) => {
         const attributes = arrayToObject(item.attributes);
@@ -41,6 +52,25 @@ module.exports = async function Run(integrationMap) {
         return false;
       });
 
+      const fields = Object.keys(activities[0]);
+      const opts = { fields };
+
+      const parser = new Parser(opts);
+      const csv = parser.parse(activities);
+
+      await s3.put(
+        "customers.jungledynamics.com",
+        `heap/activities/${start}-${end}.csv`,
+        csv
+      );
+
+      await s3.put(
+        "customers.jungledynamics.com",
+        `heap/activities/manifest.json`,
+        JSON.stringify(manifest)
+      );
+
+      return true;
       var i,
         j,
         temparray,
