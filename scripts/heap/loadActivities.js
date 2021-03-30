@@ -13,6 +13,17 @@ module.exports = async function Run(integrationMap) {
 
     const s3 = new S3();
 
+    let leadsCSV = await s3.get(
+      "customers.jungledynamics.com",
+      `heap/leads.csv`
+    );
+
+    const csv = require("csvtojson");
+    leads = await csv().fromString(leadsCSV);
+
+    let leadMap = {};
+    leads.forEach((lead) => (leadMap[lead.Id] = lead));
+
     let manifest = await s3.get(
       "customers.jungledynamics.com",
       `heap/activities/manifest.json`
@@ -33,14 +44,12 @@ module.exports = async function Run(integrationMap) {
       onEnd
     );
 
+    let allActivities = [];
+
     async function saveActivities(activities) {
-      let start = moment(activities[0].activityDate).toISOString();
-      let end = moment(
-        activities[activities.length - 1].activityDate
-      ).toISOString();
-      manifest.push({ start, end });
       const keys = [];
       activities = activities.filter((item) => {
+        if (!leadMap[item.leadId]) return false;
         const attributes = arrayToObject(item.attributes);
         item.attributes = attributes;
         const marketoGUID = `${item.activityTypeId}-${item.leadId}-${attributes["Campaign Run ID"]}`;
@@ -52,23 +61,33 @@ module.exports = async function Run(integrationMap) {
         return false;
       });
 
-      const fields = Object.keys(activities[0]);
-      const opts = { fields };
+      allActivities.push(activities);
+      if (allActivities.length > 100000) {
+        let start = moment(allActivities[0].activityDate).toISOString();
+        let end = moment(
+          allActivities[allActivities.length - 1].activityDate
+        ).toISOString();
+        manifest.push({ start, end });
 
-      const parser = new Parser(opts);
-      const csv = parser.parse(activities);
+        const fields = Object.keys(allActivities[0]);
+        const opts = { fields };
 
-      await s3.put(
-        "customers.jungledynamics.com",
-        `heap/activities/${start}-${end}.csv`,
-        csv
-      );
+        const parser = new Parser(opts);
+        const csv = parser.parse(allActivities);
 
-      await s3.put(
-        "customers.jungledynamics.com",
-        `heap/activities/manifest.json`,
-        JSON.stringify(manifest)
-      );
+        await s3.put(
+          "customers.jungledynamics.com",
+          `heap/activities/${start}-${end}.csv`,
+          csv
+        );
+
+        await s3.put(
+          "customers.jungledynamics.com",
+          `heap/activities/manifest.json`,
+          JSON.stringify(manifest)
+        );
+        allActivities = [];
+      }
 
       return true;
       var i,

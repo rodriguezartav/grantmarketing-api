@@ -10,8 +10,12 @@ class S3 {
       Key: key,
     };
 
-    const result = this.s3.getObject(params).promise();
-    return result.Body;
+    try {
+      const result = await this.s3.getObject(params).promise();
+      return result.Body.toString("utf-8");
+    } catch (e) {
+      return null;
+    }
   };
 
   put = async function put(bucket, key, body) {
