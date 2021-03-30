@@ -60,7 +60,7 @@ module.exports = async function Run(integrationMap) {
         return false;
       });
 
-      allActivities.push(activities);
+      allActivities = allActivities.concat(activities);
       if (allActivities.length > 100000) {
         let start = moment(allActivities[0].activityDate).toISOString();
         let end = moment(
