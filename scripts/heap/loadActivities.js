@@ -46,6 +46,8 @@ module.exports = async function Run(integrationMap) {
     );
 
     async function onSaveActivities(activities, last = false) {
+      console.log("saving", allActivities.length, last);
+
       if (activities) allActivities = allActivities.concat(activities);
       if (allActivities.length > 50000 || last) {
         let start = moment(allActivities[0].activityDate).toISOString();
