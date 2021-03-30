@@ -5,6 +5,7 @@ const Knex = require("../../helpers/knex_pg");
 const S3 = require("../../helpers/s3");
 
 const { Parser } = require("json2csv");
+let allActivities = [];
 
 let knex;
 module.exports = async function Run(integrationMap) {
@@ -43,8 +44,6 @@ module.exports = async function Run(integrationMap) {
       saveActivities,
       onEnd
     );
-
-    let allActivities = [];
 
     async function saveActivities(activities) {
       const keys = [];
