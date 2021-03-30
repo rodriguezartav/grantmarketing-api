@@ -1,7 +1,7 @@
 const moment = require("moment");
 const request = require("superagent");
 const Marketo = require("../../helpers/marketo");
-const Knex = require("../../helpers/knex_pg");
+
 const S3 = require("../../helpers/s3");
 const { Readable } = require("stream");
 const { AsyncParser } = require("json2csv");
@@ -9,11 +9,8 @@ const { AsyncParser } = require("json2csv");
 const { Parser } = require("json2csv");
 let allActivities = [];
 
-let knex;
 module.exports = async function Run(integrationMap) {
   try {
-    const knex = Knex(integrationMap["postgres"]);
-
     const s3 = new S3();
 
     let leadsCSV = await s3.get(
@@ -108,7 +105,6 @@ module.exports = async function Run(integrationMap) {
 
     async function onEnd() {
       await onSaveActivities(null, true);
-      await knex.destroy();
     }
   } catch (e) {
     console.log(e);
