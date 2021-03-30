@@ -45,23 +45,9 @@ module.exports = async function Run(integrationMap) {
       onEnd
     );
 
-    async function saveActivities(activities) {
-      const keys = [];
-      activities = activities.filter((item) => {
-        if (!leadMap[item.leadId]) return false;
-        const attributes = arrayToObject(item.attributes);
-        item.attributes = attributes;
-        const marketoGUID = `${item.activityTypeId}-${item.leadId}-${attributes["Campaign Run ID"]}`;
-        item.marketoGUID = marketoGUID;
-        if (keys.indexOf(item.marketoGUID) == -1) {
-          keys.push(item.marketoGUID);
-          return true;
-        }
-        return false;
-      });
-
-      allActivities = allActivities.concat(activities);
-      if (allActivities.length > 100000) {
+    async function onSaveActivities(activities, last = false) {
+      if (activities) allActivities = allActivities.concat(activities);
+      if (allActivities.length > 50000 || last) {
         let start = moment(allActivities[0].activityDate).toISOString();
         let end = moment(
           allActivities[allActivities.length - 1].activityDate
@@ -87,37 +73,30 @@ module.exports = async function Run(integrationMap) {
         );
         allActivities = [];
       }
+    }
+
+    async function saveActivities(activities) {
+      const keys = [];
+      activities = activities.filter((item) => {
+        if (!leadMap[item.leadId]) return false;
+        const attributes = arrayToObject(item.attributes);
+        item.attributes = attributes;
+        const marketoGUID = `${item.activityTypeId}-${item.leadId}-${attributes["Campaign Run ID"]}`;
+        item.marketoGUID = marketoGUID;
+        if (keys.indexOf(item.marketoGUID) == -1) {
+          keys.push(item.marketoGUID);
+          return true;
+        }
+        return false;
+      });
+
+      await onSaveActivities(activities);
 
       return true;
-      var i,
-        j,
-        temparray,
-        chunk = 500;
-      for (i = 0, j = activities.length; i < j; i += chunk) {
-        temparray = activities.slice(i, i + chunk).map((activity) => {
-          return {
-            marketoGUID: activity.marketoGUID,
-            lead_id: activity.leadId,
-            activity_date: activity.activityDate,
-            activity_type_id: activity.activityTypeId,
-            campaignRunId: activity.attributes["Campaign Run ID"],
-            campaign_id:
-              activity.campaignId == "null" ? null : activity.campaignId,
-            primary_attribute_value_id: activity.primaryAttributeValueId,
-            primary_attribute_value: activity.primaryAttributeValue,
-            attributes: activity.attributes,
-            program_name: activity.primaryAttributeValue.split(".")[0],
-          };
-        });
-        await knex
-          .table("activities")
-          .insert(temparray)
-          .onConflict("marketoGUID")
-          .merge();
-      }
     }
 
     async function onEnd() {
+      await onSaveActivities(null, true);
       await knex.destroy();
     }
   } catch (e) {
