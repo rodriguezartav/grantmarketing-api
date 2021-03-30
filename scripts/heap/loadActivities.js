@@ -3,6 +3,8 @@ const request = require("superagent");
 const Marketo = require("../../helpers/marketo");
 const Knex = require("../../helpers/knex_pg");
 const S3 = require("../../helpers/s3");
+const { Readable } = require("stream");
+const { AsyncParser } = require("json2csv");
 
 const { Parser } = require("json2csv");
 let allActivities = [];
@@ -46,9 +48,10 @@ module.exports = async function Run(integrationMap) {
     );
 
     async function onSaveActivities(activities, last = false) {
+      if (activities) allActivities = allActivities.concat(activities);
+
       console.log("saving", allActivities.length, last);
 
-      if (activities) allActivities = allActivities.concat(activities);
       if (allActivities.length > 50000 || last) {
         let start = moment(allActivities[0].activityDate).toISOString();
         let end = moment(
@@ -59,20 +62,26 @@ module.exports = async function Run(integrationMap) {
         const fields = Object.keys(allActivities[0]);
         const opts = { fields };
 
-        const parser = new Parser(opts);
-        const csv = parser.parse(allActivities);
+        const asyncParser = new AsyncParser(opts, {});
+        const { writeStream, promise } = s3.uploadStream({
+          Bucket: "customers.jungledynamics.com",
+          Key: `heap/activities/${start}-${end}.csv`,
+        });
 
-        await s3.put(
-          "customers.jungledynamics.com",
-          `heap/activities/${start}-${end}.csv`,
-          csv
+        const input = Readable.from(
+          activities.map((item) => JSON.stringify(item))
         );
+
+        asyncParser.fromInput(input).toOutput(writeStream);
+
+        await promise;
 
         await s3.put(
           "customers.jungledynamics.com",
           `heap/activities/manifest.json`,
           JSON.stringify(manifest)
         );
+
         allActivities = [];
       }
     }

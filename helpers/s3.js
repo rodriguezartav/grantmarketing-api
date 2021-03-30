@@ -1,3 +1,5 @@
+const stream = require("stream");
+
 class S3 {
   constructor(keys) {
     this.AWS = require("aws-sdk");
@@ -25,6 +27,23 @@ class S3 {
       Key: key,
     };
     return this.s3.putObject(params).promise();
+  };
+
+  upload = async function put(bucket, key, body) {
+    var params = {
+      Body: body,
+      Bucket: bucket,
+      Key: key,
+    };
+    return this.s3.upload(params).promise();
+  };
+
+  uploadStream = ({ Bucket, Key }) => {
+    const pass = new stream.PassThrough();
+    return {
+      writeStream: pass,
+      promise: this.s3.upload({ Bucket, Key, Body: pass }).promise(),
+    };
   };
 }
 
