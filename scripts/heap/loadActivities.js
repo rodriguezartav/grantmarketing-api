@@ -37,7 +37,7 @@ module.exports = async function Run(integrationMap) {
 
     const startFilter = manifest[manifest.length - 1]
       ? moment(manifest[manifest.length - 1].end)
-      : moment().add(-7, "months");
+      : moment().add(-1, "years").startOf("year");
 
     await Marketo.getBulkActivities(
       integrationMap["marketo"],
@@ -52,7 +52,7 @@ module.exports = async function Run(integrationMap) {
 
       console.log("saving", allActivities.length, last);
 
-      if (allActivities.length > 50000 || last) {
+      if (allActivities.length > 10000 || last) {
         let start = moment(allActivities[0].activityDate).toISOString();
         let end = moment(
           allActivities[allActivities.length - 1].activityDate
