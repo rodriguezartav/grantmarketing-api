@@ -36,7 +36,10 @@ module.exports = async function Run(integrationMap) {
     if (manifest) manifest = JSON.parse(manifest);
     else manifest = [];
 
-    const startFilter = moment().add(-1, "years").startOf("year");
+    const startFilter =
+      manifest.length > 0
+        ? moment(manifest[manifest.length - 1])
+        : moment().add(-1, "years").startOf("year");
 
     await Marketo.getBulkActivities(
       integrationMap["marketo"],
@@ -49,34 +52,34 @@ module.exports = async function Run(integrationMap) {
 
         activities = activities.filter((item) => {
           if (!leadMap[item.leadId]) return false;
+          if (moment(item.activityDate).isSameOrBefore(startFilter))
+            return false;
           const attributes = arrayToObject(item.attributes);
           item.attributes = attributes;
           return true;
         });
 
-        var params = {
-          Records: activities.map((item) => {
-            return {
-              Data: `${item.id},${item.leadId},${item.activityDate},${item.activityTypeId},"${item.primaryAttributeValue}"\n`,
-            };
-          }),
+        if (activities.length > 0) {
+          var params = {
+            Records: activities.map((item) => {
+              return {
+                Data: `${item.id},${item.leadId},${item.activityDate},${item.activityTypeId},"${item.primaryAttributeValue}"\n`,
+              };
+            }),
 
-          DeliveryStreamName: "marketoStream" /* required */,
-        };
-        await firehose.putRecordBatch(params).promise();
+            DeliveryStreamName: "marketoStream" /* required */,
+          };
+          await firehose.putRecordBatch(params).promise();
 
-        manifest.push(lastDate);
-        await s3.put(
-          "customers.jungledynamics.com",
-          `heap/activities/manifest.json`,
-          JSON.stringify(manifest)
-        );
+          manifest.push(lastDate);
+          await s3.put(
+            "customers.jungledynamics.com",
+            `heap/activities/manifest.json`,
+            JSON.stringify(manifest)
+          );
+        }
       },
-      async () => {},
-      async (e) => {
-        console.log(e);
-        console.log("NOTICE", "error procesing records", "last date");
-      }
+      async () => {}
     );
   } catch (e) {
     console.log(e);

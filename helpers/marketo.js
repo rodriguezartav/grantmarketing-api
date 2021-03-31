@@ -103,8 +103,8 @@ Marketo.getBulkActivities = async function (
         _lastResult = null;
       }
     } catch (e) {
-      console.log(JSON.stringify(e));
-      await onError(e);
+      console.log(e);
+      throw e;
     }
   }
 
