@@ -3,6 +3,10 @@ const request = require("superagent");
 const Marketo = require("../../helpers/marketo");
 
 const S3 = require("../../helpers/s3");
+
+const AWS = require("aws-sdk");
+var firehose = new AWS.Firehose({ region: "us-east-1" });
+
 const { Readable } = require("stream");
 const { AsyncParser } = require("json2csv");
 
@@ -32,80 +36,48 @@ module.exports = async function Run(integrationMap) {
     if (manifest) manifest = JSON.parse(manifest);
     else manifest = [];
 
-    const startFilter = manifest[manifest.length - 1]
-      ? moment(manifest[manifest.length - 1].end)
-      : moment().add(-1, "years").startOf("year");
+    const startFilter = moment().add(-1, "years").startOf("year");
 
     await Marketo.getBulkActivities(
       integrationMap["marketo"],
       startFilter.format("YYYY-MM-DDTHH:MM:SS"),
       [1, 2],
-      saveActivities,
-      onEnd
-    );
+      async (activities) => {
+        if (!activities) return;
 
-    async function onSaveActivities(activities, last = false) {
-      if (activities) allActivities = allActivities.concat(activities);
+        let lastDate = activities[activities.length - 1].activityDate;
 
-      console.log("saving", allActivities.length, last);
-
-      if (allActivities.length > 10000 || last) {
-        let start = moment(allActivities[0].activityDate).toISOString();
-        let end = moment(
-          allActivities[allActivities.length - 1].activityDate
-        ).toISOString();
-        manifest.push({ start, end });
-
-        const fields = Object.keys(allActivities[0]);
-        const opts = { fields };
-
-        const asyncParser = new AsyncParser(opts, {});
-        const { writeStream, promise } = s3.uploadStream({
-          Bucket: "customers.jungledynamics.com",
-          Key: `heap/activities/${start}-${end}.csv`,
+        activities = activities.filter((item) => {
+          if (!leadMap[item.leadId]) return false;
+          const attributes = arrayToObject(item.attributes);
+          item.attributes = attributes;
+          return true;
         });
 
-        const input = Readable.from(
-          activities.map((item) => JSON.stringify(item))
-        );
+        var params = {
+          Records: activities.map((item) => {
+            return {
+              Data: `${item.id},${item.leadId},${item.activityDate},${item.activityTypeId},"${item.primaryAttributeValue}"\n`,
+            };
+          }),
 
-        asyncParser.fromInput(input).toOutput(writeStream);
+          DeliveryStreamName: "marketoStream" /* required */,
+        };
+        await firehose.putRecordBatch(params).promise();
 
-        await promise;
-
+        manifest.push(lastDate);
         await s3.put(
           "customers.jungledynamics.com",
           `heap/activities/manifest.json`,
           JSON.stringify(manifest)
         );
-
-        allActivities = [];
+      },
+      async () => {},
+      async (e) => {
+        console.log(e);
+        console.log("NOTICE", "error procesing records", "last date");
       }
-    }
-
-    async function saveActivities(activities) {
-      const keys = [];
-      activities = activities.filter((item) => {
-        if (!leadMap[item.leadId]) return false;
-        const attributes = arrayToObject(item.attributes);
-        item.attributes = attributes;
-        const marketoGUID = `${item.activityTypeId}-${item.leadId}-${attributes["Campaign Run ID"]}`;
-        item.marketoGUID = marketoGUID;
-        if (keys.indexOf(item.marketoGUID) == -1) {
-          keys.push(item.marketoGUID);
-          return true;
-        }
-        return false;
-      });
-
-      await onSaveActivities(activities);
-
-      return true;
-    }
-
-    async function onEnd() {
-      await onSaveActivities(null, true);
-    }
+    );
   } catch (e) {
     console.log(e);
 

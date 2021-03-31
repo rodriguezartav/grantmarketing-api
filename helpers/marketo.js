@@ -61,7 +61,8 @@ Marketo.getBulkActivities = async function (
   startDate,
   activityTypeIds,
   onLoad,
-  onEnd
+  onEnd,
+  onError
 ) {
   const url = `${integration.application_id.replace("/rest", "")}`;
   let token = await Marketo.get(
@@ -72,7 +73,7 @@ Marketo.getBulkActivities = async function (
   let lastResult;
   let count = 0;
 
-  while (count < 8000 && (!lastResult || lastResult.body.moreResult)) {
+  while (!lastResult || lastResult.body.moreResult) {
     token = (lastResult ? lastResult.body : token).nextPageToken;
     let start = moment();
 
@@ -103,7 +104,7 @@ Marketo.getBulkActivities = async function (
       }
     } catch (e) {
       console.log(JSON.stringify(e));
-      throw e;
+      await onError(e);
     }
   }
 
