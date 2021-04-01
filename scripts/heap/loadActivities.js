@@ -7,12 +7,6 @@ const S3 = require("../../helpers/s3");
 const AWS = require("aws-sdk");
 var firehose = new AWS.Firehose({ region: "us-east-1" });
 
-const { Readable } = require("stream");
-const { AsyncParser } = require("json2csv");
-
-const { Parser } = require("json2csv");
-let allActivities = [];
-
 module.exports = async function Run(integrationMap) {
   try {
     const s3 = new S3();
