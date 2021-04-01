@@ -57,13 +57,14 @@ module.exports = async function Run(integrationMap) {
           var params = {
             Records: activities.map((item) => {
               return {
-                Data: `${item.id},${item.leadId},${item.activityDate},${item.activityTypeId},"${item.primaryAttributeValue}"\n`,
+                Data: `${item.id},${item.leadId},${item.activityDate},${item.activityTypeId},"${item.primaryAttributeValue}",${item.attributes}\n`,
               };
             }),
 
             DeliveryStreamName: "marketoStream" /* required */,
           };
-          await firehose.putRecordBatch(params).promise();
+          const res = await firehose.putRecordBatch(params).promise();
+          console.log("Errors: ", res.FailedPutCount);
 
           manifest.push(lastDate);
           await s3.put(
