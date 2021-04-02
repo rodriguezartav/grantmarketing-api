@@ -59,11 +59,11 @@ module.exports = async function Run(integrationMap) {
               return {
                 Data: `${item.id},${item.leadId},${item.activityDate},${
                   item.activityTypeId
-                },${item.primaryAttributeValue},${JSON.stringify(
+                },"${item.primaryAttributeValue},${JSON.stringify(
                   item.attributes
                 )
                   .split('"')
-                  .join("'")}\n`,
+                  .join("'")}"\n`,
               };
             }),
 
