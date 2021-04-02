@@ -59,13 +59,19 @@ module.exports = async function Run(integrationMap) {
               return {
                 Data: `${item.id},${item.leadId},${item.activityDate},${
                   item.activityTypeId
-                },${item.primaryAttributeValue},${
+                },${item.primaryAttributeValue},${(
                   item.attributes["Client IP Address"] || ""
-                },${item.attributes["Referrer URL"] || ""},${
-                  item.attributes["User Agent"] || ""
-                },${item.attributes["Search Engine"] || ""},${
-                  item.attributes["Webpage URL"] || ""
-                }\n`,
+                )
+                  .split(",")
+                  .join(" ")},${(item.attributes["Referrer URL"] || "")
+                  .split(",")
+                  .join(" ")},${(item.attributes["User Agent"] || "")
+                  .split(",")
+                  .join(" ")},${(item.attributes["Search Engine"] || "")
+                  .split(",")
+                  .join(" ")},${(item.attributes["Webpage URL"] || "")
+                  .split(",")
+                  .join(" ")}\n`,
               };
             }),
 
