@@ -24,7 +24,7 @@ module.exports = async function Run(integrationMap) {
 
     let manifest = await s3.get(
       "customers.jungledynamics.com",
-      `heap/marketo/activities/manifest.json`
+      `heap/marketo/activities-manifest.json`
     );
 
     if (manifest) manifest = JSON.parse(manifest);
@@ -57,7 +57,11 @@ module.exports = async function Run(integrationMap) {
           var params = {
             Records: activities.map((item) => {
               return {
-                Data: `${item.id},${item.leadId},${item.activityDate},${item.activityTypeId},"${item.primaryAttributeValue}",${item.attributes}\n`,
+                Data: `${item.id},${item.leadId},${item.activityDate},${
+                  item.activityTypeId
+                },"${item.primaryAttributeValue}",${JSON.stringify(
+                  item.attributes
+                )}\n`,
               };
             }),
 
@@ -69,7 +73,7 @@ module.exports = async function Run(integrationMap) {
           manifest.push(lastDate);
           await s3.put(
             "customers.jungledynamics.com",
-            `heap/marketo/activities/manifest.json`,
+            `heap/marketo/activities-manifest.json`,
             JSON.stringify(manifest)
           );
         }
