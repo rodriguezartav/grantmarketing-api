@@ -24,7 +24,7 @@ module.exports = async function Run(integrationMap) {
 
     let manifest = await s3.get(
       "customers.jungledynamics.com",
-      `heap/activities/manifest.json`
+      `heap/marketo/activities/manifest.json`
     );
 
     if (manifest) manifest = JSON.parse(manifest);
@@ -64,12 +64,12 @@ module.exports = async function Run(integrationMap) {
             DeliveryStreamName: "marketoStream" /* required */,
           };
           const res = await firehose.putRecordBatch(params).promise();
-          console.log("Errors: ", res.FailedPutCount);
+          console.log("Info: ", res.FailedPutCount);
 
           manifest.push(lastDate);
           await s3.put(
             "customers.jungledynamics.com",
-            `heap/activities/manifest.json`,
+            `heap/marketo/activities/manifest.json`,
             JSON.stringify(manifest)
           );
         }
