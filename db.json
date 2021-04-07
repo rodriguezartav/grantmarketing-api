@@ -1,0 +1,42 @@
+{
+  "AvailabilityZones": ["us-east-1a", "us-east-1b", "us-east-1c"],
+  "BackupRetentionPeriod": 7,
+
+  "DatabaseName": "master",
+  "DBClusterIdentifier": "signalon",
+  "DBClusterParameterGroupName": "default.aurora-postgresql10",
+  "VpcSecurityGroupIds": ["sg-03998740a97270c0c"],
+  "DBSubnetGroupName": "default-vpc-095eb6f727e9bb933",
+  "Engine": "aurora-postgresql",
+  "EngineVersion": "10.12",
+  "Port": 5432,
+  "MasterUsername": "root",
+  "MasterUserPassword": "2wsxzaq1",
+
+  "PreferredBackupWindow": "04:57-05:27",
+  "PreferredMaintenanceWindow": "thu:07:32-thu:08:02",
+  "ReplicationSourceIdentifier": "",
+
+  "StorageEncrypted": true,
+  "KmsKeyId": "arn:aws:kms:us-east-1:182722714341:key/fdae8f88-429b-4308-ac8a-eeb65745e3b8",
+  "PreSignedUrl": "",
+
+  "EngineMode": "serverless",
+  "ScalingConfiguration": {
+    "MinCapacity": 2,
+    "MaxCapacity": 4,
+    "AutoPause": true,
+    "SecondsUntilAutoPause": 600,
+    "TimeoutAction": "RollbackCapacityChange"
+  },
+  "DeletionProtection": true,
+
+  "EnableHttpEndpoint": true,
+  "CopyTagsToSnapshot": true,
+  "Domain": "",
+  "DomainIAMRoleName": "",
+
+  "SourceRegion": ""
+}
+
+//aws rds create-db-cluster --cli-input-json file://./db.json --region us-east-1

@@ -128,7 +128,7 @@ module.exports = async function Run(integrationMap) {
     var invoiceSql = {
       name: item.invoiceNumber || item.creditNoteNumber,
       external_id__c: item.invoiceID || item.creditNoteID,
-      cuenta__c: account ? account.Id : null,
+      cuenta__c: account ? account.id : null,
       total__c: total,
       impuesto__c: impuestos,
       fecha__c: moment(item.date).format("YYYY-MM-DD"),

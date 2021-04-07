@@ -47,6 +47,12 @@ app.use("/integrations/salesforce", cors(), SalesforceIntegration);
 app.use("/integrations/google", cors(), GoogleIntegration);
 app.use("/integrations/slack", cors(), SlackIntegration);
 app.use(
+  "/integrations/mogiSlack",
+  cors(),
+  require("./routes/integrations/mogiSlack")
+);
+
+app.use(
   "/integrations/marketo",
   cors(),
   require("./routes/integrations/marketo")
