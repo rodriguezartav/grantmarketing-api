@@ -71,7 +71,9 @@ module.exports = async function Run(integrationMap) {
                   .split(",")
                   .join(" ")},${(item.attributes["Webpage URL"] || "")
                   .split(",")
-                  .join(" ")}\n`,
+                  .join(" ")},${(
+                  item.attributes["Query Parameters"] || ""
+                ).split(",")}\n`,
               };
             }),
 

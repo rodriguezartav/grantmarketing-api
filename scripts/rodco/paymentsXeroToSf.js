@@ -41,12 +41,12 @@ module.exports = async function Run(integrationMap) {
 
   const facturasMap = {};
   facturas.forEach((item) => {
-    facturasMap[item.external_id__c] = item.Id;
+    facturasMap[item.external_id__c] = item.id;
   });
 
   const clientesMap = {};
   clientes.forEach((item) => {
-    clientesMap[item.external_id__c] = item.Id;
+    clientesMap[item.external_id__c] = item.id;
   });
 
   const sfPayments = [];

@@ -3,7 +3,12 @@ module.exports = async function (knex, customer_id) {
     .table("integrations")
     .select("integrations.*", "providers.name as provider")
     .join("providers", "providers.id", "integrations.provider_id")
-    .where({ customer_id: customer_id });
+    .join("customers", "customers.id", "integrations.customer_id")
+    .where(
+      typeof customer_id == "string" ? "customers.name" : "customer_id",
+      typeof customer_id == "string" ? "ilike" : "=",
+      customer_id
+    );
 
   const integrationTokens = await knex
     .table("integration_tokens")

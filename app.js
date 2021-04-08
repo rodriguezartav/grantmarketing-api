@@ -47,9 +47,9 @@ app.use("/integrations/salesforce", cors(), SalesforceIntegration);
 app.use("/integrations/google", cors(), GoogleIntegration);
 app.use("/integrations/slack", cors(), SlackIntegration);
 app.use(
-  "/integrations/mogiSlack",
+  "/integrations/mogiForSlack",
   cors(),
-  require("./routes/integrations/mogiSlack")
+  require("./routes/integrations/mogiForSlack")
 );
 
 app.use(
@@ -63,6 +63,10 @@ app.use("/webhooks/heroku", require("./routes/webhooks/heroku"));
 app.use("/webhooks/papertrail", require("./routes/webhooks/papertrail"));
 app.use("/webhooks/paddle", require("./routes/webhooks/paddle"));
 app.use("/webhooks/rodco/shopify", require("./routes/webhooks/rodco/shopify"));
+app.use(
+  "/webhooks/signalon/mogi4us",
+  require("./routes/webhooks/signalon/mogi4us")
+);
 
 app.use("/api/login", cors(), Login);
 app.use("/api/userLogin", cors(), UserLogin);

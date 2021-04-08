@@ -31,7 +31,8 @@ router.get("/callback", async function (req, res, next) {
     }
 
     const oauthRes = await superagent
-      .post("https://slack.com/api/oauth.access")
+      .post("https://slack.com/api/oauth.v2.access")
+      .type("form")
 
       .send({
         code: req.query.code,
@@ -44,10 +45,8 @@ router.get("/callback", async function (req, res, next) {
       .table("integrations")
       .update({
         is_connected: true,
-        external_user_id: oauthRes.body.bot
-          ? oauthRes.body.bot.bot_user_id
-          : null,
-        api_key: oauthRes.body.bot ? oauthRes.body.bot.bot_access_token : null,
+        external_user_id: oauthRes.body.authed_user.id,
+        api_key: oauthRes.body.authed_user.access_token,
         auth_token: oauthRes.body.access_token,
         expiry_date: moment().add(1000, "months"),
       })
@@ -77,7 +76,7 @@ router.get("/:customer_id", async function (req, res, next) {
     .where("providers.name", "mogiForSlack")
     .first();
 
-  const url = `https://slack.com/oauth/v2/authorize?scope=chat:write&client_id=${integrationToken.client_id}&redirect_uri=${process.env.API_URL}/integrations/mogiForSlack/callback&state=${req.params.customer_id}`;
+  const url = `https://slack.com/oauth/v2/authorize?scope=chat:write,chat:write.customize,commands,im:write,im:read,groups:read,users:read,users:write,users:read.email,pins:write,app_mentions:read,channels:join,channels:manage,files:write,incoming-webhook&user_scope=chat:write&client_id=${integrationToken.client_id}&redirect_uri=${process.env.API_URL}/integrations/mogiForSlack/callback&state=${req.params.customer_id}`;
 
   res.redirect(url);
 });
