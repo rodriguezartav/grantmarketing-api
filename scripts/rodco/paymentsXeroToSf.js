@@ -6,13 +6,13 @@ module.exports = async function Run(integrationMap) {
   let xeroPayments = await xeroApi(
     integrationMap["xero"],
     "getPayments",
-    moment().add(-4, "d")
+    moment().add(-45, "d")
   );
 
   let xeroBatchPayments = await xeroApi(
     integrationMap["xero"],
     "getBatchPayments",
-    moment().add(-4, "d").toDate()
+    moment().add(-45, "d").toDate()
   );
 
   const referenceMap = {};
