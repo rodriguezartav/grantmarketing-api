@@ -71,13 +71,13 @@ module.exports = async function (body, res) {
         {
           type: "section",
           text: {
-            type: "mrkdwn",
+            type: "plain_text",
             emoji: true,
             text:
-              "*Message sent to " +
+              "* Message sent to " +
               state.values.customer_select_section.customer_select
                 .selected_option.value +
-              "*",
+              " *",
           },
         },
         {
