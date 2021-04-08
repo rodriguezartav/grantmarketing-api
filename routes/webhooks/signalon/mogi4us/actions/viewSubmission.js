@@ -91,5 +91,7 @@ module.exports = async function (body, res) {
       ],
     });
 
+  console.log("NOTICE", sres.body, sres.text);
+
   return true;
 };
