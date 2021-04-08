@@ -38,9 +38,16 @@ module.exports = async function (body, res) {
             type: "static_select",
             placeholder: {
               type: "plain_text",
-              text: "Select an item",
+              text: "Select a customer",
             },
             options: [
+              {
+                text: {
+                  type: "plain_text",
+                  text: "SignalOn",
+                },
+                value: "signalon",
+              },
               {
                 text: {
                   type: "plain_text",
