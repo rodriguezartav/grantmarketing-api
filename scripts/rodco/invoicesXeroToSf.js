@@ -2,7 +2,7 @@ const moment = require("moment");
 const { xeroApi, redis } = require("../../helpers/xero");
 const { sfConn, bulk, query } = require("../../helpers/sf");
 
-const DAYS = 2;
+const DAYS = 45;
 
 module.exports = async function Run(integrationMap) {
   let productCosts = {};
