@@ -151,7 +151,9 @@ module.exports = async function Run(integrationMap) {
     throw new Error("Not all Facturas where save in Salesforce " + errors);
 
   const facturasMap = {};
-  facturaItems.forEach((item) => (facturasMap[item.external_id__c] = item.id));
+  facturaItems.forEach((item) => {
+    return (facturasMap[item.external_id__c] = item.id);
+  });
 
   const lineItems = [];
 

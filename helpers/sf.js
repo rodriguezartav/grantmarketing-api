@@ -149,9 +149,9 @@ async function bulk(conn, objectName, operation, externalIdFieldName, arr) {
     });
 
   results = results.map((item) => {
-    const result = { id: item.sf__Id };
+    let result = { id: item.sf__Id };
     if (externalIdFieldName)
-      results[externalIdFieldName] = item[externalIdFieldName];
+      result[externalIdFieldName] = item[externalIdFieldName];
     return result;
   });
 
