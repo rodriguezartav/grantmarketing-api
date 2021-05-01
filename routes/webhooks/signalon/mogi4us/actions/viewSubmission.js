@@ -11,8 +11,12 @@ module.exports = async function (body, res) {
   res.send({});
 
   const private_metadata = JSON.parse(view.private_metadata);
+  console.log(state);
 
-  const integrationMap = await IntegrationMap(Knex(), "jungledynamics");
+  const integrationMap = await IntegrationMap(
+    Knex(),
+    state.values.customer_select_section.customer_select.selected_option
+  );
 
   const slack = await Slack(integrationMap["mogiForSlack"]);
 

@@ -69,7 +69,7 @@ module.exports = async function (body, res) {
                   type: "plain_text",
                   text: "JungleDynamics",
                 },
-                value: "JungleDynamics",
+                value: "jungledynamics",
               },
             ],
           },
