@@ -63,36 +63,13 @@ router.get("/callback", async function (req, res, next) {
 
     console.log("NOTICE", sresCreateChannel.body, sresCreateChannel.text);
     try {
-      const sresChannel = await superagent
-        .post("https://slack.com/api/conversations.join")
-        .auth(oauthRes.body.access_token, {
-          type: "bearer",
-        })
-        .send({
-          channel: sresCreateChannel.body.channel.id,
-        });
-
-      console.log("NOTICE", sresChannel.body, sresChannel.text);
-
-      const channels = await superagent
-        .post("https://slack.com/api/conversations.list")
-        .auth(oauthRes.body.access_token, {
-          type: "bearer",
-        })
-        .send({
-          limit: 1000,
-          types: "public_channel",
-        });
-
       const sres1 = await request
         .post("https://slack.com/api/chat.postMessage")
         .auth(integrationMap.mogiForSlack.auth_token, {
           type: "bearer",
         })
         .send({
-          channel: channels.body.filter(
-            (item) => item.name == "mogi_insights"
-          )[0].id,
+          channel: channels.body.filter((item) => item.name == "general")[0].id,
           text: "Welcome to Mogi, join #mogi_insights",
           blocks: [
             {
