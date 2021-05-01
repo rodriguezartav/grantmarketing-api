@@ -64,6 +64,8 @@ module.exports = async function (body, res) {
       ],
     });
 
+  console.log("NOTICE", sres1.body, sres1.text);
+
   const sres = await request
     .post("https://slack.com/api/chat.postMessage")
     .auth(process.env.MOGI_SLACK_BOT_TOKEN, {
