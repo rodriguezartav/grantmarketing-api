@@ -6,12 +6,12 @@ module.exports = async function Rds(integration) {
   console.log("creating slack connection");
 
   // Initialize
-  const web = new WebClient(process.env.SLACK_TOKEN || integration.auth_token);
+  const web = new WebClient(integration.auth_token || process.env.SLACK_TOKEN);
   web.channelsMap = {};
 
-  if (channelsByToken[process.env.SLACK_TOKEN || integration.auth_token])
+  if (channelsByToken[integration.auth_token || process.env.SLACK_TOKEN])
     web.channels =
-      channelsByToken[process.env.SLACK_TOKEN || integration.auth_token];
+      channelsByToken[integration.auth_token || process.env.SLACK_TOKEN];
   else {
     console.log("Loading Slack Channels");
     const result = await web.conversations.list({
@@ -19,7 +19,7 @@ module.exports = async function Rds(integration) {
     });
 
     web.channels = result.channels;
-    channelsByToken[process.env.SLACK_TOKEN || integration.auth_token] =
+    channelsByToken[integration.auth_token || process.env.SLACK_TOKEN] =
       result.channels;
   }
   web.channels.forEach((item) => (web.channelsMap[item.name] = item));

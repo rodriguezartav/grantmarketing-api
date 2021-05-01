@@ -39,7 +39,7 @@ module.exports = async function (body, res) {
       type: "bearer",
     })
     .send({
-      channel: slack.channels.filter((item) => item.name == "general")[0].id,
+      channel: slack.generalChannelId,
       text: private_metadata.message.text,
       blocks: [
         {
