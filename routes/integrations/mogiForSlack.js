@@ -98,7 +98,7 @@ router.get("/:customer_id", async function (req, res, next) {
     .where("providers.name", "mogiForSlack")
     .first();
 
-  const url = `https://slack.com/oauth/v2/authorize?scope=chat:write,chat:write.customize,commands,im:write,im:read,groups:read,users:read,users:write,users:read.email,pins:write,app_mentions:read,channels:write,channels:read,channels:join,channels:manage,files:write,incoming-webhook&user_scope=chat:write&client_id=${integrationToken.client_id}&redirect_uri=${process.env.API_URL}/integrations/mogiForSlack/callback&state=${req.params.customer_id}`;
+  const url = `https://slack.com/oauth/v2/authorize?scope=chat:write,chat:write.customize,commands,im:write,im:read,groups:read,users:read,users:write,users:read.email,pins:write,app_mentions:read,channels:read,channels:join,channels:manage,files:write,incoming-webhook&user_scope=chat:write&client_id=${integrationToken.client_id}&redirect_uri=${process.env.API_URL}/integrations/mogiForSlack/callback&state=${req.params.customer_id}`;
 
   res.redirect(url);
 });
