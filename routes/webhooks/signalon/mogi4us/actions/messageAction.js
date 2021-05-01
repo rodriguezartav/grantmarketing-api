@@ -13,7 +13,7 @@ module.exports = async function (body, res) {
             ? message.files.map((item) => {
                 return { id: item.id, permalink_public: item.permalink_public };
               })
-            : [],
+            : null,
         },
         channel,
       }),
@@ -80,7 +80,7 @@ module.exports = async function (body, res) {
 
   const sres = await request
     .post("https://slack.com/api/views.open")
-    .auth("xoxb-1029697359297-1958173099952-rpSy4Wh1Y5oJK6MaGlyBXY6P", {
+    .auth(process.env.MOGI_SLACK_BOT_TOKEN, {
       type: "bearer",
     })
     .send(payload);

@@ -19,12 +19,9 @@ module.exports = async function (body, res) {
   if (private_metadata.message.files.length > 0)
     await request
       .post("https://slack.com/api/files.sharedPublicURL")
-      .auth(
-        "xoxp-1029697359297-1738488455956-1940535631316-abbcbe3a224467273c547f98feafe3a4",
-        {
-          type: "bearer",
-        }
-      )
+      .auth(process.env.MOGI_SLACK_USER_TOKEN, {
+        type: "bearer",
+      })
       .send({
         file: private_metadata.message.files[0].id,
       });
@@ -61,7 +58,7 @@ module.exports = async function (body, res) {
 
   const sres = await request
     .post("https://slack.com/api/chat.postMessage")
-    .auth("xoxb-1029697359297-1958173099952-rpSy4Wh1Y5oJK6MaGlyBXY6P", {
+    .auth(process.env.MOGI_SLACK_BOT_TOKEN, {
       type: "bearer",
     })
     .send({
