@@ -9,9 +9,11 @@ module.exports = async function (body, res) {
       private_metadata: JSON.stringify({
         message: {
           text: message.text,
-          files: message.files.map((item) => {
-            return { id: item.id, permalink_public: item.permalink_public };
-          }),
+          files: message.files
+            ? message.files.map((item) => {
+                return { id: item.id, permalink_public: item.permalink_public };
+              })
+            : [],
         },
         channel,
       }),

@@ -16,17 +16,18 @@ module.exports = async function (body, res) {
 
   const slack = await Slack(integrationMap["mogiForSlack"]);
 
-  const fshare = await request
-    .post("https://slack.com/api/files.sharedPublicURL")
-    .auth(
-      "xoxp-1029697359297-1738488455956-1940535631316-abbcbe3a224467273c547f98feafe3a4",
-      {
-        type: "bearer",
-      }
-    )
-    .send({
-      file: private_metadata.message.files[0].id,
-    });
+  if (private_metadata.message.files.length > 0)
+    await request
+      .post("https://slack.com/api/files.sharedPublicURL")
+      .auth(
+        "xoxp-1029697359297-1738488455956-1940535631316-abbcbe3a224467273c547f98feafe3a4",
+        {
+          type: "bearer",
+        }
+      )
+      .send({
+        file: private_metadata.message.files[0].id,
+      });
 
   const sres1 = await request
     .post("https://slack.com/api/chat.postMessage")
@@ -46,13 +47,15 @@ module.exports = async function (body, res) {
           },
         },
 
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `*Email Insights* Checkout the latest insights from Mogi. ${private_metadata.message.files[0].permalink_public} `,
-          },
-        },
+        private_metadata.message.files.length > 0
+          ? {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: `*Email Insights* Checkout the latest insights from Mogi. ${private_metadata.message.files[0].permalink_public} `,
+              },
+            }
+          : {},
       ],
     });
 
