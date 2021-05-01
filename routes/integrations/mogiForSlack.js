@@ -79,7 +79,7 @@ router.get("/callback", async function (req, res, next) {
           type: "bearer",
         })
         .send({
-          channel: channels.body.filter(
+          channel: channels.body.channels.filter(
             (item) => item.name == "mogi_insights"
           )[0].id,
         });
@@ -92,8 +92,8 @@ router.get("/callback", async function (req, res, next) {
           type: "bearer",
         })
         .send({
-          channel: channels.body.filter(
-            (item) => item.name == "mogi_insights"
+          channel: channels.body.channels.filter(
+            (item) => item.name == "general"
           )[0].id,
           text: "Welcome to Mogi, join #mogi_insights",
           blocks: [
