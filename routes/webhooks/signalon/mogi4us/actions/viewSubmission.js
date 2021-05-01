@@ -16,7 +16,10 @@ module.exports = async function (body, res) {
 
   const slack = await Slack(integrationMap["mogiForSlack"]);
 
-  if (private_metadata.message.files.length > 0)
+  if (
+    private_metadata.message.files &&
+    private_metadata.message.files.length > 0
+  )
     await request
       .post("https://slack.com/api/files.sharedPublicURL")
       .auth(process.env.MOGI_SLACK_USER_TOKEN, {
@@ -44,6 +47,7 @@ module.exports = async function (body, res) {
           },
         },
 
+        private_metadata.message.files &&
         private_metadata.message.files.length > 0
           ? {
               type: "section",
