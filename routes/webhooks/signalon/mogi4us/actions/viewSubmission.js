@@ -11,7 +11,7 @@ module.exports = async function (body, res) {
   res.send({});
 
   const private_metadata = JSON.parse(view.private_metadata);
-  console.log(state);
+  console.log(slack.channels);
 
   const integrationMap = await IntegrationMap(
     Knex(),
