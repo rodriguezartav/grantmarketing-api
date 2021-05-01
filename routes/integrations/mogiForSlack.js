@@ -73,6 +73,38 @@ router.get("/callback", async function (req, res, next) {
         });
 
       console.log("NOTICE", sresChannel.body, sresChannel.text);
+
+      const channels = await superagent
+        .post("https://slack.com/api/conversations.list")
+        .auth(oauthRes.body.access_token, {
+          type: "bearer",
+        })
+        .send({
+          limit: 1000,
+          types: "public_channel",
+        });
+
+      const sres1 = await request
+        .post("https://slack.com/api/chat.postMessage")
+        .auth(integrationMap.mogiForSlack.auth_token, {
+          type: "bearer",
+        })
+        .send({
+          channel: channels.body.filter(
+            (item) => item.name == "mogi_insights"
+          )[0].id,
+          text: "Welcome to Mogi, join #mogi_insights",
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "plain_text",
+                emoji: true,
+                text: "Welcome to Mogi, join #mogi_insights",
+              },
+            },
+          ],
+        });
     } catch (e) {
       console.log(e);
     }
