@@ -2,7 +2,7 @@ const { WebClient } = require("@slack/web-api");
 
 const channelsByToken = {};
 
-module.exports = async function Rds(integration) {
+module.exports = async function Rds(integration = {}) {
   console.log("creating slack connection");
 
   // Initialize
