@@ -15,7 +15,7 @@ module.exports = async function (body, res) {
 
   const integrationMap = await IntegrationMap(
     Knex(),
-    state.values.customer_select_section.customer_select.selected_option
+    state.values.customer_select_section.customer_select.selected_option.value
   );
 
   const slack = await Slack(integrationMap["mogiForSlack"]);
