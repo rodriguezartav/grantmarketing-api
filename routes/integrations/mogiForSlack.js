@@ -63,7 +63,7 @@ router.get("/callback", async function (req, res, next) {
 
     console.log("NOTICE", sresCreateChannel.body, sresCreateChannel.text);
     try {
-      const sres1 = await request
+      const sres1 = await superagent
         .post("https://slack.com/api/chat.postMessage")
         .auth(integrationMap.mogiForSlack.auth_token, {
           type: "bearer",
