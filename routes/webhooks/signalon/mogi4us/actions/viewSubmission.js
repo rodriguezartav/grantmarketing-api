@@ -33,6 +33,17 @@ module.exports = async function (body, res) {
         file: private_metadata.message.files[0].id,
       });
 
+  const sresChannel = await request
+    .post("https://slack.com/api/conversations.join")
+    .auth(integrationMap.mogiForSlack.auth_token, {
+      type: "bearer",
+    })
+    .send({
+      channel: slack.generalChannelId,
+    });
+
+  console.log("NOTICE", sresChannel.body, sresChannel.text);
+
   const sres1 = await request
     .post("https://slack.com/api/chat.postMessage")
     .auth(integrationMap.mogiForSlack.auth_token, {
