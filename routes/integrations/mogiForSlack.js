@@ -70,6 +70,7 @@ router.get("/callback", async function (req, res, next) {
         })
         .send({
           limit: 1000,
+          exclude_archived: true,
           types: "public_channel",
         });
 
