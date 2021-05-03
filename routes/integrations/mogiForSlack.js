@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const Knex = require("../../helpers/knex");
+const Slack = require("../../helpers/slack");
 const moment = require("moment");
 const superagent = require("superagent");
 
@@ -41,16 +42,20 @@ router.get("/callback", async function (req, res, next) {
         redirect_uri: `${process.env.API_URL}/integrations/mogiForSlack/callback`,
       });
 
+    const updatedIntegration = {
+      is_connected: true,
+      external_user_id: oauthRes.body.authed_user.id,
+      api_key: oauthRes.body.authed_user.access_token,
+      auth_token: oauthRes.body.access_token,
+      expiry_date: moment().add(1000, "months"),
+    };
+
     await Knex()
       .table("integrations")
-      .update({
-        is_connected: true,
-        external_user_id: oauthRes.body.authed_user.id,
-        api_key: oauthRes.body.authed_user.access_token,
-        auth_token: oauthRes.body.access_token,
-        expiry_date: moment().add(1000, "months"),
-      })
+      .update(updatedIntegration)
       .where("id", integration.id);
+
+    const slack = Slack(updatedIntegration);
 
     const sresCreateChannel = await superagent
       .post("https://slack.com/api/conversations.create")
@@ -63,17 +68,6 @@ router.get("/callback", async function (req, res, next) {
 
     console.log("NOTICE", sresCreateChannel.body, sresCreateChannel.text);
     try {
-      const channels = await superagent
-        .post("https://slack.com/api/conversations.list")
-        .auth(oauthRes.body.access_token, {
-          type: "bearer",
-        })
-        .send({
-          limit: 1000,
-          exclude_archived: true,
-          types: "public_channel",
-        });
-
       try {
         const sresChannel = await superagent
           .post("https://slack.com/api/conversations.join")
@@ -81,14 +75,10 @@ router.get("/callback", async function (req, res, next) {
             type: "bearer",
           })
           .send({
-            channel: channels.body.channels.filter((item) => {
-              console.log(item.name);
-              return item.name == "mogi_insights";
-            })[0].id,
+            channel: slack.channelsMap["mogi_insights"],
           });
+        console.log("NOTICE", sresChannel.body, sresChannel.text);
       } catch (e) {}
-
-      console.log("NOTICE", sresChannel.body, sresChannel.text);
 
       const sres1 = await request
         .post("https://slack.com/api/chat.postMessage")
@@ -96,9 +86,7 @@ router.get("/callback", async function (req, res, next) {
           type: "bearer",
         })
         .send({
-          channel: channels.body.channels.filter(
-            (item) => item.name == "general"
-          )[0].id,
+          channel: slack.generalChannelId,
           text: "Welcome to Mogi, join #mogi_insights",
           blocks: [
             {
