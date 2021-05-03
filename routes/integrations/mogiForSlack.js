@@ -55,7 +55,7 @@ router.get("/callback", async function (req, res, next) {
       .update(updatedIntegration)
       .where("id", integration.id);
 
-    const slack = Slack(updatedIntegration);
+    const slack = await Slack(updatedIntegration);
 
     const sresCreateChannel = await superagent
       .post("https://slack.com/api/conversations.create")
