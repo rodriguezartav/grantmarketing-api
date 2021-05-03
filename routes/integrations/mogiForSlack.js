@@ -94,9 +94,8 @@ router.get("/callback", async function (req, res, next) {
             {
               type: "section",
               text: {
-                type: "plain_text",
-                emoji: true,
-                text: `Hi <!everyone>! Mogi has just been installed on your Slack , join the <#${slack.channelsMap["mogi_insights"].id}> channel to receive marketing analytics insights and alerts.`,
+                type: "mrkdwn",
+                text: `Hi <!everyone>, Mogi has just been installed on your Slack , join the <#${slack.channelsMap["mogi_insights"].id}|mogi_insights> channel to receive marketing analytics insights and alerts.`,
               },
             },
           ],
