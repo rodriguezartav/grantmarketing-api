@@ -16,6 +16,7 @@ module.exports = async function Rds(integration = {}) {
     console.log("Loading Slack Channels");
     const result = await web.conversations.list({
       types: "public_channel",
+      exclude_archived: true,
     });
 
     web.channels = result.channels;
