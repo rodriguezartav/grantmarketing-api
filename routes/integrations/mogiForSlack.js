@@ -74,17 +74,19 @@ router.get("/callback", async function (req, res, next) {
           types: "public_channel",
         });
 
-      const sresChannel = await superagent
-        .post("https://slack.com/api/conversations.join")
-        .auth(oauthRes.body.access_token, {
-          type: "bearer",
-        })
-        .send({
-          channel: channels.body.channels.filter((item) => {
-            console.log(item.name);
-            return item.name == "mogi_insights";
-          })[0].id,
-        });
+      try {
+        const sresChannel = await superagent
+          .post("https://slack.com/api/conversations.join")
+          .auth(oauthRes.body.access_token, {
+            type: "bearer",
+          })
+          .send({
+            channel: channels.body.channels.filter((item) => {
+              console.log(item.name);
+              return item.name == "mogi_insights";
+            })[0].id,
+          });
+      } catch (e) {}
 
       console.log("NOTICE", sresChannel.body, sresChannel.text);
 
