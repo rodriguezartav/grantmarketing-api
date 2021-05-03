@@ -55,8 +55,6 @@ router.get("/callback", async function (req, res, next) {
       .update(updatedIntegration)
       .where("id", integration.id);
 
-    const slack = await Slack(updatedIntegration);
-
     const sresCreateChannel = await superagent
       .post("https://slack.com/api/conversations.create")
       .auth(oauthRes.body.access_token, {
@@ -65,6 +63,10 @@ router.get("/callback", async function (req, res, next) {
       .send({
         name: "mogi_insights",
       });
+
+    const slack = await Slack(updatedIntegration);
+
+    console.log(slack.channelsMap);
 
     console.log("NOTICE", sresCreateChannel.body, sresCreateChannel.text);
     try {
@@ -75,7 +77,7 @@ router.get("/callback", async function (req, res, next) {
             type: "bearer",
           })
           .send({
-            channel: slack.channelsMap["mogi_insights"],
+            channel: slack.channelsMap["mogi_insights"].id,
           });
         console.log("NOTICE", sresChannel.body, sresChannel.text);
       } catch (e) {}
@@ -86,7 +88,7 @@ router.get("/callback", async function (req, res, next) {
           type: "bearer",
         })
         .send({
-          channel: slack.generalChannelId,
+          channel: slack.channelsMap["general"].id,
           text: "Welcome to Mogi, join #mogi_insights",
           blocks: [
             {
