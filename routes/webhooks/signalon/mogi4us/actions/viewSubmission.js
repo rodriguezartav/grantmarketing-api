@@ -39,7 +39,7 @@ module.exports = async function (body, res) {
       type: "bearer",
     })
     .send({
-      channel: slack.generalChannelId,
+      channel: slack.channelsMap["mogi_insights"].id,
       text: private_metadata.message.text,
       blocks: [
         {

@@ -89,6 +89,8 @@ router.get("/callback", async function (req, res, next) {
         })
         .send({
           channel: slack.channelsMap["general"].id,
+          parse: "full",
+          unfurl_links: true,
           text: "Welcome to Mogi, join #mogi_insights",
           blocks: [
             {
