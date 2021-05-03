@@ -79,9 +79,10 @@ router.get("/callback", async function (req, res, next) {
           type: "bearer",
         })
         .send({
-          channel: channels.body.channels.filter(
-            (item) => item.name == "mogi_insights"
-          )[0].id,
+          channel: channels.body.channels.filter((item) => {
+            console.log(item.name);
+            return item.name == "mogi_insights";
+          })[0].id,
         });
 
       console.log("NOTICE", sresChannel.body, sresChannel.text);
