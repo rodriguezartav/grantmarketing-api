@@ -14,8 +14,9 @@ var JWTMiddleware = function (req, res, next) {
 
   const decodedToken = Jwt.decode(token);
   if (
-    !decodedToken.timestamp ||
-    !moment(decodedToken.timestamp).isSame(moment(), "day")
+    !decodedToken.expiry_date &&
+    (!decodedToken.timestamp ||
+      !moment(decodedToken.timestamp).isSame(moment(), "day"))
   )
     return next({ status: 403, message: "Token is expired" });
   req.user = decodedToken;

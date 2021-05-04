@@ -17,7 +17,7 @@ router.post("/getCode", async function (req, res, next) {
       countryCode: req.body.countryCode,
     });
 
-    if (user) return res.send({ succes: true });
+    if (user) return res.send({ success: true });
     else {
       await sms("Login Error " + JSON.stringify(req.body), "+50684191862");
       return next({
