@@ -16,6 +16,8 @@ function makeRouter(map = {}, more = {}) {
     router.post("/action/" + itemName, more[itemName]);
     router.get("/action/" + itemName, more[itemName]);
   });
+
+  router.get("/getList", map["getList"] || getList);
   router.post("/getList", map["getList"] || getList);
   router.post("/getMany", map["getMany"] || getMany);
   router.post("/getManyReference", map["getManyReference"] || getManyReference);
