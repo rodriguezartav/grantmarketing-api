@@ -7,6 +7,7 @@ const numeral = require("numeral");
 const jwt_decode = require("jwt-decode");
 const IntegrationMap = require("../../../helpers/integrationMap");
 const CustomerIO = require("../../../helpers/customerio");
+const Slack = require("../../../helpers/slack");
 const { sfConn, bulk, query, insertContact } = require("../../../helpers/sf");
 
 const request = require("superagent");
@@ -16,6 +17,7 @@ router.post("/", async function ({ body }, res, next) {
   const integrationMap = await IntegrationMap(knex, 1);
   const conn = await sfConn(integrationMap["salesforce"]);
   const cio = CustomerIO(integrationMap["customerio"]);
+  const slack = Slack(integrationMap["slack"]);
 
   let identification = null;
   let mobile = null;
@@ -70,16 +72,12 @@ router.post("/", async function ({ body }, res, next) {
     if (discount_codes.length > 0)
       await cio.track(contact.id, { name: discount_codes[0].code });
 
-    await request
-      .post(
-        "https://hooks.slack.com/services/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"
-      )
-      .send({
-        username: "Shopify",
-        text: `Venta Shopify de ${customerName} por ${numeral(
-          total_price
-        ).format("0,0")} ${order_status_url}`,
-      });
+    await slack.chat.postMessage({
+      text: `Venta Shopify de ${customerName} por ${numeral(total_price).format(
+        "0,0"
+      )} ${order_status_url}`,
+      channel: slack.generalChannelId,
+    });
   } catch (e) {
     console.log(e);
   }
