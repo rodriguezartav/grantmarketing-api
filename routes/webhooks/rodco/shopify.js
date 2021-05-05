@@ -72,6 +72,7 @@ router.post("/", async function ({ body }, res, next) {
     if (discount_codes.length > 0)
       await cio.track(contact.id, { name: discount_codes[0].code });
 
+    console.log(slack);
     await slack.chat.postMessage({
       text: `Venta Shopify de ${customerName} por ${numeral(total_price).format(
         "0,0"
