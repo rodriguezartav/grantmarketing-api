@@ -17,7 +17,7 @@ router.post("/", async function ({ body }, res, next) {
   const integrationMap = await IntegrationMap(knex, 1);
   const conn = await sfConn(integrationMap["salesforce"]);
   const cio = CustomerIO(integrationMap["customerio"]);
-  const slack = Slack(integrationMap["slack"]);
+  const slack = await Slack(integrationMap["slack"]);
 
   let identification = null;
   let mobile = null;
