@@ -33,7 +33,7 @@ router.get("/callback", async function (req, res, next) {
         integration.application_id = integration_tokens.application_id;
     }
 
-console.log(integration, req.query.code)
+    console.log(integration, req.query.code)
 
     const oauthRes = await superagent
       .post("https://slack.com/api/oauth.access")
