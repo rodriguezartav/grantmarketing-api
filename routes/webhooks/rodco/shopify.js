@@ -74,7 +74,7 @@ router.post("/", async function ({ body }, res, next) {
 
     console.log(slack);
 
-    await request
+    const resslack = await request
       .post("https://slack.com/api/chat.postMessage")
       .auth(integrationMap["slack"].auth_token, {
         type: "bearer",
@@ -85,6 +85,7 @@ router.post("/", async function ({ body }, res, next) {
           total_price
         ).format("0,0")}`,
       });
+      console.log(resslack.body||resslack.text)
   } catch (e) {
     console.log(e);
   }
