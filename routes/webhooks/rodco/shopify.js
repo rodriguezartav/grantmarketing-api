@@ -72,7 +72,7 @@ router.post("/", async function ({ body }, res, next) {
     if (discount_codes.length > 0)
       await cio.track(contact.id, { name: discount_codes[0].code });
 
-    console.log(slack);
+    console.log(integrationMap);
 
     const resslack = await request
       .post("https://slack.com/api/chat.postMessage")
