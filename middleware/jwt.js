@@ -7,8 +7,6 @@ var JWTMiddleware = function (req, res, next) {
     req.headers.Authorization ||
     req.query.authorization;
 
-  console.log(token, req);
-
   if (!token)
     return next({
       status: 403,
