@@ -73,12 +73,18 @@ router.post("/", async function ({ body }, res, next) {
       await cio.track(contact.id, { name: discount_codes[0].code });
 
     console.log(slack);
-    await slack.chat.postMessage({
-      text: `Venta Shopify de ${customerName} por ${numeral(total_price).format(
-        "0,0"
-      )} ${order_status_url}`,
-      channel: slack.generalChannelId,
-    });
+
+    await request
+      .post("https://slack.com/api/chat.postMessage")
+      .auth(integrationMap["slack"].auth_token, {
+        type: "bearer",
+      })
+      .send({
+        channel: slack.generalChannelId,
+        text: `Venta Shopify de ${customerName} por ${numeral(
+          total_price
+        ).format("0,0")}`,
+      });
   } catch (e) {
     console.log(e);
   }

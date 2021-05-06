@@ -5,7 +5,10 @@ const client = require("twilio")(accountSid, authToken);
 module.exports = function sms(msg, phone) {
   return client.messages.create({
     body: msg,
-    from: process.env.TWILIO_NUMBER,
+    from:
+      phone.indexOf("whatsapp") > -1
+        ? "whatsapp:" + process.env.TWILIO_NUMBER
+        : process.env.TWILIO_NUMBER,
     to: phone,
   });
 };
