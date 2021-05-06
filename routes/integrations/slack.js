@@ -45,7 +45,7 @@ router.get("/callback", async function (req, res, next) {
         redirect_uri: `${process.env.API_URL}/integrations/slack/callback`,
       });
 
-  console.log(oauthRes.body)
+   console.log(oauthRes.body)
       
     await Knex()
       .table("integrations")
