@@ -36,8 +36,8 @@ router.get("/callback", async function (req, res, next) {
     console.log(integration, req.query.code)
 
     const oauthRes = await superagent
-      .post("https://slack.com/api/oauth.access")
-
+      .post("https://slack.com/api/oauth.v2.access")
+      .type("form")
       .send({
         code: req.query.code,
         client_id: integration.client_id,
@@ -45,7 +45,7 @@ router.get("/callback", async function (req, res, next) {
         redirect_uri: `${process.env.API_URL}/integrations/slack/callback`,
       });
 
-console.log(oauthRes.body)
+  console.log(oauthRes.body)
       
     await Knex()
       .table("integrations")
