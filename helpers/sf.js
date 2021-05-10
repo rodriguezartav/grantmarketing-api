@@ -6,10 +6,28 @@ const CSV = require("csvtojson");
 
 async function sfConn(integration) {
   console.log("creating salesforce connection");
+  if(!integration) return new jsforce.Connection();
   return new jsforce.Connection({
     instanceUrl: integration.application_id,
     accessToken: integration.auth_token,
   });
+}
+
+async function loginWithPassword(conn, integration){
+
+  function promise(resolve,reject){
+    conn.login(
+      integration.client_id,
+      integration.client_secret,
+      function (err, userInfo) {
+        if(err) return reject(err);
+        resolve(userInfo)
+      }
+    );
+    
+  }
+  return new Promise(promise);
+
 }
 
 async function insertContact(conn, contact, insertCompany) {
@@ -218,6 +236,7 @@ module.exports = {
   bulk,
   insertContact,
   insert,
+  loginWithPassword,
   update,
   query,
   sfConn,
