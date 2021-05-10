@@ -32,8 +32,7 @@ const fs = require("fs");
 
     if(key == "last") return false;
 
-    fs.writeFileSync("./eth.json",JSON.stringify(balance.result[key]));
-
+ 
     const nameKey = key.replace("X","").replace("ZUSD","");
     const last =balance.result[key][balance.result[key].length-1];
     const time = last[0];
