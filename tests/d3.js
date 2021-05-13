@@ -43,8 +43,6 @@ function d3Draw() {
     .x(d => x(moment(d.date ).toDate()))
     .y(d => y(d.upper))
   
-
-
     svg
       .append("path")
       .attr("d", line(data))
