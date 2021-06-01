@@ -58,11 +58,11 @@ module.exports = async function Run(integrationMap) {
 
     const update = shopifyProducts
       .filter((item) => {
-        const filter = sfItemsIndex[item.sku] == null;
-        sfItemsIndex[item.sku] = item;
-        if (!filter)
+        if (sfItemsIndex[item.sku]){
+          sfItemsIndex[item.sku] = item;
           console.log("NOTIFY", "Duplicated SKU in Shopify", item.sku, item);
-        return filter;
+        }
+        return sfItemsIndex[item.sku] == null;
       })
       .map((item) => {
         let allMapped = true;
