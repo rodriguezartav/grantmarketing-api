@@ -81,7 +81,7 @@ module.exports = async function Run(integrationMap) {
               id: variant.id,
               sku: sku,
               inventory_item_id: variant.inventory_item_id,
-              price: parseInt(product.precio_mayoreo__c * 100) / 100,
+              price: parseInt(product.precio_mayoreo__c / 0.6 * 100) / 100,
             };
           } else {
             //console.log(
