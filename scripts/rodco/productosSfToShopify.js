@@ -89,14 +89,13 @@ module.exports = async function Run(integrationMap) {
             //item.handle,
             //item.variants.map((variant) => variant.sku).join(",")
             //);
-            allMapped = false;
-            return null;
+             return variant;
           }
         });
 
         return {
           id: item.id,
-          variants: allMapped ? newVariants : item.variants,
+          variants:   newVariants  ,
           published: allMapped,
         };
       });
