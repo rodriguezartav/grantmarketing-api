@@ -15,6 +15,7 @@ module.exports = async function Run(integrationMap) {
       email__c: item.emailAddress,
     };
 
+    console.log(item.paymentTerms);
     if (
       item.paymentTerms &&
       item.paymentTerms.sales &&
