@@ -8,8 +8,6 @@ module.exports = async function Run(integrationMap) {
   const conn = await sfConn(integrationMap["salesforce"]);
 
   const items = itemsGetResponse.contacts.map((item) => {
-    console.log(JSON.stringify(item));
-
     var customerSql = {
       name: item.name,
       number__c: item.taxNumber,
@@ -20,9 +18,10 @@ module.exports = async function Run(integrationMap) {
     if (
       item.paymentTerms &&
       item.paymentTerms.sales &&
-      item.paymentTerm.sales.day
-    )
+      item.paymentTerms.sales.day
+    ) {
       customerSql.credito_dias__c = item.paymentTerms.sales.day;
+    }
 
     if (item.addreses && item.address.length > 0) {
       customerSql.shippingAddress = {
