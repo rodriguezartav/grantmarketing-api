@@ -58,7 +58,7 @@ module.exports = async function Run(integrationMap) {
 
     const update = shopifyProducts
       .filter((item) => {
-        if (sfItemsIndex[item.sku]){
+        if (sfItemsIndex[item.sku]) {
           sfItemsIndex[item.sku] = item;
           console.log("NOTIFY", "Duplicated SKU in Shopify", item.sku, item);
         }
@@ -69,7 +69,7 @@ module.exports = async function Run(integrationMap) {
         let newVariants = item.variants.map((variant) => {
           let sku = variant.sku;
 
-          if (sku.length == 9) sku = "0" + sku;
+          if (sku && sku.length == 9) sku = "0" + sku;
           let product = productMap[sku];
           if (product) {
             sfItems.push({
@@ -89,13 +89,13 @@ module.exports = async function Run(integrationMap) {
             //item.handle,
             //item.variants.map((variant) => variant.sku).join(",")
             //);
-             return variant;
+            return variant;
           }
         });
 
         return {
           id: item.id,
-          variants:   newVariants  ,
+          variants: newVariants,
           published: allMapped,
         };
       });
