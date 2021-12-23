@@ -8,7 +8,9 @@ router.post("/", async function (req, res) {
   const slack = await Slack();
   try {
     const knex = Knex();
-    console.log("******", req.body);
+
+    if (!req.body.payload) return res.sendStatus(200);
+
     const parsed = JSON.parse(req.body.payload);
     const events = parsed.events;
     const search = parsed.saved_search.query;
