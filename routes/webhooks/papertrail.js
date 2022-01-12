@@ -10,7 +10,7 @@ router.post("/", async function (req, res) {
     const knex = Knex();
 
     if (!req.body.payload) return res.sendStatus(200);
-
+    console.log(req.body.payload);
     const parsed = JSON.parse(req.body.payload);
     const events = parsed.events;
     const search = parsed.saved_search.query;
